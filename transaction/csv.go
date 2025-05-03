@@ -23,7 +23,6 @@ package transaction
 import (
 	"errors"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -120,7 +119,7 @@ func (trn *Transaction) ParseCSV(fields []string, format CSVformat) error {
 
 // StringCSV returns a string representing this transaction in CSV record format.
 func (trn Transaction) StringCSV( /*format CSVformat?*/ ) string {
-	amt := strconv.FormatFloat(trn.Amount, 'f', 2, 64)
+	amt := formatAmount(trn.Amount)
 	flds := []string{trn.Date, trn.ThisAccount, trn.OtherAccount, trn.Memo, amt}
 
 	return strings.Join(flds, ",")
@@ -232,11 +231,11 @@ func parseValue(fields []string, format CSVformat) (float64, error) {
 
 	switch {
 	case amt != "":
-		return parseFloat64(amt)
+		return parseAmount(amt)
 	case crt != "" && dbt == "":
-		return parsePositiveFloat64(crt)
+		return parsePositiveAmount(crt)
 	case dbt != "" && crt == "":
-		val, err := parsePositiveFloat64(dbt)
+		val, err := parsePositiveAmount(dbt)
 
 		return val * -1.00, err
 	default:

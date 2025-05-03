@@ -28,8 +28,10 @@ import (
 func (trn Transaction) StringLedger() string {
 	const sep = "  " // The hard separator (see section 5.6 of [Ledger 3 manual]).
 
-	return fmt.Sprintf("%v %v\n%v%v%v%.2f\n%v%v\n",
+	amt := formatAmount(trn.Amount)
+
+	return fmt.Sprintf("%v %v\n%v%v%v%v\n%v%v\n",
 		trn.Date, trn.Memo,
-		sep, trn.ThisAccount, sep, trn.Amount,
+		sep, trn.ThisAccount, sep, amt,
 		sep, trn.OtherAccount)
 }

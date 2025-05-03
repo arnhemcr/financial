@@ -34,7 +34,6 @@ package transaction
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -108,36 +107,4 @@ func parseDate(str, format string) (string, error) {
 	}
 
 	return val.Format(time.DateOnly), nil
-}
-
-/*
-ParseFloat64 returns the float64 value parsed from str and nil.
-If it fails to parse a value, parseFloat64 returns an error.
-*/
-func parseFloat64(str string) (float64, error) {
-	val, err := strconv.ParseFloat(str, 64)
-	if err != nil {
-		return 0.00, fmt.Errorf("parseFloat64: %w", err)
-	}
-
-	return val, nil
-}
-
-var errNotPositive = errors.New("numeric value must be positive (0 < value)")
-
-/*
-ParsePositiveFloat64 returns the positive float64 value parsed from str and nil.
-If it fails to parse a positive value, parsePositiveFloat64 returns the first error.
-*/
-func parsePositiveFloat64(str string) (float64, error) {
-	val, err := parseFloat64(str)
-	if err != nil {
-		return 0.00, err
-	}
-
-	if val <= 0.00 {
-		return 0.00, errNotPositive
-	}
-
-	return val, nil
 }
