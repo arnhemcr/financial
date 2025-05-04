@@ -27,8 +27,8 @@ import (
 )
 
 /*
-ParseAmount returns the float64 value parsed from str and nil.
-If it fails to parse a value, parseAmount returns an error.
+ParseAmount returns the amount parsed from str and nil.
+If it fails to parse an amount, parseAmount returns the error.
 */
 func parseAmount(str string) (float64, error) {
 	amt, err := strconv.ParseFloat(str, 64)
@@ -42,8 +42,8 @@ func parseAmount(str string) (float64, error) {
 var errNotPositive = errors.New("amount must be positive (0 < value)")
 
 /*
-ParsePositiveAmount returns the positive float64 value parsed from str and nil.
-If it fails to parse a positive value, parsePositiveAmount returns the first error.
+ParsePositiveAmount returns the positive amount parsed from str and nil.
+If it fails to parse a positive amount, parsePositiveAmount returns the first error.
 */
 func parsePositiveAmount(str string) (float64, error) {
 	amt, err := parseAmount(str)
@@ -58,7 +58,7 @@ func parsePositiveAmount(str string) (float64, error) {
 	return amt, nil
 }
 
-// FormatAmount returns a string representing a float64 value.
+// FormatAmount returns the string representing amount.
 func formatAmount(amount float64) string {
 	return strconv.FormatFloat(amount, 'f', 2, 64)
 }

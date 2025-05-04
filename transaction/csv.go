@@ -37,19 +37,19 @@ type CSVformat struct {
 		 * 0: this field is not contained in these records
 		 * 1..NFields: each non-zero field index must be unique
 	*/
-	// If the amount index is zero then both the credit and debit indexes must be non-zero.
+	// If the amount index is zero then the credit and debit indexes must both be non-zero.
 	AmountI, CreditI, DebitI uint8
 	DateI                    uint8
+	DateFormat               string // The format of dates in the records Go style e.g. "02/01/2006".
 	MemoI                    uint8
 	OtherAccountI            uint8  // The name or number of the other account in this transaction.
-	ThisAccountI             uint8  // If the this account index is zero then this account must be a non-empty string.
-	DateFormat               string // The format of dates in the records Go style e.g. "02/01/2006".
+	ThisAccountI             uint8  // If the this account index is zero, this account must be a non-empty string.
 	ThisAccount              string // The name or number of this account.
 }
 
 const NIndexes = 7 // The number of field indexes in a CSV format.
 
-// GetAfFormat returns arnhemcr/financial format for CSV records representing transactions.
+// GetAfFormat returns the arnhemcr/financial CSV format.
 func GetAfFormat() CSVformat {
 	return CSVformat{
 		NFields: 5,
@@ -117,8 +117,8 @@ func (trn *Transaction) ParseCSV(fields []string, format CSVformat) error {
 	return nil
 }
 
-// StringCSV returns a string representing this transaction in CSV record format.
-func (trn Transaction) StringCSV( /*format CSVformat?*/ ) string {
+// StringCSV returns the string representing this transaction in arnhemcr/transacttion CSV format.
+func (trn Transaction) StringCSV() string {
 	amt := formatAmount(trn.Amount)
 	flds := []string{trn.Date, trn.ThisAccount, trn.OtherAccount, trn.Memo, amt}
 
@@ -224,7 +224,7 @@ func (format CSVformat) areOptionsValid() error {
 
 /*
 ParseValue parses the value of a transaction from either the amount, credit or debit fields.
-If it fails to parse a value, parseValue returns an error.
+If it fails to parse the value, parseValue returns the error.
 */
 func parseValue(fields []string, format CSVformat) (float64, error) {
 	amt, crt, dbt := fields[format.AmountI], fields[format.CreditI], fields[format.DebitI]
