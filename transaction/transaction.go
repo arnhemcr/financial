@@ -1,21 +1,21 @@
 /*
 Copyright (C) 2025 Andrew Flint.
 
-This file is part of arnhemcr/financial/transaction.
+This file is part of arnhemcr/financial.
 
-Arnhemcr/financial/transaction is free software:
+Arnhemcr/financial is free software:
 you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Arnhemcr/financial/transaction is distributed in the hope that it will be useful,
+Arnhemcr/financial is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with arnhemcr/financial/transaction.
+along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
 
@@ -69,7 +69,7 @@ func (trn Transaction) Validate() error {
 
 	_, err := time.Parse(time.DateOnly, trn.Date)
 	if err != nil {
-		return fmt.Errorf("transaction.Validate: %w", err)
+		return fmt.Errorf("validate: %w", err)
 	}
 
 	if trn.Memo == "" {
@@ -103,7 +103,7 @@ If it fails to parse a date, parseDate returns an error.
 func parseDate(str, format string) (string, error) {
 	val, err := time.Parse(format, str)
 	if err != nil {
-		return "", fmt.Errorf("parseDate: %w", err)
+		return "", fmt.Errorf("parsedate: %w", err)
 	}
 
 	return val.Format(time.DateOnly), nil

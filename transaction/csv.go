@@ -1,21 +1,21 @@
 /*
 Copyright (C) 2025 Andrew Flint.
 
-This file is part of arnhemcr/financial/transaction.
+This file is part of arnhemcr/financial.
 
-Arnhemcr/financial/transaction is free software:
+Arnhemcr/financial is free software:
 you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Arnhemcr/financial/transaction is distributed in the hope that it will be useful,
+Arnhemcr/financial is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with arnhemcr/financial/transaction.
+along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
 package transaction
@@ -49,14 +49,14 @@ type CSVformat struct {
 
 const NIndexes = 7 // The number of field indexes in a CSV format.
 
-// GetStdFormat returns a standard format for CSV records representing transactions.
-func GetStdFormat() CSVformat {
+// GetAfFormat returns arnhemcr/financial format for CSV records representing transactions.
+func GetAfFormat() CSVformat {
 	return CSVformat{
 		NFields: 5,
 		DateI:   1, DateFormat: "2006-01-02",
-		ThisAccountI: 2, ThisAccount: "", OtherAccountI: 3,
+		ThisAccountI: 2, OtherAccountI: 3,
 		MemoI:   4,
-		AmountI: 5, CreditI: 0, DebitI: 0,
+		AmountI: 5,
 	}
 }
 
