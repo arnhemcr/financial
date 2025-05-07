@@ -41,6 +41,24 @@ func TestHappyConfig(t *testing.T) {
 	}
 }
 
+func TestHappyLedger(t *testing.T) {
+	t.Parallel()
+
+	trn0 := Transaction{
+		Date:        "2025-05-05",
+		ThisAccount: "ABC", OtherAccount: "XYZ",
+		Memo:   "Transfer",
+		Amount: -1.23,
+	}
+
+	expect := "2025-05-05 Transfer\n  ABC  -1.23\n  XYZ\n"
+
+	got := trn0.StringLedger()
+	if got != expect {
+		t.Fatalf("wrong StringLedger: expected==%q, got==%q\n", expect, got)
+	}
+}
+
 func TestHappyTransactKBAmount(t *testing.T) {
 	t.Parallel()
 
