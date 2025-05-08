@@ -340,17 +340,45 @@ func TestUnhappyTransact(t *testing.T) {
 	}
 }
 
+func TestUnhappyTransactAccount(t *testing.T) {
+	t.Parallel()
+
+	// this and that cannot be the same account
+	trn := Transaction{
+		Date:        "2025-05-07",
+		ThisAccount: "PCUS1", OtherAccount: "PCUS1",
+		Memo:   "Oh dear!",
+		Amount: 0.01,
+	}
+
+	err := trn.Validate()
+	if err == nil {
+		t.Fatalf("wrong trn.Validate: expected!=nil, got==nil")
+	}
+}
+
 func TestUnhappyTransactAmount(t *testing.T) {
 	t.Parallel()
 
-	format := pcu
+	format := kbFull
+
+	// amount cannot be zero
+	flds := []string{"ZZ-YYYY-XXXXXXX-WW", "29-12-2023", "Automatic Payment Rates MISS E MACD ;Ref: Rates MISS E MACD",
+		"AP", "Rates", "E", "", "", "", "", "MISS E MACD", "AA-BBBB-CCCCCCC-DD", "0.00", "", "0.00", "1434.23"}
 
 	var trn Transaction
 
-	// either credit or debit fields must have a value not both
-	flds := []string{"07/01/2020", "554PHP 18832946 Best of Health", "16.92", "16.92", "265.01"}
-
 	err := trn.ParseCSV(flds, format)
+	if err == nil {
+		t.Fatalf("wrong trn.ParseCSV: expected!=nil, got==nil")
+	}
+
+	format = pcu
+
+	// either credit or debit fields must have a value not both
+	flds = []string{"07/01/2020", "554PHP 18832946 Best of Health", "16.92", "16.92", "265.01"}
+
+	err = trn.ParseCSV(flds, format)
 	if err == nil {
 		t.Fatalf("wrong trn.ParseCSV: expected!=nil, got==nil")
 	}

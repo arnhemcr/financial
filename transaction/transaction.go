@@ -22,10 +22,12 @@ If not, see <https://www.gnu.org/licenses/>.
 /*
 Package transaction represents financial transactions.
 It offers methods to:
-  - parse a transaction from a [comma-separated values] (CSV) record in an arbitrary format
-  - string a transaction to the package's own CSV record format or[Ledger] format
 
-[comma-separated values]: https://www.ietf.org/rfc/rfc4180.txt "Common Format and MIME Type for Comma-Separated Values (CSV) Files"
+  - parse a transaction from a [comma-separated values] (CSV) record in an arbitrary format
+
+  - string a transaction to the package's own CSV record format or [Ledger] format
+
+[comma-separated values]: https://www.ietf.org/rfc/rfc4180.txt
 [Ledger]: https://ledger-cli.org "Ledger command-line accounting"
 
 [Ledger 3 Manual]: https://ledger-cli.org/docs.html
@@ -85,15 +87,20 @@ func (trn Transaction) Validate() error {
 		return errThisAccount
 	}
 
+	if trn.OtherAccount == trn.ThisAccount {
+		return errAccounts
+	}
+
 	return nil
 }
 
 var (
+	errAccounts     = errors.New("this account cannot be the same as that account")
 	errAmount       = errors.New("amount cannot be zero")
-	errCreditDebit  = errors.New("credit and debit cannot both be empty string or non-empty string")
+	errCreditDebit  = errors.New("credit and debit cannot both be empty string or both non-empty string")
 	errMemo         = errors.New("memo cannot be empty string")
 	errNFields      = errors.New("wrong number of fields")
-	errOtherAccount = errors.New("this account cannot be empty string")
+	errOtherAccount = errors.New("other account cannot be empty string")
 	errThisAccount  = errors.New("this account cannot be empty string")
 )
 
