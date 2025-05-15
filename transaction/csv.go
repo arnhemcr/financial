@@ -117,12 +117,12 @@ func (trn *Transaction) ParseCSV(fields []string, format CSVformat) error {
 	return nil
 }
 
-// StringCSV returns the string representing this transaction in arnhemcr/transacttion CSV format.
+// StringCSV returns this transaction as a CSV record in arnhemcr/transaction format.
 func (trn Transaction) StringCSV() string {
 	amt := formatAmount(trn.Amount)
 	flds := []string{trn.Date, trn.ThisAccount, trn.OtherAccount, trn.Memo, amt}
 
-	return strings.Join(flds, ",")
+	return strings.Join(flds, ",") + "\n"
 }
 
 /*

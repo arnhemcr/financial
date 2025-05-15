@@ -130,7 +130,7 @@ func TestHappyTransactMini(t *testing.T) {
 		t.Fatalf("wrong trn.IsValid: expected==true, got==false\n")
 	}
 
-	expect := "2025-04-17,Mini,Imbalance,A penny for your thoughts.,0.01"
+	expect := "2025-04-17,Mini,Imbalance,A penny for your thoughts.,0.01\n"
 	got := trn.StringCSV()
 
 	if got != expect {
@@ -153,7 +153,7 @@ func TestHappyTransactPCUCredit(t *testing.T) {
 		t.Fatalf("wrong trn.ParseCSV: expected==nil, got==%v", err)
 	}
 
-	expect := "2019-11-28,Assets:Current:PCUS1,Imbalance,HealthAndLif eInsuranceAn dSubs ARNHEMCR BP,123.00"
+	expect := "2019-11-28,Assets:Current:PCUS1,Imbalance,HealthAndLif eInsuranceAn dSubs ARNHEMCR BP,123.00\n"
 	got := trn.StringCSV()
 
 	if got != expect {
@@ -176,7 +176,7 @@ func TestHappyTransactPCUDebit(t *testing.T) {
 		t.Fatalf("wrong trn.ParseCSV: expected==nil, got==%v", err)
 	}
 
-	expect := "2020-01-07,Assets:Current:PCUS1,Imbalance,554PHP 18832946 Best of Health,-16.92"
+	expect := "2020-01-07,Assets:Current:PCUS1,Imbalance,554PHP 18832946 Best of Health,-16.92\n"
 	got := trn.StringCSV()
 
 	if got != expect {
@@ -198,7 +198,7 @@ func TestHappyTransactOutIn(t *testing.T) {
 	}
 
 	// format then parse a transaction using the standard CSV format
-	expect := "2025-05-02,Assets:Current:KB05,Assets:Current:PCUS1,To term deposit,42.00"
+	expect := "2025-05-02,Assets:Current:KB05,Assets:Current:PCUS1,To term deposit,42.00\n"
 	got := trn0.StringCSV()
 
 	if got != expect {
@@ -206,6 +206,8 @@ func TestHappyTransactOutIn(t *testing.T) {
 	}
 
 	var trn1 Transaction
+
+	got = strings.TrimRight(got, "\n")
 
 	err := trn1.ParseCSV(strings.Split(got, ","), GetAfFormat())
 	if err != nil {
