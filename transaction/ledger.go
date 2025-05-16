@@ -24,9 +24,9 @@ import (
 	"fmt"
 )
 
-// StringLedger returns the string representing this transaction in [Ledger] format.
+// StringLedger returns this transaction as a Ledger journal entry.
 func (trn Transaction) StringLedger() string {
-	const sep = "  " // The hard separator (see section 5.6 of the [Ledger 3 manual]).
+	const sep = "  " // The hard separator (see section 5.6 of the Ledger 3 manual).
 
 	amt := formatAmount(trn.Amount)
 

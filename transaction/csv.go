@@ -29,22 +29,31 @@ import (
 
 // A CSVformat defines the format of CSV records representing financial transactions.
 type CSVformat struct {
+	/*
+		The name of the account these records belong to.
+		If it is an empty string, the records must contain a this account field.
+	*/
+	ThisAccount string
+
 	NFields uint8 // The number of fields in each record.
+
 	/*
 		The indexes of fields in the records.
 		Index values can be:
 
 		 * 0: this field is not contained in these records
-		 * 1..NFields: each non-zero field index must be unique
+		 * 1..NFields
 	*/
-	// If the amount index is zero then the credit and debit indexes must both be non-zero.
-	AmountI, CreditI, DebitI uint8
-	DateI                    uint8
-	DateFormat               string // The format of dates in the records Go style e.g. "02/01/2006".
-	MemoI                    uint8
-	OtherAccountI            uint8  // The name or number of the other account in this transaction.
-	ThisAccountI             uint8  // If the this account index is zero, this account must be a non-empty string.
-	ThisAccount              string // The name or number of this account.
+	AmountI uint8
+	// If the amount index is zero, both the credit and debit indexes must be non-zero.
+	CreditI, DebitI uint8
+	DateI           uint8
+	MemoI           uint8
+	OtherAccountI   uint8
+	ThisAccountI    uint8
+
+	// The Go-style format of the date field in the records e.g. "02/01/2006".
+	DateFormat string
 }
 
 const NIndexes = 7 // The number of field indexes in a CSV format.
@@ -52,11 +61,13 @@ const NIndexes = 7 // The number of field indexes in a CSV format.
 // GetAfFormat returns the arnhemcr/financial CSV format.
 func GetAfFormat() CSVformat {
 	return CSVformat{
-		NFields: 5,
-		DateI:   1, DateFormat: "2006-01-02",
-		ThisAccountI: 2, OtherAccountI: 3,
-		MemoI:   4,
-		AmountI: 5,
+		NFields:       5,
+		DateI:         1,
+		ThisAccountI:  2,
+		OtherAccountI: 3,
+		MemoI:         4,
+		AmountI:       5,
+		DateFormat:    "2006-01-02",
 	}
 }
 
@@ -77,7 +88,7 @@ func (trn *Transaction) ParseCSV(fields []string, format CSVformat) error {
 
 	/*
 		Prepend fields with an empty string,
-		so a field with index zero has a value of empty string.
+		so a field whose index is zero has a value of empty string.
 	*/
 	flds := slices.Insert(fields, 0, "")
 
@@ -117,7 +128,7 @@ func (trn *Transaction) ParseCSV(fields []string, format CSVformat) error {
 	return nil
 }
 
-// StringCSV returns this transaction as a CSV record in arnhemcr/transaction format.
+// StringCSV returns this transaction as an arnhemcr/financial CSV record.
 func (trn Transaction) StringCSV() string {
 	amt := formatAmount(trn.Amount)
 	flds := []string{trn.Date, trn.ThisAccount, trn.OtherAccount, trn.Memo, amt}

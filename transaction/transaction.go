@@ -24,13 +24,10 @@ Package transaction represents financial transactions.
 It offers methods to:
 
   - parse a transaction from a [comma-separated values] (CSV) record in an arbitrary format
-
-  - string a transaction to the package's own CSV record format or [Ledger] format
+  - string a transaction to the package's own CSV record format or [Ledger] journal format
 
 [comma-separated values]: https://www.ietf.org/rfc/rfc4180.txt
-[Ledger]: https://ledger-cli.org "Ledger command-line accounting"
-
-[Ledger 3 Manual]: https://ledger-cli.org/docs.html
+[Ledger]: https://ledger-cli.org
 */
 package transaction
 

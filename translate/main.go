@@ -48,7 +48,7 @@ Other account is optional, and it has a default value.
 # Parsing and configuration
 
 The parsing configuration is built into the format structure in function main.
-It can be updated to translate CSV account statements in other formats.
+It can be updated to translate other CSV formats.
 
 # References
 
@@ -215,7 +215,7 @@ It is a filter which:
   - writes the transactions, in Ledger format ordered by date ascending, to standard output
 
 The parsing configuration is built into the format structure in function main.
-It can be updated to translate CSV account statements in other formats.
+It can be updated to translate other CSV formats.
 The flags are:
 
 `)
