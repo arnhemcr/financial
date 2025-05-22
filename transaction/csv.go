@@ -60,8 +60,8 @@ type CSVFormat struct {
 	DateLayout string
 }
 
-// GetAFFormat returns the format for parsing arnhemcr/financial CSV records.
-func GetAFFormat() CSVFormat {
+// GetDefault returns the package's default CSV record format.
+func GetDefault() CSVFormat {
 	return CSVFormat{
 		NFields:       6,
 		DateI:         1,
