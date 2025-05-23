@@ -5,7 +5,7 @@ from an arbitrary [comma-separated values (CSV)] format
 into a standard format.
 It allows transactions in different formats,
 from different financial institutions or account types,
-to be combined.
+to be combined for analysis.
 
 Arnhemcr/financial is a Go module, which contains a package and a program.
 
@@ -15,7 +15,7 @@ Package transaction represents financial transactions.
 It offers:
 
 * a configurable parser for CSV records into transactions
-* stringers for transactions into the package's default CSV records or [Ledger] journal entries
+* stringers for transactions into the package's CSV records or [Ledger] journal entries
 
 ## Program translate
 

@@ -19,44 +19,6 @@ along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
 
-/*
-Translate translates financial transactions
-from a [comma-separated values (CSV)] format
-to [Ledger] journal entries or arnhemcr/financial CSV records.
-
-# Overview
-
-Translate is a [filter] which:
-
-  - reads a CSV account statement from standard input
-  - parses a transaction's fields from those in the CSV record on each line
-  - writes the transactions, by date ascending, to standard output
-
-# Transactions and accounts
-
-A financial transaction on an account statement is the transfer of money (an amount)
-between the account the statement belongs to (this account)
-and another account (other account) on a particular date.
-
-The CSV records in a statement may contain account numbers e.g. 01-2345-6789012-34.
-Financial software, including Ledger, identifies account by name e.g. Assets:Current.
-
-This account is mandatory.
-Its value can be set from a field in the CSV records,
-and can be overridden from the translate command line (-t flag).
-Other account is optional, and it has a default value.
-
-# Parsing and configuration
-
-The parsing configuration is built into the format structure in function main.
-It can be updated to translate other CSV formats.
-
-# References
-
-[comma-separated values (CSV)]: https://www.ietf.org/rfc/rfc4180.txt
-[filter]: https://en.wikipedia.org/wiki/Filter_(software)
-[Ledger]: https://ledger-cli.org "Ledger command-line accounting"
-*/
 package main
 
 import (
@@ -73,16 +35,15 @@ import (
 
 // The configuration returned by parseFlags.
 type config struct {
-	help          bool
-	outFormatName string
-	thisAccount   string
+	formatFileName string
+	help           bool
+	outFormatName  string
+	thisAccount    string
 }
 
 func main() {
 	log.SetPrefix(os.Args[0] + ": ")
 	log.SetFlags(0)
-
-	inFormat := aft.GetAFFormat()
 
 	cfg := parseFlags()
 	if cfg.help {
@@ -90,9 +51,21 @@ func main() {
 		os.Exit(0)
 	}
 
-	err := inFormat.Validate()
+	var err error
+
+	inFormat := aft.GetPkgFormat()
+	if cfg.formatFileName != "" {
+		inFormat, err = aft.GetFormat(cfg.formatFileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	inFormat.ThisAccount = cfg.thisAccount
+
+	err = inFormat.Validate()
 	if err != nil {
-		log.Fatalf("validate: %v", err)
+		log.Fatal(err)
 	}
 
 	r := csv.NewReader(os.Stdin)
@@ -107,7 +80,7 @@ func main() {
 
 	ts, err := parseTransactions(r, inFormat)
 	if err != nil {
-		log.Fatalf("parsetransactions: %v", err)
+		log.Fatal(err)
 	}
 
 	stringTransactions(ts, os.Stdout, cfg.outFormatName)
@@ -117,10 +90,12 @@ func main() {
 func parseFlags() config {
 	var cfg config
 
+	flag.StringVar(&cfg.formatFileName, "f", "", "format file name")
 	flag.BoolVar(&cfg.help, "h", false, "write this help text then exit")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
-		fmt.Sprintf("output format name: %q or %q", aft.CSV, aft.Ledger))
-	flag.StringVar(&cfg.thisAccount, "t", "", "this account name")
+		fmt.Sprintf("output format name: this package's %q or %q", aft.CSV, aft.Ledger))
+	flag.StringVar(&cfg.thisAccount, "t", "",
+		"this account name, the name of the account that this statement belongs to")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -182,20 +157,5 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 // Usage prints the help text for translate.
 func usage() {
 	fmt.Fprintf(os.Stderr, "usage: %v [flags]\n", os.Args[0])
-	fmt.Fprint(os.Stderr, `
-This program translates financial transactions 
-from a comma-separated values (CSV) format
-to Ledger journal entries or arnhemcr/financial CSV records.
-It is a filter which:
-
-  - reads a CSV account statement, belonging to this account, from standard input
-  - parses a transaction's fields from those in the CSV record on each line
-  - writes the transactions, ordered by date ascending, to standard output
-
-The parsing configuration is built into the format structure in function main.
-It can be updated to translate other CSV formats.
-The flags are:
-
-`)
 	flag.PrintDefaults()
 }

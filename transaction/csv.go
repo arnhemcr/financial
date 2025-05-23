@@ -21,13 +21,16 @@ If not, see <https://www.gnu.org/licenses/>.
 package transaction
 
 import (
+	"encoding/xml"
 	"errors"
+	"fmt"
+	"os"
 	"slices"
 	"strings"
 	"time"
 )
 
-const CSV = "csv" // The name of the arnhemcr/financial CSV record format.
+const CSV = "csv" // The name of this package's CSV format.
 
 // A CSVFormat defines the format of CSV records representing financial transactions.
 type CSVFormat struct {
@@ -56,12 +59,32 @@ type CSVFormat struct {
 	// If this account is an empty string, this account index must be non-zero.
 	ThisAccountI uint8
 
-	// The Go-style layout of the date field in the records e.g. "02/01/2006".
+	// The layout of the date field in the records e.g. "02/01/2006".
 	DateLayout string
 }
 
-// GetDefault returns the package's default CSV record format.
-func GetDefault() CSVFormat {
+/*
+GetFormat returns the first CSV format from the named file.
+If it fails to get a format, getFormat returns the first error.
+*/
+func GetFormat(fileName string) (CSVFormat, error) {
+	var cf CSVFormat
+
+	bs, err := os.ReadFile(fileName)
+	if err != nil {
+		return cf, fmt.Errorf("getformat: %w", err)
+	}
+
+	err = xml.Unmarshal(bs, &cf)
+	if err != nil {
+		return cf, fmt.Errorf("getformat: %w", err)
+	}
+
+	return cf, nil
+}
+
+// GetPkgFormat returns this package's CSV format.
+func GetPkgFormat() CSVFormat {
 	return CSVFormat{
 		NFields:       6,
 		DateI:         1,
@@ -131,7 +154,7 @@ func (t *Transaction) ParseCSV(fields []string, cf CSVFormat) error {
 	return nil
 }
 
-// StringCSV returns this transaction as an arnhemcr/financial CSV record.
+// StringCSV returns this transaction as a CSV record in this package's format.
 func (t Transaction) StringCSV() string {
 	a := formatAmount(t.Amount)
 	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Memo, a, t.Currency}

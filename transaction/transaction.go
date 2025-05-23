@@ -23,8 +23,8 @@ If not, see <https://www.gnu.org/licenses/>.
 Package transaction represents financial transactions.
 It offers:
 
- * a configurable parser for [comma-separated values (CSV)] records into transactions
- * stringers for transactions into the package's default CSV records or [Ledger] journal entries
+  - a configurable parser for [comma-separated values (CSV)] records into transactions
+  - stringers for transactions into the package's CSV records or [Ledger] journal entries
 
 [comma-separated values (CSV)]: https://www.ietf.org/rfc/rfc4180.txt
 [Ledger]: https://ledger-cli.org

@@ -207,11 +207,9 @@ func TestHappyTransactOutIn(t *testing.T) {
 
 	var trn1 Transaction
 
-	format := GetDefault()
-
 	got = strings.TrimRight(got, "\n")
 
-	err := trn1.ParseCSV(strings.Split(got, ","), format)
+	err := trn1.ParseCSV(strings.Split(got, ","), GetPkgFormat())
 	if err != nil {
 		t.Fatalf("wrong trn1.ParseCSV: expected==nil, got==%v", err)
 	}
