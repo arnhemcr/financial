@@ -61,8 +61,6 @@ func main() {
 		}
 	}
 
-	inFormat.ThisAccount = cfg.thisAccount
-
 	err = inFormat.Validate()
 	if err != nil {
 		log.Fatal(err)
@@ -78,7 +76,7 @@ func main() {
 	r.FieldsPerRecord = int(inFormat.NFields) // strict
 	// r.FieldsPerRecord = -1 // relaxed
 
-	ts, err := parseTransactions(r, inFormat)
+	ts, err := parseTransactions(r, cfg.thisAccount, inFormat)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,7 +91,7 @@ func parseFlags() config {
 	flag.StringVar(&cfg.formatFileName, "f", "", "format file name")
 	flag.BoolVar(&cfg.help, "h", false, "write this help text then exit")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
-		fmt.Sprintf("output format name: this package's %q or %q", aft.CSV, aft.Ledger))
+		fmt.Sprintf("output format name: this module's %q or %q", aft.CSV, aft.Ledger))
 	flag.StringVar(&cfg.thisAccount, "t", "",
 		"this account name, the name of the account that this statement belongs to")
 
@@ -113,7 +111,7 @@ parses a transaction's fields from those in the CSV record on each line
 then returns the transactions.
 If it fails to read the statement, parseTransactions returns an error.
 */
-func parseTransactions(r *csv.Reader, cf aft.CSVFormat) ([]aft.Transaction, error) {
+func parseTransactions(r *csv.Reader, thisAccount string, cf aft.CSVFormat) ([]aft.Transaction, error) {
 	var ts []aft.Transaction
 
 	for {
@@ -125,6 +123,8 @@ func parseTransactions(r *csv.Reader, cf aft.CSVFormat) ([]aft.Transaction, erro
 		}
 
 		var t aft.Transaction
+
+		t.ThisAccount = thisAccount
 
 		err = t.ParseCSV(fs, cf)
 		if err != nil {

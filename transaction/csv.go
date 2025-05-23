@@ -30,16 +30,10 @@ import (
 	"time"
 )
 
-const CSV = "csv" // The name of this package's CSV format.
+const CSV = "csv" // The name of this module's CSV format.
 
 // A CSVFormat defines the format of CSV records representing financial transactions.
 type CSVFormat struct {
-	/*
-		The name of the account these records belong to.
-		If it is an empty string, the records must contain a this account field.
-	*/
-	ThisAccount string
-
 	NFields uint8 // The number of fields in each record.
 
 	/*
@@ -83,7 +77,7 @@ func GetFormat(fileName string) (CSVFormat, error) {
 	return cf, nil
 }
 
-// GetPkgFormat returns this package's CSV format.
+// GetPkgFormat returns this module's CSV format.
 func GetPkgFormat() CSVFormat {
 	return CSVFormat{
 		NFields:       6,
@@ -143,8 +137,7 @@ func (t *Transaction) ParseCSV(fields []string, cf CSVFormat) error {
 	}
 
 	switch {
-	case cf.ThisAccount != "":
-		t.ThisAccount = cf.ThisAccount
+	case t.ThisAccount != "":
 	case fs[cf.ThisAccountI] != "":
 		t.ThisAccount = fs[cf.ThisAccountI]
 	default:
@@ -154,7 +147,7 @@ func (t *Transaction) ParseCSV(fields []string, cf CSVFormat) error {
 	return nil
 }
 
-// StringCSV returns this transaction as a CSV record in this package's format.
+// StringCSV returns this transaction as a CSV record in this module's format.
 func (t Transaction) StringCSV() string {
 	a := formatAmount(t.Amount)
 	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Memo, a, t.Currency}
@@ -211,8 +204,6 @@ var (
 	errIndexRange   = errors.New("field index is out of range")
 	errMemoI        = errors.New("memo field index cannot be zero")
 	errNFieldsRange = errors.New("number of fields in CSV record is out of range")
-	errThisAcctOpt  = errors.New("this account and this account index " +
-		"cannot be empty string and zero respectively")
 )
 
 /*
@@ -245,13 +236,9 @@ func (cf CSVFormat) areIndexesValid() error {
 
 /*
 AreOptionsValid returns nil if the combination of options is valid.
-If not, areOptionsValid returns the first error.
+If not, areOptionsValid returns the error.
 */
 func (cf CSVFormat) areOptionsValid() error {
-	if cf.ThisAccount == "" && cf.ThisAccountI == 0 {
-		return errThisAcctOpt
-	}
-
 	if (cf.AmountI == 0) && (cf.CreditI == 0 || cf.DebitI == 0) {
 		return errAmountOpt
 	}

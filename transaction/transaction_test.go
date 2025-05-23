@@ -70,6 +70,8 @@ func TestHappyTransactKBAmount(t *testing.T) {
 
 	var trn Transaction
 
+	trn.ThisAccount = "Assets:Current:KB06"
+
 	err := trn.ParseCSV(flds, format)
 	if err != nil {
 		t.Fatalf("wrong trn.ParseCSV: expected==nil, got==%v", err)
@@ -103,7 +105,7 @@ func TestHappyTransactKBAmount(t *testing.T) {
 		t.Fatalf("wrong that account: expected==%q, got==%q\n", expect, got)
 	}
 
-	expect = "ZZ-YYYY-XXXXXXX-WW"
+	expect = "Assets:Current:KB06"
 	got = trn.ThisAccount
 
 	if got != expect {
@@ -120,6 +122,8 @@ func TestHappyTransactMini(t *testing.T) {
 	flds := []string{"2025-04-17", "A penny for your thoughts.", ".01"}
 
 	var trn Transaction
+
+	trn.ThisAccount = "Mini"
 
 	err := trn.ParseCSV(flds, format)
 	if err != nil {
@@ -148,6 +152,8 @@ func TestHappyTransactPCUCredit(t *testing.T) {
 
 	var trn Transaction
 
+	trn.ThisAccount = "Assets:Current:PCUS1"
+
 	err := trn.ParseCSV(flds, format)
 	if err != nil {
 		t.Fatalf("wrong trn.ParseCSV: expected==nil, got==%v", err)
@@ -170,6 +176,8 @@ func TestHappyTransactPCUDebit(t *testing.T) {
 	flds := []string{"07/01/2020", "554PHP 18832946 Best of Health", "16.92", "", "265.01"}
 
 	var trn Transaction
+
+	trn.ThisAccount = "Assets:Current:PCUS1"
 
 	err := trn.ParseCSV(flds, format)
 	if err != nil {
@@ -307,20 +315,10 @@ func TestUnhappyConfigOptional(t *testing.T) {
 
 	format := kbFull
 
-	// this account and its field index cannot be empty string and zero respectively
-	format.ThisAccount, format.ThisAccountI = "", 0
-
-	err := format.Validate()
-	if err == nil {
-		t.Fatalf("wrong format.Validate: expected!=nil, got==nil\n")
-	}
-
-	format = kbFull
-
 	// if amount field index is zero then both credit and debit indexes must be non-zero
 	format.AmountI, format.CreditI, format.DebitI = 0, 1, 0
 
-	err = format.Validate()
+	err := format.Validate()
 	if err == nil {
 		t.Fatalf("wrong format.Validate: expected!=nil, got==nil\n")
 	}
@@ -516,19 +514,19 @@ var kbFull = CSVFormat{ // for Kiwibank full CSV statement
 	NFields: 16,
 	AmountI: 15, CreditI: 13, DateI: 2, DebitI: 14,
 	MemoI: 3, OtherAccountI: 12, ThisAccountI: 1,
-	DateLayout: "02-01-2006", ThisAccount: "",
+	DateLayout: "02-01-2006",
 }
 
 var mini = CSVFormat{ // for minimal CSV statement
 	NFields: 3,
 	AmountI: 3, CreditI: 0, DateI: 1, DebitI: 0,
 	MemoI: 2, OtherAccountI: 0, ThisAccountI: 0,
-	DateLayout: "2006-01-02", ThisAccount: "Mini",
+	DateLayout: "2006-01-02",
 }
 
 var pcu = CSVFormat{ // for PCU account CSV statement
 	NFields: 5,
 	AmountI: 0, CreditI: 4, DateI: 1, DebitI: 3,
 	MemoI: 2, OtherAccountI: 0, ThisAccountI: 0,
-	DateLayout: "02/01/2006", ThisAccount: "Assets:Current:PCUS1",
+	DateLayout: "02/01/2006",
 }

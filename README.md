@@ -15,7 +15,7 @@ Package transaction represents financial transactions.
 It offers:
 
 * a configurable parser for CSV records into transactions
-* stringers for transactions into the package's CSV records or [Ledger] journal entries
+* stringers for transactions into the module's CSV records or [Ledger] journal entries
 
 ## Program translate
 
