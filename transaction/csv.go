@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
+
 package transaction
 
 import (
@@ -34,7 +35,7 @@ const CSV = "csv" // The name of this module's CSV format.
 
 // A CSVFormat defines the format of CSV records representing financial transactions.
 type CSVFormat struct {
-	NFields uint8 // The number of fields in each record.
+	NFields uint8 // The number of fields in the records.
 
 	/*
 		The indexes of fields in the records.
@@ -49,36 +50,36 @@ type CSVFormat struct {
 	CurrencyI       uint8
 	DateI           uint8
 	MemoI           uint8
-	OtherAccountI   uint8 // The other account index can be zero.
-	// If this account is an empty string, this account index must be non-zero.
-	ThisAccountI uint8
+	// The this and other account indexes can be zero.
+	OtherAccountI uint8
+	ThisAccountI  uint8
 
 	// The layout of the date field in the records e.g. "02/01/2006".
 	DateLayout string
 }
 
 /*
-GetFormat returns the first CSV format from the named file.
+ReadFormat returns the first CSV format read from the named file.
 If it fails to get a format, getFormat returns the first error.
 */
-func GetFormat(fileName string) (CSVFormat, error) {
+func ReadFormat(fileName string) (CSVFormat, error) {
 	var cf CSVFormat
 
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return cf, fmt.Errorf("getformat: %w", err)
+		return cf, fmt.Errorf("readformat: %w", err)
 	}
 
 	err = xml.Unmarshal(bs, &cf)
 	if err != nil {
-		return cf, fmt.Errorf("getformat: %w", err)
+		return cf, fmt.Errorf("readformat: %w", err)
 	}
 
 	return cf, nil
 }
 
-// GetPkgFormat returns this module's CSV format.
-func GetPkgFormat() CSVFormat {
+// GetModuleFormat returns this module's CSV format.
+func GetModuleFormat() CSVFormat {
 	return CSVFormat{
 		NFields:       6,
 		DateI:         1,
@@ -97,7 +98,7 @@ func (cf CSVFormat) IsValid() bool {
 }
 
 /*
-ParseCSV parses this transaction from fields, according to the CSV format, and returns nil.
+ParseCSV parses this transaction from fields according to the CSV format.
 It assumes the format is valid.
 If ParseCSV fails to parse the transaction, it returns the first error.
 */
@@ -126,6 +127,8 @@ func (t *Transaction) ParseCSV(fields []string, cf CSVFormat) error {
 		return errAmount
 	}
 
+	t.Currency = fs[cf.CurrencyI]
+
 	t.Memo = fs[cf.MemoI]
 	if t.Memo == "" {
 		return errMemo
@@ -138,6 +141,10 @@ func (t *Transaction) ParseCSV(fields []string, cf CSVFormat) error {
 
 	switch {
 	case t.ThisAccount != "":
+		/*
+			This account's non-empty string value takes precedence
+			over any value in the this account field.
+		*/
 	case fs[cf.ThisAccountI] != "":
 		t.ThisAccount = fs[cf.ThisAccountI]
 	default:
@@ -149,7 +156,7 @@ func (t *Transaction) ParseCSV(fields []string, cf CSVFormat) error {
 
 // StringCSV returns this transaction as a CSV record in this module's format.
 func (t Transaction) StringCSV() string {
-	a := formatAmount(t.Amount)
+	a := stringAmount(t.Amount)
 	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Memo, a, t.Currency}
 
 	return strings.Join(fs, ",") + "\n"
@@ -208,7 +215,7 @@ var (
 
 /*
 AreIndexesValid returns nil if the field indexes in this CSV format are valid.
-It assumes the number of fields in the format NFields is in range.
+It assumes the number of fields in the format is in range.
 All indexes must be <= nFields, and all non-zero indexes must be unique.
 If not, areIndexesValid returns the first error.
 */
@@ -223,7 +230,7 @@ func (cf CSVFormat) areIndexesValid() error {
 		case cf.NFields < i:
 			return errIndexRange
 		case i == 0:
-			// CSV records do not contain this field
+			// These CSV records do not contain this field.
 		case inUse[i]:
 			return errIndexUnique
 		default:
@@ -259,9 +266,9 @@ func parseValue(fields []string, cf CSVFormat) (float64, error) {
 	case c != "" && d == "":
 		return parsePositiveAmount(c)
 	case d != "" && c == "":
-		n, err := parsePositiveAmount(d)
+		v, err := parsePositiveAmount(d)
 
-		return n * -1.00, err
+		return v * -1.00, err
 	default:
 		return 0.00, errCreditDebit
 	}

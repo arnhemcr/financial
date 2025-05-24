@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
+
 package transaction
 
 import (
@@ -27,7 +28,7 @@ import (
 )
 
 /*
-ParseAmount returns the floating-point number parsed from s.
+ParseAmount returns the floating-point number parsed from the string.
 If it fails to parse a number, parseAmount returns the error.
 */
 func parseAmount(s string) (float64, error) {
@@ -42,7 +43,7 @@ func parseAmount(s string) (float64, error) {
 var errNotPositive = errors.New("amount must be positive (0 < value)")
 
 /*
-ParsePositiveAmount returns the positive floating-point number parsed from s.
+ParsePositiveAmount returns the positive floating-point number parsed from the string.
 If it fails to parse a positive number, parsePositiveAmount returns the first error.
 */
 func parsePositiveAmount(s string) (float64, error) {
@@ -58,7 +59,7 @@ func parsePositiveAmount(s string) (float64, error) {
 	return n, nil
 }
 
-// FormatAmount returns the string representing n.
-func formatAmount(n float64) string {
+// StringAmount returns the floating-point number as a string.
+func stringAmount(n float64) string {
 	return strconv.FormatFloat(n, 'f', 2, 64)
 }

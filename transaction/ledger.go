@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
+
 package transaction
 
 import (
@@ -30,7 +31,7 @@ const Ledger = "ledger" // The name of the Ledger journal entry format.
 func (t Transaction) StringLedger() string {
 	const s = "  " // The hard separator (see section 5.6 of the Ledger 3 manual).
 
-	a := formatAmount(t.Amount)
+	a := stringAmount(t.Amount)
 
 	var c string
 

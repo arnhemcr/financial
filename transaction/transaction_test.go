@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
+
 package transaction
 
 import (
@@ -119,7 +120,7 @@ func TestHappyTransactMini(t *testing.T) {
 	format := mini
 
 	// test transaction with minimal number of fields
-	flds := []string{"2025-04-17", "A penny for your thoughts.", ".01"}
+	flds := []string{"2025-04-17", "A penny for your thoughts.", ".01", "NZD"}
 
 	var trn Transaction
 
@@ -134,7 +135,7 @@ func TestHappyTransactMini(t *testing.T) {
 		t.Fatalf("wrong trn.IsValid: expected==true, got==false\n")
 	}
 
-	expect := "2025-04-17,Mini,Imbalance,A penny for your thoughts.,0.01,\n"
+	expect := "2025-04-17,Mini,Imbalance,A penny for your thoughts.,0.01,NZD\n"
 	got := trn.StringFormat("csv")
 
 	if got != expect {
@@ -217,7 +218,7 @@ func TestHappyTransactOutIn(t *testing.T) {
 
 	got = strings.TrimRight(got, "\n")
 
-	err := trn1.ParseCSV(strings.Split(got, ","), GetPkgFormat())
+	err := trn1.ParseCSV(strings.Split(got, ","), GetModuleFormat())
 	if err != nil {
 		t.Fatalf("wrong trn1.ParseCSV: expected==nil, got==%v", err)
 	}
@@ -518,8 +519,8 @@ var kbFull = CSVFormat{ // for Kiwibank full CSV statement
 }
 
 var mini = CSVFormat{ // for minimal CSV statement
-	NFields: 3,
-	AmountI: 3, CreditI: 0, DateI: 1, DebitI: 0,
+	NFields: 4,
+	AmountI: 3, CreditI: 0, CurrencyI: 4, DateI: 1, DebitI: 0,
 	MemoI: 2, OtherAccountI: 0, ThisAccountI: 0,
 	DateLayout: "2006-01-02",
 }

@@ -53,9 +53,9 @@ func main() {
 
 	var err error
 
-	inFormat := aft.GetPkgFormat()
+	inFormat := aft.GetModuleFormat()
 	if cfg.formatFileName != "" {
-		inFormat, err = aft.GetFormat(cfg.formatFileName)
+		inFormat, err = aft.ReadFormat(cfg.formatFileName)
 		if err != nil {
 			log.Fatal(err)
 		}

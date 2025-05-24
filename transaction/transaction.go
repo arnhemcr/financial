@@ -23,8 +23,8 @@ If not, see <https://www.gnu.org/licenses/>.
 Package transaction represents financial transactions.
 It offers:
 
-  - a configurable parser for [comma-separated values (CSV)] records into transactions
-  - stringers for transactions into the package's CSV records or [Ledger] journal entries
+  - configurable parsing of [comma-separated values (CSV)] records into transactions
+  - stringing of transactions into the module's CSV records or [Ledger] journal entries
 
 [comma-separated values (CSV)]: https://www.ietf.org/rfc/rfc4180.txt
 [Ledger]: https://ledger-cli.org
@@ -44,7 +44,7 @@ on a particular date.
 */
 type Transaction struct {
 	Amount       float64
-	Currency     string // This field is not currently used.
+	Currency     string
 	Date         string
 	Memo         string // This field is also known as the description.
 	OtherAccount string // This field defaults to DefaultOtherAccount.
@@ -92,8 +92,8 @@ func (t Transaction) Validate() error {
 }
 
 /*
-StringFormat returns this transaction as a string in the named format.
-If the format name is not known, stringFormat returns empty string.
+StringFormat returns this transaction in the named format.
+If the name is not known, stringFormat returns the empty string.
 */
 func (t Transaction) StringFormat(name string) string {
 	switch name {
