@@ -21,10 +21,10 @@ It offers:
 
 Program translate is a [filter] which:
 
-  - reads an account statement line by line
-  - parses a transaction from the CSV record on each line <!--Ed: mention config-->
-  - strings each transaction into a default CSV record or Ledger journal entry
-  - writes the transaction strings <!--ordered by date ascending-->
+  - reads a CSV account statement line by line
+  - parses a transaction from the CSV record on each line according to the input format
+  - strings each transaction according to the output format
+  - writes the transaction strings
 
 [comma-separated values (CSV)]: https://www.ietf.org/rfc/rfc4180.txt
 [filter]: https://en.wikipedia.org/wiki/Filter_(software)

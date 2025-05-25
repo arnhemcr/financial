@@ -19,6 +19,14 @@ along with arnhemcr/financial.
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+/*
+Translate [filter]s financial transactions from an arbitrary [CSV] format
+to either [Ledger] journal entries or this module's CSV records.
+
+[CSV]: https://www.ietf.org/rfc/rfc4180.txt
+[filter]: https://en.wikipedia.org/wiki/Filter_(software)
+[Ledger]: https://ledger-cli.org "Ledger command-line accounting"
+*/
 package main
 
 import (
@@ -88,12 +96,14 @@ func main() {
 func parseFlags() config {
 	var cfg config
 
-	flag.StringVar(&cfg.formatFileName, "f", "", "format file name")
+	flag.StringVar(&cfg.formatFileName, "f", "",
+		"input format file name; if not set the input format defaults to this module's CSV record")
 	flag.BoolVar(&cfg.help, "h", false, "write this help text then exit")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
-		fmt.Sprintf("output format name: this module's %q or %q", aft.CSV, aft.Ledger))
+		fmt.Sprintf("output format name: %q or %q", aft.CSV, aft.Ledger))
 	flag.StringVar(&cfg.thisAccount, "t", "",
-		"this account name, the name of the account that this statement belongs to")
+		"this account name, the one this statement belongs to; "+
+			"if not set then the CSV records must contain the this account field")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -157,5 +167,24 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 // Usage prints the help text for translate.
 func usage() {
 	fmt.Fprintf(os.Stderr, "usage: %v [flags]\n", os.Args[0])
+	fmt.Fprint(os.Stderr, `
+Translate filters financial transactions from an arbitrary CSV format
+to either Ledger journal entries or this module's CSV records.
+It:
+  - reads a CSV account statement from standard input line by line
+  - parses a transaction from the CSV record on each line according to the input format
+  - strings each transaction according to the output format
+  - writes the transaction strings to standard output ordered by date ascending
+
+A financial transaction has the following fields:
+date, this and other account number or name, memo (or description), amount and currency.
+The input format links fields in a CSV record to those in a transaction.
+This module's CSV record format is:
+
+  #Date,This account,Other account,Memo,Amount,Currency
+  1982-10-01,01-2345-6789012-03,01-0101-0101010-10,Dent A salary BBC Radio,154.30,GBP
+
+Translate's flags are:
+`)
 	flag.PrintDefaults()
 }
