@@ -1,0 +1,5 @@
+Account number,Date,Memo/Description,Source Code (payment type),TP ref,TP part,TP code,OP ref,OP part,OP code,OP name,OP Bank Account Number,Amount (credit),Amount (debit),Amount,Balance
+01-2345-6789012-34,01-10-1982,Dent A salary BBC Radio,AP,Salary,BBC Radio,,,,,BBC Radio,01-0101-0101010-10,154.40,,154.30,180.22
+01-2345-6789012-34,02-10-1982,Holiday savings,,Holiday,,,,,,,12-3456-7890123-45,,50.00,-50.00,130.22
+01-2345-6789012-34,07-10-1982,155 Country Lane rates CCC,DD,Rates,CCC,,,,,CCC,98-7654-3210987-65,,10.37,-10.37,119.85
+01-2345-6789012-34,07-10-1982,Horse and Groom,,,,,,,,,,,4.38,-4.38,115.47

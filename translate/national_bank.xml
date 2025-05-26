@@ -1,0 +1,15 @@
+<CSVFormat>
+  <!--National Bank-->
+  <NFields>16</NFields>
+
+  <CurrencyI>0</CurrencyI>
+  <ThisAccountI>1</ThisAccountI>
+  <DateI>2</DateI>
+  <MemoI>3</MemoI>
+  <OtherAccountI>12</OtherAccountI>
+  <CreditI>13</CreditI>
+  <DebitI>14</DebitI>
+  <AmountI>15</AmountI>
+
+  <DateLayout>02-01-2006</DateLayout>
+</CSVFormat>
