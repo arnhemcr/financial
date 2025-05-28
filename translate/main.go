@@ -49,6 +49,8 @@ type config struct {
 	thisAccount    string
 }
 
+var errThisAccount = errors.New("this account and its index cannot be empty string and zero")
+
 func main() {
 	log.SetPrefix(os.Args[0] + ": ")
 	log.SetFlags(0)
@@ -72,6 +74,10 @@ func main() {
 	err = inFormat.Validate()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if cfg.thisAccount == "" && inFormat.ThisAccountI == 0 {
+		log.Fatal(fmt.Errorf("main: %w", errThisAccount))
 	}
 
 	r := csv.NewReader(os.Stdin)
