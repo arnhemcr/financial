@@ -1,0 +1,22 @@
+<!--CSV record format of the fictional National Bank's account statements.-->
+<CSVRecordFormat>
+  <NFields>16</NFields><!--The number of fields in the records.-->
+
+  <!--
+    The indexes of fields in the records.
+    Index values can be:
+
+      * 1..NFields or
+      * 0: this field is not contained in these records
+    -->
+  <ThisAccountI>1</ThisAccountI>
+  <DateI>2</DateI>
+  <MemoI>3</MemoI>
+  <OtherAccountI>12</OtherAccountI>
+  <CreditI>13</CreditI>
+  <DebitI>14</DebitI>
+  <AmountI>15</AmountI>
+  <CurrencyI>0</CurrencyI>
+
+  <DateLayout>02-01-2006</DateLayout>
+</CSVRecordFormat>
