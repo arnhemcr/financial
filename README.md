@@ -8,15 +8,15 @@ Arnhemcr/financial contains a program and supporting package.
 
 ## Program translate
 
-Translate [filters] transaction records from a CSV account statement into a standard format.
+Translate [filters] transaction records from a CSV account statement to a standard format.
 
 The input CSV record format is usually configured by an [XML] file.
 It defaults to this module's CSV record.
-If a statement line cannot be translated into a transaction, it is reported as an error.
+If a statement line cannot be translated to a transaction, translate prints the error.
 
 The output formats for transactions are [Ledger] journal entry, the default,
 or this module's CSV record.
-The output order for transactions is date ascending.
+The output order is date ascending.
 
 For more information and examples to try, run `go doc` in the translate directory.
 
@@ -25,7 +25,7 @@ For more information and examples to try, run `go doc` in the translate director
 This package represents a financial transaction as an instance of type Transaction.
 A transaction is the transfer of an amount of currency from one account to another.
 The transfer takes place on a date and is described by a memo.
-A statement and its transactions belong to an account, which is known as this account.
+A statement and its transactions belong to an account known as this account.
 
 This package offers:
 

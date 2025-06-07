@@ -26,6 +26,8 @@ import (
 	"strconv"
 )
 
+var errNotPositive = errors.New("amount must be positive")
+
 /*
 ParseAmount returns the floating-point number parsed from the string.
 If it fails to parse a number, parseAmount returns the error.
@@ -33,13 +35,11 @@ If it fails to parse a number, parseAmount returns the error.
 func parseAmount(s string) (float64, error) {
 	n, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0.00, err
+		return 0, err
 	}
 
 	return n, nil
 }
-
-var errNotPositive = errors.New("amount must be positive (0 < value)")
 
 /*
 ParsePositiveAmount returns the positive floating-point number parsed from the string.
@@ -47,18 +47,17 @@ If it fails to parse a positive number, parsePositiveAmount returns the first er
 */
 func parsePositiveAmount(s string) (float64, error) {
 	n, err := parseAmount(s)
-	if err != nil {
-		return 0.00, err
+	switch {
+	case err != nil:
+		return 0, err
+	case n <= 0:
+		return 0, errNotPositive
+	default:
+		return n, nil
 	}
-
-	if n <= 0.00 {
-		return 0.00, errNotPositive
-	}
-
-	return n, nil
 }
 
 // StringAmount returns the floating-point number as a string.
 func stringAmount(n float64) string {
-	return strconv.FormatFloat(n, 'f', 2, 64)
+	return strconv.FormatFloat(n, 'f', -1, 64)
 }

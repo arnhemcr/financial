@@ -20,14 +20,13 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Translate [filters] financial transactions
-from a [comma-separated values (CSV)] account statement
-to either [Ledger] journal entries or this module's CSV records.
+Translate [filters] transaction records from a
+[comma-separated values (CSV)] account statement to a standard format.
 
 # Examples
 
 Assuming translate is installed in a Unix-like environment and
-is being run from the translate source code directory,
+being run from the translate source code directory,
 here are some examples of its use.
 
 ## Run with default input and output formats
@@ -36,7 +35,7 @@ here are some examples of its use.
 		translate
 
 By default, transactions are translated
-from this module's CSV records to Ledger journal entries.
+from this module's CSV records to [Ledger] journal entries.
 The fields in the record are date,
 this account (the one this transaction belongs to), other account,
 memo, amount and currency.
@@ -47,7 +46,8 @@ memo, amount and currency.
 
 The format of a National Bank CSV statement is configured by the [XML] file (-f flag).
 Translate warns about the statement's header line, which cannot be translated.
-If other account is not set in a transaction, translate sets it to "Imbalance".
+If a transaction's other account field is empty string,
+translate resets it to "Imbalance".
 
 ## Set this account and output format
 
@@ -56,22 +56,22 @@ If other account is not set in a transaction, translate sets it to "Imbalance".
 In contrast to the last example, a Local Credit Union statement:
 
   - does not contain its own account number in a this account field
-  - contains debit and credit fields but not an amount field
+  - contains debit and credit fields instead of an amount field
   - orders transactions by date descending instead of ascending
 
 This account is set to its Ledger name (-t flag).
 The output format is set to this module's CSV records (-o flag).
-Translate outputs transactions in date ascending order.
+Translate outputs transactions ordered by date ascending.
 
-## Merge CSV statements into Ledger journal
+## Merge CSV statements to Ledger journal
 
 	translate -f national_bank.xml -t Assets:Current -o csv <national_bank.csv >all.csv
 	translate -f local_CU.xml -t Assets:Saving -o csv <local_CU.csv >>all.csv
 	sed -E -f adjust.sed all.csv | sort -t , -k 1 | translate
 
-Each CSV statement is translated into this module's CSV records.
+Each CSV statement is translated to this module's CSV records.
 The stream editor replaces account numbers with names and removes mirrored transactions.
-The CSV records are sorted by date ascending then translated into Ledger journal entries.
+The CSV records are sorted by date ascending then translated to Ledger journal entries.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
@@ -220,9 +220,8 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 // Usage prints the help text for translate.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-Translate filters financial transactions 
-from a comma-separated values (CSV) account statement in an arbitrary format
-to either Ledger journal entries or this module's CSV records.
+Translate filters financial transaction records
+from a comma-separated values (CSV) account statement to a standard format.
 
 Usage:
 

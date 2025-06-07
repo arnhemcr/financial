@@ -31,24 +31,22 @@ It offers:
 */
 package transaction
 
-import "errors"
-
 /*
 A transaction represents a financial transaction.
-It is the transfer of an amount of currency
-from one account (this account) to another (other account)
-with a memo on a date.
+It is the transfer of an amount of currency from one account to another.
+The transfer takes place on a date, and is described by a memo.
+A transaction belongs to an account known as this account.
 */
 type Transaction struct {
 	Amount       float64
 	Currency     string // can be empty string
 	Date         string
 	Memo         string
-	OtherAccount string // defaults to DefaultOtherAccount
+	OtherAccount string // defaults to "Imbalance"
 	ThisAccount  string
 }
 
-const DefaultOtherAccount = "Imbalance"
+const DefaultOtherAccount = "Imbalance" // The default value for other account.
 
 /*
 StringFormat returns this transaction in the named format.
@@ -64,12 +62,3 @@ func (t Transaction) StringFormat(name string) string {
 		return ""
 	}
 }
-
-var (
-	errAccounts     = errors.New("this account cannot be the same as other account")
-	errAmount       = errors.New("amount cannot be zero")
-	errCreditDebit  = errors.New("credit and debit cannot both be empty string or both non-empty string")
-	errMemo         = errors.New("memo cannot be empty string")
-	errOtherAccount = errors.New("other account cannot be empty string")
-	errThisAccount  = errors.New("this account cannot be empty string")
-)

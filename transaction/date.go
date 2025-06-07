@@ -24,8 +24,8 @@ package transaction
 import "time"
 
 /*
-ParseDate returns the date parsed from s, according to the date layout, as a string.
-It assumes the layout is valid for Go e.g. "2006-01-02".
+ParseDate returns the date parsed from s as a string.
+It assumes the date layout is valid e.g. "2006-01-02".
 If parseDate fails to parse a date, it returns the error.
 */
 func parseDate(s, layout string) (string, error) {

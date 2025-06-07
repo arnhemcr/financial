@@ -38,40 +38,20 @@ type CSVRecordFormat struct {
 
 	/*
 		The indexes of fields in the record.
-		Some fields are required but others are optional.
+		Some fields are required; the rest are optional.
 		The index for a required field is between 1 and NFields inclusive.
-		If the record does not contain an optional field, the field's index is zero.
+		If the record does not contain an optional field, its index is zero.
 	*/
 	// Either amount, or both credit and debit are required.
 	AmountI, CreditI, DebitI uint8
-	CurrencyI                uint8 // optional
+	CurrencyI                uint8
 	DateI                    uint8 // required
 	MemoI                    uint8 // required
-	OtherAccountI            uint8 // optional
-	ThisAccountI             uint8 // optional
+	OtherAccountI            uint8
+	ThisAccountI             uint8
 
 	// The layout of the date field in the records e.g. "02/01/2006".
 	DateLayout string
-}
-
-/*
-ReadCSVFormat returns the first CSV record format read from the named file.
-If it fails to get a format, ReadCSVFormat returns the first error.
-*/
-func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
-	var crf CSVRecordFormat
-
-	bs, err := os.ReadFile(fileName)
-	if err != nil {
-		return crf, err
-	}
-
-	err = xml.Unmarshal(bs, &crf)
-	if err != nil {
-		return crf, err
-	}
-
-	return crf, nil
 }
 
 // GetModuleCSVFormat returns this module's CSV record format.
@@ -89,7 +69,7 @@ func GetModuleCSVFormat() CSVRecordFormat {
 }
 
 /*
-ParseCSV parses this transaction from fields according to the CSV record format.
+ParseCSV parses this transaction from the CSV record fields according to the format.
 It assumes the format is valid.
 If ParseCSV fails to parse the transaction, it returns the first error.
 */
@@ -106,19 +86,20 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	var err error
 
-	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
-	if err != nil {
-		return err
-	}
-
 	t.Amount, err = parseValue(fs, crf)
-	if err != nil {
+	switch {
+	case err != nil:
 		return err
-	} else if t.Amount == 0.00 {
+	case t.Amount == 0:
 		return errAmount
 	}
 
 	t.Currency = fs[crf.CurrencyI]
+
+	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
+	if err != nil {
+		return err
+	}
 
 	t.Memo = fs[crf.MemoI]
 	if t.Memo == "" {
@@ -132,17 +113,35 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	switch {
 	case t.ThisAccount != "":
-		// This account already has a value, so ignore the this account field.
+		// This account already has a value, which takes precedence over its field.
+		return nil
 	case fs[crf.ThisAccountI] != "":
 		t.ThisAccount = fs[crf.ThisAccountI]
+
+		return nil
 	default:
 		return errThisAccount
 	}
-
-	return nil
 }
 
-// StringModuleCSV returns this transaction as a CSV record in this module's format.
+/*
+ReadCSVFormat returns the CSV record format read from the named file.
+If it fails to read a format, ReadCSVFormat returns the first error.
+*/
+func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
+	var crf CSVRecordFormat
+
+	bs, err := os.ReadFile(fileName)
+	if err != nil {
+		return crf, err
+	}
+
+	err = xml.Unmarshal(bs, &crf)
+
+	return crf, err
+}
+
+// StringModuleCSV returns this transaction as this module's CSV record.
 func (t Transaction) StringModuleCSV() string {
 	a := stringAmount(t.Amount)
 	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Memo, a, t.Currency}
@@ -155,11 +154,6 @@ Validate returns nil if this CSV record format is valid.
 If not, validate returns the first error.
 */
 func (crf CSVRecordFormat) Validate() error {
-	d, _ := time.Parse(crf.DateLayout, crf.DateLayout)
-	if d.Format(time.DateOnly) != time.DateOnly {
-		return errDateLayout
-	}
-
 	if crf.NFields < minNFields || maxNFields < crf.NFields {
 		return errNFieldsRange
 	}
@@ -169,17 +163,14 @@ func (crf CSVRecordFormat) Validate() error {
 		return err
 	}
 
-	if crf.DateI == 0 {
-		return errDateI
-	}
-
-	if crf.MemoI == 0 {
-		return errMemoI
-	}
-
 	err = crf.areOptionsValid()
 	if err != nil {
 		return err
+	}
+
+	d, _ := time.Parse(crf.DateLayout, crf.DateLayout)
+	if d.Format(time.DateOnly) != time.DateOnly {
+		return errDateLayout
 	}
 
 	return nil
@@ -192,20 +183,26 @@ const (
 )
 
 var (
+	errAmount       = errors.New("amount cannot be zero")
 	errAmountOpt    = errors.New("amount field index, or credit and debit indexes cannot both be zero")
+	errCreditDebit  = errors.New("credit and debit cannot both be empty string or both non-empty string")
 	errDateI        = errors.New("date field index cannot be zero")
 	errDateLayout   = errors.New("date layout in CSV record must be Go style e.g. \"02/01/2006\"")
 	errIndexUnique  = errors.New("field indexes cannot share a non-zero value")
 	errIndexRange   = errors.New("field index is out of range")
+	errMemo         = errors.New("memo cannot be empty string")
 	errMemoI        = errors.New("memo field index cannot be zero")
 	errNFields      = errors.New("unexpected number of fields in CSV record")
 	errNFieldsRange = errors.New("number of fields in CSV record is out of range")
+	errThisAccount  = errors.New("this account cannot be empty string")
 )
 
 /*
 AreIndexesValid returns nil if the field indexes in this CSV record format are valid.
 It assumes the number of fields in the format is in range.
-All indexes must be <= nFields, and all non-zero indexes must be unique.
+Indexes must be <= nFields.
+Each non-zero index must be unique.
+Required indexes must be non-zero.
 If not, areIndexesValid returns the first error.
 */
 func (crf CSVRecordFormat) areIndexesValid() error {
@@ -227,11 +224,19 @@ func (crf CSVRecordFormat) areIndexesValid() error {
 		}
 	}
 
-	return nil
+	switch {
+	case crf.DateI == 0:
+		return errDateI
+	case crf.MemoI == 0:
+		return errMemoI
+	default:
+		return nil
+	}
 }
 
 /*
-AreOptionsValid returns nil if the combination of options is valid.
+AreOptionsValid returns nil if the combination of optional field indexes
+in this CSV record format is valid.
 If not, areOptionsValid returns the error.
 */
 func (crf CSVRecordFormat) areOptionsValid() error {
@@ -260,8 +265,8 @@ func parseValue(fields []string, crf CSVRecordFormat) (float64, error) {
 	case d != "" && c == "":
 		v, err := parsePositiveAmount(d)
 
-		return v * -1.00, err
+		return v * -1, err
 	default:
-		return 0.00, errCreditDebit
+		return 0, errCreditDebit
 	}
 }

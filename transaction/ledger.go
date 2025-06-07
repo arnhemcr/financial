@@ -29,14 +29,13 @@ const Ledger = "ledger" // The name of the Ledger journal entry format.
 
 // StringLedger returns this transaction as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
-	const s = "  " // The Ledger hard separator.
+	const s = "  " // Ledger hard separator
 
 	a := stringAmount(t.Amount)
 
-	var c string
-
+	c := t.Currency
 	if t.Currency != "" {
-		c = " " + t.Currency
+		c = " " + c
 	}
 
 	return fmt.Sprintf("%v %v\n%v%v%v%v%v\n%v%v\n",
