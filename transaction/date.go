@@ -24,20 +24,6 @@ package transaction
 import "time"
 
 /*
-ValidateDateOnly returns nil if s is a date in the "2006-01-02" layout
-also known as time.DateOnly.
-If not, validateDateOnly returns the error.
-*/
-func validateDateOnly(s string) error {
-	_, err := time.Parse(time.DateOnly, s)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-/*
 ParseDate returns the date parsed from s, according to the date layout, as a string.
 It assumes the layout is valid for Go e.g. "2006-01-02".
 If parseDate fails to parse a date, it returns the error.

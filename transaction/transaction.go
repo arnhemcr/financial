@@ -50,37 +50,6 @@ type Transaction struct {
 
 const DefaultOtherAccount = "Imbalance"
 
-// IsValid reports whether this transaction is valid.
-func (t Transaction) IsValid() bool {
-	return t.Validate() == nil
-}
-
-/*
-Validate returns nil if this transaction is valid.
-If not, validate returns the first error.
-*/
-func (t Transaction) Validate() error {
-	err := validateDateOnly(t.Date)
-	if err != nil {
-		return err
-	}
-
-	switch {
-	case t.Amount == 0.00:
-		return errAmount
-	case t.Memo == "":
-		return errMemo
-	case t.OtherAccount == "":
-		return errOtherAccount
-	case t.ThisAccount == "":
-		return errThisAccount
-	case t.OtherAccount == t.ThisAccount:
-		return errAccounts
-	default:
-		return nil
-	}
-}
-
 /*
 StringFormat returns this transaction in the named format.
 If the name is not known, stringFormat returns the empty string.

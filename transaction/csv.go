@@ -30,7 +30,7 @@ import (
 	"time"
 )
 
-const CSV = "csv" // The name of this module's CSV format.
+const CSV = "csv" // The name of this module's CSV record format.
 
 // A CSVRecordFormat defines the format of CSV records representing financial transactions.
 type CSVRecordFormat struct {
@@ -55,10 +55,10 @@ type CSVRecordFormat struct {
 }
 
 /*
-ReadFormat returns the first CSV format read from the named file.
-If it fails to get a format, getFormat returns the first error.
+ReadCSVFormat returns the first CSV record format read from the named file.
+If it fails to get a format, ReadCSVFormat returns the first error.
 */
-func ReadFormat(fileName string) (CSVRecordFormat, error) {
+func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
 	var crf CSVRecordFormat
 
 	bs, err := os.ReadFile(fileName)
@@ -74,8 +74,8 @@ func ReadFormat(fileName string) (CSVRecordFormat, error) {
 	return crf, nil
 }
 
-// GetModuleFormat returns this module's CSV record format.
-func GetModuleFormat() CSVRecordFormat {
+// GetModuleCSVFormat returns this module's CSV record format.
+func GetModuleCSVFormat() CSVRecordFormat {
 	return CSVRecordFormat{
 		NFields:       6,
 		DateI:         1,
@@ -86,11 +86,6 @@ func GetModuleFormat() CSVRecordFormat {
 		CurrencyI:     6,
 		DateLayout:    "2006-01-02",
 	}
-}
-
-// IsValid reports whether this CSV record format is valid.
-func (crf CSVRecordFormat) IsValid() bool {
-	return crf.Validate() == nil
 }
 
 /*
@@ -156,7 +151,7 @@ func (t Transaction) StringCSV() string {
 }
 
 /*
-Validate returns nil if this CSV format is valid.
+Validate returns nil if this CSV record format is valid.
 If not, validate returns the first error.
 */
 func (crf CSVRecordFormat) Validate() error {
@@ -208,7 +203,7 @@ var (
 )
 
 /*
-AreIndexesValid returns nil if the field indexes in this CSV format are valid.
+AreIndexesValid returns nil if the field indexes in this CSV record format are valid.
 It assumes the number of fields in the format is in range.
 All indexes must be <= nFields, and all non-zero indexes must be unique.
 If not, areIndexesValid returns the first error.

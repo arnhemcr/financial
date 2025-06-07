@@ -114,9 +114,9 @@ func main() {
 
 	var err error
 
-	inFormat := aft.GetModuleFormat()
+	inFormat := aft.GetModuleCSVFormat()
 	if cfg.formatFileName != "" {
-		inFormat, err = aft.ReadFormat(cfg.formatFileName)
+		inFormat, err = aft.ReadCSVFormat(cfg.formatFileName)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -23,9 +23,9 @@ For more information and examples to try, run `go doc` in the translate director
 ## Package transaction
 
 This package represents a financial transaction as an instance of type Transaction.
-A transaction is the transfer of an amount of currency 
-from one account (this account) to another (other account).
-The transfer happens on a date and has a description or memo.
+A transaction is the transfer of an amount of currency from one account to another.
+The transfer takes place on a date and described by a memo.
+A statement and its transactions belong to an account, which is known as this account.
 
 This package offers:
 
