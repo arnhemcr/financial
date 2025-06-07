@@ -1,9 +1,10 @@
 # Arnhemcr/financial
 
-Arnhemcr/financial translates financial transactions
-from an arbitrary [comma-separated values (CSV)] format into a standard format.
-It allows CSV account statements in different formats to be merged for analysis.
-Arnhemcr/financial is a Go module which contains a program and supporting package.
+This Go module translates financial transactions
+from [comma-separated values (CSV)] to a standard format.
+It allows transactions from CSV account statements in different formats
+to be merged for analysis.
+Arnhemcr/financial contains a program and supporting package.
 
 ## Program translate
 
@@ -11,9 +12,9 @@ Translate [filters] transaction records from a CSV account statement into a stan
 
 The input CSV record format is usually configured by an [XML] file.
 It defaults to this module's CSV record.
-If a staement line cannot be translated into a transaction, it is reported as an error.
+If a statement line cannot be translated into a transaction, it is reported as an error.
 
-The output transaction format defaults to [Ledger] journal entry.
+The output transaction format defaults to a [Ledger] journal entry.
 It can also be set to this module's CSV record.
 Transactions are ordered by date ascending.
 
@@ -21,16 +22,17 @@ For more information and examples to try, run `go doc` in the translate director
 
 ## Package transaction
 
-This package represents financial transactions as Transaction structures.
+This package represents a financial transaction as an instance of type Transaction.
 A transaction is the transfer of an amount of currency 
-from one account (this account) to another (other account) 
-with a memo on a date.
+from one account (this account) to another (other account).
+The transfer happens on a date and has a description or memo.
+
 This package offers:
 
   - parsing a transaction from a CSV record
   - stringing a transaction to either a Ledger journal entry or this module's CSV record
 
-The parser is configured by a CSVRecordFormat structure.
+The parser is configured by an instance of type CSVRecordFormat.
 
 For more information, run `go doc -all` in the transaction directory.
 
