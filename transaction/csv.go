@@ -142,8 +142,8 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 	return nil
 }
 
-// StringCSV returns this transaction as a CSV record in this module's format.
-func (t Transaction) StringCSV() string {
+// StringModuleCSV returns this transaction as a CSV record in this module's format.
+func (t Transaction) StringModuleCSV() string {
 	a := stringAmount(t.Amount)
 	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Memo, a, t.Currency}
 

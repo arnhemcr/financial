@@ -57,7 +57,7 @@ If the name is not known, stringFormat returns the empty string.
 func (t Transaction) StringFormat(name string) string {
 	switch name {
 	case CSV:
-		return t.StringCSV()
+		return t.StringModuleCSV()
 	case Ledger:
 		return t.StringLedger()
 	default:
