@@ -34,11 +34,13 @@ package transaction
 /*
 A transaction represents a financial transaction.
 It is the transfer of an amount of currency from one account to another.
-The transfer takes place on a date, and is described by a memo.
+The transfer takes place on a date. 
+It is described by a memo and optionally a code e.g. "AP" for automatic payment.
 A transaction belongs to an account known as this account.
 */
 type Transaction struct {
 	Amount       float64
+	Code         string // can be empty string
 	Currency     string // can be empty string
 	Date         string
 	Memo         string

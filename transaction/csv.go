@@ -45,6 +45,7 @@ type CSVRecordFormat struct {
 	// Either amount, or both credit and debit are required.
 	AmountI, CreditI, DebitI uint8
 	CurrencyI                uint8
+	CodeI                    uint8
 	DateI                    uint8 // required
 	MemoI                    uint8 // required
 	OtherAccountI            uint8
@@ -57,13 +58,14 @@ type CSVRecordFormat struct {
 // GetModuleCSVFormat returns this module's CSV record format.
 func GetModuleCSVFormat() CSVRecordFormat {
 	return CSVRecordFormat{
-		NFields:       6,
+		NFields:       7,
 		DateI:         1,
 		ThisAccountI:  2,
 		OtherAccountI: 3,
-		MemoI:         4,
-		AmountI:       5,
-		CurrencyI:     6,
+		CodeI:         4,
+		MemoI:         5,
+		AmountI:       6,
+		CurrencyI:     7,
 		DateLayout:    "2006-01-02",
 	}
 }
@@ -94,7 +96,7 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 		return errAmount
 	}
 
-	t.Currency = fs[crf.CurrencyI]
+	t.Code, t.Currency = fs[crf.CodeI], fs[crf.CurrencyI]
 
 	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
 	if err != nil {
@@ -144,7 +146,7 @@ func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
 // StringModuleCSV returns this transaction as this module's CSV record.
 func (t Transaction) StringModuleCSV() string {
 	a := stringAmount(t.Amount)
-	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Memo, a, t.Currency}
+	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, a, t.Currency}
 
 	return strings.Join(fs, ",") + "\n"
 }

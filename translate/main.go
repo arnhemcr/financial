@@ -31,8 +31,8 @@ here are some examples of its use.
 
 ## Run with default input and output formats
 
-	echo "1982-10-08,12-3456-7890123-45,01-2345-6789012-34,Daily allowance,-30,ALD" | \
-		translate
+	echo "1982-10-08,12-3456-7890123-45,01-2345-6789012-34,DB,Daily allowance,-30,ALD" | \
+		./translate
 
 By default, transactions are translated
 from this module's CSV records to [Ledger] journal entries.

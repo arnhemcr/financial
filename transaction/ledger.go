@@ -33,13 +33,18 @@ func (t Transaction) StringLedger() string {
 
 	a := stringAmount(t.Amount)
 
-	c := t.Currency
-	if t.Currency != "" {
-		c = " " + c
+	var co, cu string
+
+	if t.Code != "" {
+		co = " (" + t.Code + ")"
 	}
 
-	return fmt.Sprintf("%v %v\n%v%v%v%v%v\n%v%v\n",
-		t.Date, t.Memo,
-		s, t.ThisAccount, s, a, c,
+	if t.Currency != "" {
+		cu = " " + t.Currency
+	}
+
+	return fmt.Sprintf("%v%v %v\n%v%v%v%v%v\n%v%v\n",
+		t.Date, co, t.Memo,
+		s, t.ThisAccount, s, a, cu,
 		s, t.OtherAccount)
 }
