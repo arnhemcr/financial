@@ -27,7 +27,7 @@ Translate [filters] transaction records from a
 
 Assuming translate is installed in a Unix-like environment and
 being run from the translate source code directory,
-here are some examples of its use.
+here are some examples to try.
 
 ## Run with default input and output formats
 
@@ -38,7 +38,7 @@ By default, transactions are translated
 from this module's CSV records to [Ledger] journal entries.
 The fields in the record are date,
 this account (the one this transaction belongs to), other account,
-memo, amount and currency.
+code, memo, amount and currency.
 
 ## Configure input format
 
@@ -47,7 +47,7 @@ memo, amount and currency.
 The format of a National Bank CSV statement is configured by the [XML] file (-f flag).
 Translate warns about the statement's header line, which cannot be translated.
 If a transaction's other account field is empty string,
-translate resets it to "Imbalance".
+translate sets it to "Imbalance".
 
 ## Set this account and output format
 
@@ -55,7 +55,7 @@ translate resets it to "Imbalance".
 
 In contrast to the last example, a Local Credit Union statement:
 
-  - does not contain its own account number in a this account field
+  - does not contain its own account number, a this account field
   - contains debit and credit fields instead of an amount field
   - orders transactions by date descending instead of ascending
 

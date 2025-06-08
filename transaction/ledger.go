@@ -27,24 +27,29 @@ import (
 
 const Ledger = "ledger" // The name of the Ledger journal entry format.
 
-// StringLedger returns this transaction as a Ledger journal entry.
+/*
+StringLedger returns this transaction as a Ledger journal entry.
+
+The format of a Ledger journal entry is described in sections
+4.1 "The Most Basic Entry" and 5.4 "Codes" of the [Ledger 3 Manual].
+*/
 func (t Transaction) StringLedger() string {
-	const s = "  " // Ledger hard separator
+	const sp, sp2 = " ", "  " // single and double space
 
 	a := stringAmount(t.Amount)
 
 	var co, cu string
 
 	if t.Code != "" {
-		co = " (" + t.Code + ")"
+		co = sp + "(" + t.Code + ")"
 	}
 
 	if t.Currency != "" {
-		cu = " " + t.Currency
+		cu = sp + t.Currency
 	}
 
 	return fmt.Sprintf("%v%v %v\n%v%v%v%v%v\n%v%v\n",
 		t.Date, co, t.Memo,
-		s, t.ThisAccount, s, a, cu,
-		s, t.OtherAccount)
+		sp, t.ThisAccount, sp2, a, cu,
+		sp, t.OtherAccount)
 }

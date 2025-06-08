@@ -36,12 +36,11 @@ const CSV = "csv" // The name of this module's CSV record format.
 type CSVRecordFormat struct {
 	NFields uint8 // The number of fields in a record.
 
-	/*
-		The indexes of fields in the record.
-		Some fields are required; the rest are optional.
-		The index for a required field is between 1 and NFields inclusive.
-		If the record does not contain an optional field, its index is zero.
-	*/
+	// The indexes of fields in the record.
+	// Some fields are required; the rest are optional.
+	// The index for a required field is between 1 and NFields inclusive.
+	// If a field is not contained in a record, its index is zero.
+	//
 	// Either amount, or both credit and debit are required.
 	AmountI, CreditI, DebitI uint8
 	CurrencyI                uint8
