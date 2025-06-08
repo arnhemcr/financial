@@ -26,13 +26,34 @@ import (
 	"strconv"
 )
 
-var errNotPositive = errors.New("amount must be positive")
+var errNotPositive = errors.New("number must be positive")
 
 /*
-ParseAmount returns the floating-point number parsed from the string.
-If it fails to parse a number, parseAmount returns the error.
+ParseAmount parses the amount of a transaction from either the amount, credit or debit fields.
+If it fails to parse an amount, parseAmount returns the error.
 */
-func parseAmount(s string) (float64, error) {
+func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
+	a, c, d := fields[crf.AmountI], fields[crf.CreditI], fields[crf.DebitI]
+
+	switch {
+	case a != "":
+		return parseFloat(a)
+	case c != "" && d == "":
+		return parsePositiveFloat(c)
+	case d != "" && c == "":
+		v, err := parsePositiveFloat(d)
+
+		return v * -1, err
+	default:
+		return 0, errCreditDebit
+	}
+}
+
+/*
+ParseFloat returns the floating-point number parsed from the string.
+If it fails to parse a number, parseFloat returns the error.
+*/
+func parseFloat(s string) (float64, error) {
 	n, err := strconv.ParseFloat(s, 64)
 	if err != nil {
 		return 0, err
@@ -42,11 +63,11 @@ func parseAmount(s string) (float64, error) {
 }
 
 /*
-ParsePositiveAmount returns the positive floating-point number parsed from the string.
-If it fails to parse a positive number, parsePositiveAmount returns the first error.
+ParsePositiveFloat returns the positive floating-point number parsed from the string.
+If it fails to parse a positive number, parsePositiveFloat returns the first error.
 */
-func parsePositiveAmount(s string) (float64, error) {
-	n, err := parseAmount(s)
+func parsePositiveFloat(s string) (float64, error) {
+	n, err := parseFloat(s)
 	switch {
 	case err != nil:
 		return 0, err

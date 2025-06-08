@@ -42,7 +42,7 @@ also known as the description and transaction type respectively.
 A transaction belongs to an account known as this account.
 */
 type Transaction struct {
-	Amount float64
+	Amount       float64
 	Code         string // can be empty string
 	Currency     string // can be empty string
 	Date         string

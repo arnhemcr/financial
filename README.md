@@ -4,19 +4,20 @@ This Go module translates financial transactions.
 It can read transactions in an arbitrary [comma-separated values (CSV)] format.
 And it can write those transactions in various standard formats.
 This module enables merging of transactions from CSV account statements in different formats.
-Arnhemcr/financial contains a program and supporting package.
+It contains a program and supporting package.
 
 ## Program translate
 
 Translate [filters] transaction records from a CSV account statement to a standard format.
 
 The input CSV record format is usually configured by an [XML] file.
-It defaults to this module's CSV record.
-If a statement line cannot be translated to a transaction, translate prints the error.
+It defaults to the format of this module's CSV record.
+If a line from the statement cannot be translated to a transaction,
+translate prints the error.
 
-The output formats for transactions are [Ledger] journal entry, the default,
+The output formats for a transaction are [Ledger] journal entry, the default,
 or this module's CSV record.
-The output order is date ascending.
+Transactions are output in date order ascending.
 
 For more information and examples to try, run `go doc` in the translate directory.
 

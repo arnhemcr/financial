@@ -87,7 +87,7 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	var err error
 
-	t.Amount, err = parseValue(fs, crf)
+	t.Amount, err = parseAmount(fs, crf)
 	switch {
 	case err != nil:
 		return err
@@ -159,12 +159,12 @@ func (crf CSVRecordFormat) Validate() error {
 		return errNFieldsRange
 	}
 
-	err := crf.areIndexesValid()
+	err := crf.validateIndexes()
 	if err != nil {
 		return err
 	}
 
-	err = crf.areOptionsValid()
+	err = crf.validateOptions()
 	if err != nil {
 		return err
 	}
@@ -199,15 +199,15 @@ var (
 )
 
 /*
-AreIndexesValid returns nil if the field indexes in this CSV record format are valid.
+ValidateIndexes returns nil if the field indexes in this CSV record format are valid.
 It assumes the number of fields in the format is in range.
 Indexes must be <= nFields.
 Each non-zero index must be unique.
 Required indexes must be non-zero.
-If not, areIndexesValid returns the first error.
+If not, validateIndexes returns the first error.
 */
-func (crf CSVRecordFormat) areIndexesValid() error {
-	is := [...]uint8{crf.AmountI, crf.CreditI, crf.DateI, crf.DebitI,
+func (crf CSVRecordFormat) validateIndexes() error {
+	is := [...]uint8{crf.AmountI, crf.CodeI, crf.CreditI, crf.DateI, crf.DebitI,
 		crf.MemoI, crf.OtherAccountI, crf.ThisAccountI}
 
 	var inUse [maxNFields + 1]bool
@@ -236,11 +236,11 @@ func (crf CSVRecordFormat) areIndexesValid() error {
 }
 
 /*
-AreOptionsValid returns nil if the combination of optional field indexes
+ValidateOptions returns nil if the combination of optional field indexes
 in this CSV record format is valid.
-If not, areOptionsValid returns the error.
+If not, validateOptions returns the error.
 */
-func (crf CSVRecordFormat) areOptionsValid() error {
+func (crf CSVRecordFormat) validateOptions() error {
 	switch {
 	case crf.AmountI != 0:
 		return nil
@@ -248,26 +248,5 @@ func (crf CSVRecordFormat) areOptionsValid() error {
 		return nil
 	default:
 		return errAmountOpt
-	}
-}
-
-/*
-ParseValue parses the value of a transaction from either the amount, credit or debit fields.
-If it fails to parse the value, parseValue returns the error.
-*/
-func parseValue(fields []string, crf CSVRecordFormat) (float64, error) {
-	a, c, d := fields[crf.AmountI], fields[crf.CreditI], fields[crf.DebitI]
-
-	switch {
-	case a != "":
-		return parseAmount(a)
-	case c != "" && d == "":
-		return parsePositiveAmount(c)
-	case d != "" && c == "":
-		v, err := parsePositiveAmount(d)
-
-		return v * -1, err
-	default:
-		return 0, errCreditDebit
 	}
 }
