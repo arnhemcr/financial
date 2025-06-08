@@ -137,6 +137,7 @@ func main() {
 		so disable the reader's check.
 	*/
 	r.FieldsPerRecord = -1
+	r.ReuseRecord = true // Reuse record instead of reallocating to improve performance.
 
 	ts, err := parseTransactions(r, cfg.thisAccount, inFormat)
 	if err != nil {
