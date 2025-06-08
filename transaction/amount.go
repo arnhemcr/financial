@@ -29,7 +29,7 @@ import (
 var errNotPositive = errors.New("number must be positive")
 
 /*
-ParseAmount parses the value of a transaction 
+ParseAmount parses the value of a transaction
 from either the amount, credit or debit fields.
 The value must be non-zero.
 If it fails to parse a non-zero value, parseAmount returns the first error.

@@ -32,6 +32,8 @@ StringLedger returns this transaction as a Ledger journal entry.
 
 The format of a Ledger journal entry is described in sections
 4.1 "The Most Basic Entry" and 5.4 "Codes" of the [Ledger 3 Manual].
+
+[Ledger 3 Manual]: https://ledger-cli.org/doc/ledger3.html
 */
 func (t Transaction) StringLedger() string {
 	const sp, sp2 = " ", "  " // single and double space

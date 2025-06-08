@@ -51,7 +51,7 @@ translate sets it to "Imbalance".
 
 ## Set this account and output format
 
-	translate -f local_CU.xml -t Assets:Saving -o csv <local_CU.csv
+	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv
 
 In contrast to the last example, a Local Credit Union statement:
 
@@ -65,13 +65,15 @@ Translate outputs transactions ordered by date ascending.
 
 ## Merge CSV statements to Ledger journal
 
-	translate -f national_bank.xml -t Assets:Current -o csv <national_bank.csv >all.csv
-	translate -f local_CU.xml -t Assets:Saving -o csv <local_CU.csv >>all.csv
-	sed -E -f adjust.sed all.csv | sort -t , -k 1 | translate
+	translate -f national_bank.xml -t Assets:Current -o modcsv <national_bank.csv >all.csv
+	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv >>all.csv
+	sed -E -f adjust.sed all.csv | sort -t , -k 1 | translate >all.journal
+	ledger -f all.journal balance
 
 Each CSV statement is translated to this module's CSV records.
 The stream editor replaces account numbers with names and removes mirrored transactions.
-The CSV records are sorted by date ascending then translated to Ledger journal entries.
+The CSV records are sorted by date ascending then translated to entries in a Ledger journal.
+Finally, Ledger reports balances for the journal.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
@@ -155,7 +157,7 @@ func parseFlags() config {
 		"input CSV record format file name (default input format is this module's CSV record)")
 	flag.BoolVar(&cfg.help, "h", false, "write this help text then exit")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
-		fmt.Sprintf("output format name: %q or %q for this module's CSV record", aft.Ledger, aft.CSV))
+		fmt.Sprintf("output format name: %q or %q for this module's CSV record", aft.Ledger, aft.ModuleCSV))
 	flag.StringVar(&cfg.thisAccount, "t", "",
 		"name of this account: the one that this statement and its transactions belong to")
 

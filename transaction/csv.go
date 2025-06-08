@@ -30,7 +30,7 @@ import (
 	"time"
 )
 
-const CSV = "csv" // The name of this module's CSV record format.
+const ModuleCSV = "modcsv" // The name of this module's CSV record format.
 
 // A CSVRecordFormat defines the format of CSV records representing financial transactions.
 type CSVRecordFormat struct {
@@ -123,8 +123,8 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 }
 
 /*
-ReadCSVFormat returns the CSV record format read from the named file.
-If it fails to read a format, ReadCSVFormat returns the first error.
+ReadCSVFormat returns a CSV record format read from the named file.
+If it fails to read the format, ReadCSVFormat returns the first error.
 */
 func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
 	var crf CSVRecordFormat
