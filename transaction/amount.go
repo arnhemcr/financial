@@ -29,23 +29,38 @@ import (
 var errNotPositive = errors.New("number must be positive")
 
 /*
-ParseAmount parses the amount of a transaction from either the amount, credit or debit fields.
-If it fails to parse an amount, parseAmount returns the error.
+ParseAmount parses the value of a transaction 
+from either the amount, credit or debit fields.
+The value must be non-zero.
+If it fails to parse a non-zero value, parseAmount returns the first error.
 */
 func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
 	a, c, d := fields[crf.AmountI], fields[crf.CreditI], fields[crf.DebitI]
 
+	var v float64
+
+	var err error
+
 	switch {
 	case a != "":
-		return parseFloat(a)
+		v, err = parseFloat(a)
 	case c != "" && d == "":
-		return parsePositiveFloat(c)
+		v, err = parsePositiveFloat(c)
 	case d != "" && c == "":
-		v, err := parsePositiveFloat(d)
+		v, err = parsePositiveFloat(d)
 
-		return v * -1, err
+		v *= -1
 	default:
 		return 0, errCreditDebit
+	}
+
+	switch {
+	case err != nil:
+		return 0, err
+	case v == 0:
+		return 0, errAmount
+	default:
+		return v, nil
 	}
 }
 

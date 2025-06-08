@@ -88,11 +88,8 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 	var err error
 
 	t.Amount, err = parseAmount(fs, crf)
-	switch {
-	case err != nil:
+	if err != nil {
 		return err
-	case t.Amount == 0:
-		return errAmount
 	}
 
 	t.Code, t.Currency = fs[crf.CodeI], fs[crf.CurrencyI]
