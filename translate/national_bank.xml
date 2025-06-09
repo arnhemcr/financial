@@ -1,13 +1,11 @@
 <!--CSV record format of the fictional National Bank's account statements.-->
 <CSVRecordFormat>
-  <NFields>16</NFields><!--The number of fields in the records.-->
+  <NFields>16</NFields><!--The number of fields in the record.-->
 
   <!--
-    The indexes of fields in the records.
-    Index values can be:
-
-      * 1..NFields or
-      * 0: this field is not contained in these records
+    The indexes of fields in the record.
+    Index values are 1..NFields inclusive or
+    zero if this field is not contained in these records.
     -->
   <ThisAccountI>1</ThisAccountI>
   <DateI>2</DateI>
@@ -17,7 +15,10 @@
   <CreditI>13</CreditI>
   <DebitI>14</DebitI>
   <AmountI>15</AmountI>
-  <CurrencyI>0</CurrencyI>
+  <!--
+    The other field is not contained in the record,
+    and its index default to zero: CurrencyI.
+    -->
 
   <DateLayout>02-01-2006</DateLayout>
 </CSVRecordFormat>

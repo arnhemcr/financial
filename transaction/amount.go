@@ -23,10 +23,15 @@ package transaction
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 )
 
-var errNotPositive = errors.New("number must be positive")
+var (
+	errAmount      = errors.New("t.parsecsv: amount cannot be zero")
+	errCreditDebit = errors.New("t.parsecsv: credit and debit cannot both be empty string or both non-empty string")
+	errNotPositive = errors.New("t.parsecsv: number must be positive")
+)
 
 /*
 ParseAmount parses the value of a transaction
@@ -71,7 +76,7 @@ If it fails to parse a number, parseFloat returns the error.
 func parseFloat(s string) (float64, error) {
 	n, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("t.parsecsv: %w", err)
 	}
 
 	return n, nil

@@ -21,7 +21,10 @@ If not, see <https://www.gnu.org/licenses/>.
 
 package transaction
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 /*
 ParseDate returns the date parsed from s as a string.
@@ -31,7 +34,7 @@ If parseDate fails to parse a date, it returns the error.
 func parseDate(s, layout string) (string, error) {
 	d, err := time.Parse(layout, s)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("t.parsecsv: %w", err)
 	}
 
 	return d.Format(time.DateOnly), nil

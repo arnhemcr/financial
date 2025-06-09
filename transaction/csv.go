@@ -24,6 +24,7 @@ package transaction
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"strings"
@@ -37,7 +38,7 @@ type CSVRecordFormat struct {
 	NFields uint8 // The number of fields in a record.
 
 	// The indexes of fields in the record.
-	// Some fields are required; the rest are optional.
+	// Some fields are required; the others are optional.
 	// The index for a required field is between 1 and NFields inclusive.
 	// If a field is not contained in a record, its index is zero.
 	//
@@ -87,17 +88,17 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	var err error
 
+	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
+	if err != nil {
+		return err
+	}
+
 	t.Amount, err = parseAmount(fs, crf)
 	if err != nil {
 		return err
 	}
 
 	t.Code, t.Currency = fs[crf.CodeI], fs[crf.CurrencyI]
-
-	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
-	if err != nil {
-		return err
-	}
 
 	t.Memo = fs[crf.MemoI]
 	if t.Memo == "" {
@@ -131,12 +132,15 @@ func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
 
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return crf, err
+		return crf, fmt.Errorf("readcsvformat: %w", err)
 	}
 
 	err = xml.Unmarshal(bs, &crf)
+	if err != nil {
+		return crf, fmt.Errorf("readcsvformat: %w", err)
+	}
 
-	return crf, err
+	return crf, nil
 }
 
 // StringModuleCSV returns this transaction as this module's CSV record.
@@ -181,18 +185,17 @@ const (
 )
 
 var (
-	errAmount       = errors.New("amount cannot be zero")
-	errAmountOpt    = errors.New("amount field index, or credit and debit indexes cannot both be zero")
-	errCreditDebit  = errors.New("credit and debit cannot both be empty string or both non-empty string")
-	errDateI        = errors.New("date field index cannot be zero")
-	errDateLayout   = errors.New("date layout in CSV record must be Go style e.g. \"02/01/2006\"")
-	errIndexUnique  = errors.New("field indexes cannot share a non-zero value")
-	errIndexRange   = errors.New("field index is out of range")
-	errMemo         = errors.New("memo cannot be empty string")
-	errMemoI        = errors.New("memo field index cannot be zero")
-	errNFields      = errors.New("unexpected number of fields in CSV record")
-	errNFieldsRange = errors.New("number of fields in CSV record is out of range")
-	errThisAccount  = errors.New("this account cannot be empty string")
+	errMemo        = errors.New("t.parsecsv: memo cannot be empty string")
+	errNFields     = errors.New("t.parsecsv: unexpected number of fields in CSV record")
+	errThisAccount = errors.New("t.parsescv: this account cannot be empty string")
+
+	errAmountOpt    = errors.New("crf.validate: amount field index, or credit and debit indexes cannot both be zero")
+	errDateI        = errors.New("crf.validate: date field index cannot be zero")
+	errDateLayout   = errors.New("crf.validate: date layout in CSV record must be Go style e.g. \"02/01/2006\"")
+	errIndexUnique  = errors.New("crf.validate: field indexes cannot share a non-zero value")
+	errIndexRange   = errors.New("crf.validate: field index is out of range")
+	errMemoI        = errors.New("crf.validate: memo field index cannot be zero")
+	errNFieldsRange = errors.New("crf.validate: number of fields in CSV record is out of range")
 )
 
 /*

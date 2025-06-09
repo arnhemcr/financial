@@ -102,7 +102,11 @@ type config struct {
 	thisAccount    string
 }
 
-var errThisAccount = errors.New("this account and its index cannot be empty string and zero")
+var (
+	errOutFormatName = errors.New("no such output format name")
+	errThisAccount   = errors.New("cannot get this account: " +
+		"CSV records do not contain that field and its flag is empty string")
+)
 
 func main() {
 	log.SetPrefix(os.Args[0] + ": ")
@@ -129,6 +133,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	switch cfg.outFormatName {
+	case aft.Ledger:
+	case aft.ModuleCSV:
+	default:
+		log.Fatalf("%q: %v", cfg.outFormatName, errOutFormatName)
+	}
+
 	if cfg.thisAccount == "" && inFormat.ThisAccountI == 0 {
 		log.Fatal(errThisAccount)
 	}
@@ -137,9 +148,11 @@ func main() {
 	/*
 		The number of fields in a record is checked by function aft.ParseCSV,
 		so disable the reader's check.
+		Set the reader to reuse its record, instead of reallocating,
+		to improve performance.
 	*/
 	r.FieldsPerRecord = -1
-	r.ReuseRecord = true // Reuse record instead of reallocating to improve performance.
+	r.ReuseRecord = true
 
 	ts, err := parseTransactions(r, cfg.thisAccount, inFormat)
 	if err != nil {
@@ -164,10 +177,6 @@ func parseFlags() config {
 	flag.Usage = usage
 	flag.Parse()
 
-	if cfg.outFormatName == "" {
-		cfg.outFormatName = aft.Ledger
-	}
-
 	return cfg
 }
 
@@ -185,7 +194,7 @@ func parseTransactions(r *csv.Reader, thisAccount string, crf aft.CSVRecordForma
 		if errors.Is(err, io.EOF) {
 			break
 		} else if err != nil {
-			return ts, err
+			return ts, fmt.Errorf("r.Read: %w", err)
 		}
 
 		var t aft.Transaction
@@ -206,7 +215,12 @@ func parseTransactions(r *csv.Reader, thisAccount string, crf aft.CSVRecordForma
 	return ts, nil
 }
 
-// StringTransactions writes the transactions in the named format ordered by date ascending.
+/*
+StringTransactions writes the transactions in the named format.
+It assumes the transactions are in date order either ascending or descending.
+If the first transaction is later than the last one,
+stringTransactions reverses the order.
+*/
 func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 	n := len(ts)
 
