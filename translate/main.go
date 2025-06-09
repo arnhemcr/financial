@@ -25,53 +25,72 @@ Translate [filters] transaction records from a
 
 # Examples
 
-Assuming translate is installed in a Unix-like environment and
-being run from the translate source code directory,
-here are some examples to try.
+The following examples explain how to use translate.
+The examples assume translate is installed in a Unix-like environment
+and is being run from its source directory.
 
-## Run with default input and output formats
+## Default input and output format
+
+Running:
 
 	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | \
-		./translate
+		translate
 
-By default, transactions are translated
-from this module's CSV records to [Ledger] journal entries.
-The fields in the record are date,
-this account (the one this transaction belongs to), other account,
-code (or transaction type), memo (or description), amount and currency.
+should produce:
 
-## Configure input format
+	1982-10-08 (DB) Daily allowance
+	 Assets:Saving  -30 ALD
+	 Assets:Current
+
+In translate, a transaction has the following fields:
+
+  - Date
+  - This account, which the transaction belongs to
+  - That account
+  - Code, also known as the type of transaction
+  - Memo, also known as the description
+  - Amount
+  - Currency
+
+This example shows the default input and output formats.
+Translate reads values from the CSV record, in this module's format, into a transaction.
+It then writes the transaction as a [Ledger] journal entry.
+
+## Custom input format
 
 	translate -f national_bank.xml <national_bank.csv
 
-A CSVRecordFormat, read from the [XML] file (-f flag),
-maps the fields in an input CSV record to the fields in a transaction within translate.
-If the other account field in the record is an empty string,
-translate sets that field in the transaction to "Imbalance".
+This example translates a CSV account statement from National Bank to Ledger journal entries.
+The bank has its own CSV statement and record format.
+An [XML] file (-f flag) configures translate for that input format with
+the number and position of fields in the record and the date layout.
 
-## Set this account and output format
+National Bank statements have a header on the first line.
+Translate warns that the line does not contain values for a transaction.
+
+## CSV records without this account
 
 	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv
 
-Another financial institution with a different CSV record format and its own XML file.
-This input record does not contain the this account field,
-so it has to be set (-t flag).
-This statement orders transactions by date descending.
+This example translates a CSV account statement from Local Credit Union to
+this module's CSV records (-o flag).
+The credit union's CSV records do not contain this account,
+so its value is set from command line (-t flag).
 
-Translate outputs the transactions as this module's CSV records (-o flag),
-and reverses their order to date ascending.
+Records in Local Credit Union account statements are ordered by date descending.
+Translate always writes transactions ordered by date ascending.
 
-## Merge CSV statements to Ledger journal
+## Ledger journal from CSV account statements
 
 	translate -f national_bank.xml -t Assets:Current -o modcsv <national_bank.csv >all.csv
 	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv >>all.csv
 	sed -E -f adjust.sed all.csv | sort -t , -k 1 | translate >all.journal
 	ledger -f all.journal balance
 
-Both statements are translated to this module's CSV records.
-The stream editor replaces account numbers with names and removes mirrored transactions.
-The records are sorted to date ascending then translated to entries in a Ledger journal.
-Finally, Ledger reports balances for the journal.
+Both statements are translated to a standard format: this module's CSV records.
+The stream editor (sed) replaces account numbers with names and removes mirrored transactions.
+The records are sorted to date ascending then translated to Ledger journal entries.
+Finally, ledger reports balances for the journal.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
