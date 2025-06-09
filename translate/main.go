@@ -31,37 +31,35 @@ here are some examples to try.
 
 ## Run with default input and output formats
 
-	echo "1982-10-08,12-3456-7890123-45,01-2345-6789012-34,DB,Daily allowance,-30,ALD" | \
+	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | \
 		./translate
 
 By default, transactions are translated
 from this module's CSV records to [Ledger] journal entries.
 The fields in the record are date,
 this account (the one this transaction belongs to), other account,
-code, memo, amount and currency.
+code (or transaction type), memo (or description), amount and currency.
 
 ## Configure input format
 
 	translate -f national_bank.xml <national_bank.csv
 
-The format of a National Bank CSV statement is configured by the [XML] file (-f flag).
-Translate warns about the statement's header line, which cannot be translated.
-If a transaction's other account field is empty string,
-translate sets it to "Imbalance".
+A CSVRecordFormat, read from the [XML] file (-f flag),
+maps the fields in an input CSV record to the fields in a transaction within translate.
+If the other account field in the record is an empty string,
+translate sets that field in the transaction to "Imbalance".
 
 ## Set this account and output format
 
 	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv
 
-In contrast to the last example, a Local Credit Union statement:
+Another financial institution with a different CSV record format and its own XML file.
+This input record does not contain the this account field,
+so it has to be set (-t flag).
+This statement orders transactions by date descending.
 
-  - does not contain its own account number, a this account field
-  - contains debit and credit fields instead of an amount field
-  - orders transactions by date descending instead of ascending
-
-This account is set to its Ledger name (-t flag).
-The output format is set to this module's CSV records (-o flag).
-Translate outputs transactions ordered by date ascending.
+Translate outputs the transactions as this module's CSV records (-o flag),
+and reverses their order to date ascending.
 
 ## Merge CSV statements to Ledger journal
 
@@ -70,9 +68,9 @@ Translate outputs transactions ordered by date ascending.
 	sed -E -f adjust.sed all.csv | sort -t , -k 1 | translate >all.journal
 	ledger -f all.journal balance
 
-Each CSV statement is translated to this module's CSV records.
+Both statements are translated to this module's CSV records.
 The stream editor replaces account numbers with names and removes mirrored transactions.
-The CSV records are sorted by date ascending then translated to entries in a Ledger journal.
+The records are sorted to date ascending then translated to entries in a Ledger journal.
 Finally, Ledger reports balances for the journal.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
