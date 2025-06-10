@@ -20,11 +20,12 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Package transaction represents financial transactions.
+Package transaction represents financial transactions as instances of type Transaction.
 It offers:
 
-  - configurable parsing of [comma-separated values (CSV)] records into transactions
-  - stringing of transactions into [Ledger] journal entries or this module's CSV records
+  - parsing a transaction from a CSV record;
+    an instance of type CSVRecordFormat configures the parser for the record format
+  - stringing a transaction to either a Ledger journal entry or this module's CSV record
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
@@ -33,10 +34,9 @@ package transaction
 
 /*
 A transaction represents a financial transaction.
-It is the transfer of an amount of currency from one account to another.
-The transfer takes place on a date.
-It is described by a memo and code.
-A transaction belongs to an account known as this account.
+It is the transfer of an amount of currency from one account to another on a date.
+It is described by a memo and code, also known as the description and type respectively.
+A transaction belong to an account known as this account.
 */
 type Transaction struct {
 	Amount       float64

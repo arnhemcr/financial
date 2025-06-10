@@ -36,7 +36,7 @@ var (
 /*
 ParseAmount parses the value of a transaction
 from either the amount, credit or debit fields.
-The value must be non-zero.
+The value cannot be zero.
 If it fails to parse a non-zero value, parseAmount returns the first error.
 */
 func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
