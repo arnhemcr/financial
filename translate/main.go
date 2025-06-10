@@ -36,7 +36,7 @@ Running:
 	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | \
 		translate
 
-should produce:
+should produce the [Ledger] journal entry:
 
 	1982-10-08 (DB) Daily allowance
 	 Assets:Saving  -30 ALD
@@ -45,16 +45,16 @@ should produce:
 In translate, a transaction has the following fields:
 
   - Date
-  - This account, which the transaction belongs to
-  - That account
+  - This account, which the transaction belongs to e.g. "Assets:Saving"
+  - That account e.g. "Assets:Current"
   - Code, also known as the type of transaction
   - Memo, also known as the description
   - Amount
   - Currency
 
 This example shows the default input and output formats.
-Translate reads values from the CSV record, in this module's format, into a transaction.
-It then writes the transaction as a [Ledger] journal entry.
+Translate reads fields from the CSV record, in this module's format, into a transaction.
+It then writes the transaction as a Ledger journal entry.
 
 ## Custom input format
 
@@ -76,6 +76,8 @@ This example translates a CSV account statement from Local Credit Union to
 this module's CSV records (-o flag).
 The credit union's CSV records do not contain this account,
 so its value is set from command line (-t flag).
+Instead of an amount, the records contain credit and debit fields,
+which are translated into the amount.
 
 Records in Local Credit Union account statements are ordered by date descending.
 Translate always writes transactions ordered by date ascending.

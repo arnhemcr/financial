@@ -9,15 +9,13 @@ This module contains a program and its supporting package.
 
 ## Program translate
 
-Translate [filters] transaction records from a CSV account statement to a standard format.
-
-The input CSV record format is configured by an [XML] file,
-which sets the number and position of fields in the record and the date layout.
-
+Translate [filters] transactions from records in a CSV account statement to a standard format.
+The format of the input CSV record is configured by an [XML] file,
+which contains the record's number and position of fields and its date layout.
 The output format for a transaction is either 
 [Ledger] journal entry or this module's CSV record.
 
-For more information and examples to try, run `go doc` in the translate directory.
+For more information and examples, see `go doc` in the translate directory.
 
 ## Package transaction
 
@@ -33,7 +31,7 @@ This package offers:
     an instance of type CSVRecordFormat configures the parser for the record format
   - stringing a transaction to either a Ledger journal entry or this module's CSV record
 
-For more information, run `go doc -all` in the transaction directory.
+For more information, see `go doc -all` in the transaction directory.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
