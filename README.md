@@ -7,15 +7,15 @@ with transactions in different CSV record formats,
 to be merged for analysis and reporting.
 This module contains a program and its supporting package.
 
-## Program translate
+## Program csv2trn
 
-Translate [filters] transactions from records in a CSV account statement to a standard format.
+CSV2trn [filters] transactions from CSV records in an account statement to a standard format.
 The format of the input CSV record is configured by an [XML] file,
 which contains the record's number and position of fields and its date layout.
 The output format for a transaction is either 
 [Ledger] journal entry or this module's CSV record.
 
-For more information and examples, see `go doc` in the translate directory.
+For more information and examples, see `go doc` in the csv2trn directory.
 
 ## Package transaction
 

@@ -20,13 +20,13 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Translate [filters] transaction records from a
-[comma-separated values (CSV)] account statement to a standard format.
+CSV2trn [filters] financial transactions from
+[comma-separated values (CSV)] records in an account statement to a standard format.
 
 # Examples
 
-The following examples explain how to use translate.
-The examples assume translate is installed in a Unix-like environment
+The following examples explain how to use csv2trn.
+The examples assume csv2trn is installed in a Unix-like environment
 and is being run from its source directory.
 
 ## Default input and output format
@@ -34,7 +34,7 @@ and is being run from its source directory.
 Running:
 
 	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | \
-		translate
+		csv2trn
 
 should produce the [Ledger] journal entry:
 
@@ -42,7 +42,7 @@ should produce the [Ledger] journal entry:
 	 Assets:Saving  -30 ALD
 	 Assets:Current
 
-In translate, a transaction has the following fields:
+In csv2trn, a transaction has the following fields:
 
   - Date
   - This account, which the transaction belongs to e.g. "Assets:Saving"
@@ -53,24 +53,24 @@ In translate, a transaction has the following fields:
   - Currency
 
 This example shows the default input and output formats.
-Translate reads fields from the CSV record, in this module's format, into a transaction.
+CSV2trn reads fields from the CSV record, in this module's format, into a transaction.
 It then writes the transaction as a Ledger journal entry.
 
 ## Custom input format
 
-	translate -f national_bank.xml <national_bank.csv
+	csv2trn -f national_bank.xml <national_bank.csv
 
 This example translates a CSV account statement from National Bank to Ledger journal entries.
 The bank has its own CSV statement and record format.
-An [XML] file (-f flag) configures translate for that input format with
+An [XML] file (-f flag) configures csv2trn for that input format with
 the number and position of fields in the record and the date layout.
 
 National Bank statements have a header on the first line,
-which translate warns is not a transaction record.
+which csv2trn warns is not a transaction record.
 
 ## CSV records without this account
 
-	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv
+	csv2trn -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv
 
 This example translates a CSV account statement from Local Credit Union to
 this module's CSV records (-o flag).
@@ -80,13 +80,13 @@ Instead of an amount, the records contain credit and debit fields,
 which are translated into the amount.
 
 Records in Local Credit Union account statements are ordered by date descending.
-Translate always writes transactions ordered by date ascending.
+CSV2trn always writes transactions ordered by date ascending.
 
 ## Ledger journal from CSV account statements
 
-	translate -f national_bank.xml -t Assets:Current -o modcsv <national_bank.csv >all.csv
-	translate -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv >>all.csv
-	sed -E -f adjust.sed all.csv | sort -t , -k 1 | translate >all.journal
+	csv2trn -f national_bank.xml -t Assets:Current -o modcsv <national_bank.csv >all.csv
+	csv2trn -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv >>all.csv
+	sed -E -f adjust.sed all.csv | sort -t , -k 1 | csv2trn >all.journal
 	ledger -f all.journal balance
 
 Both statements are translated to a standard format: this module's CSV records.
@@ -181,7 +181,7 @@ func main() {
 	stringTransactions(ts, os.Stdout, cfg.outFormatName)
 }
 
-// ParseFlags returns the values of flags from the command that ran translate.
+// ParseFlags returns the values of flags from the command that ran csv2trn.
 func parseFlags() config {
 	var cfg config
 
@@ -253,15 +253,15 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 	}
 }
 
-// Usage prints the help text for translate.
+// Usage prints the help text for csv2trn.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-Translate filters financial transaction records
-from a comma-separated values (CSV) account statement to a standard format.
+CSV2trn filters financial transactions
+from comma-separated values (CSV) records in an account statement to a standard format.
 
 Usage:
 
-	translate [flags]
+	csv2trn [flags]
 
 The flags are:
 
