@@ -1,41 +1,37 @@
 # Arnhemcr/financial
 
-This Go module translates financial transactions.
-It can read transactions in an arbitrary [comma-separated values (CSV)] format.
-And it can write those transactions in various standard formats.
-This module enables merging of transactions from CSV account statements in different formats.
-It contains a program and supporting package.
+This Go module translates financial transactions 
+from an arbitrary [comma-separated values (CSV)] format to a standard format.
+It allows account statements, 
+with transactions in different CSV record formats,
+to be merged for analysis and reporting.
+This module contains a program and its supporting package.
 
 ## Program translate
 
 Translate [filters] transaction records from a CSV account statement to a standard format.
 
-The input CSV record format is usually configured by an [XML] file.
-It defaults to the format of this module's CSV record.
-If a line from the statement cannot be translated to a transaction,
-translate prints the error.
+The input CSV record format is configured by an [XML] file,
+which sets the number and position of fields in the record and the date layout.
 
-The output formats for a transaction are [Ledger] journal entry, the default,
-or this module's CSV record.
-Transactions are output in date order ascending.
+The output format for a transaction is either 
+[Ledger] journal entry or this module's CSV record.
 
 For more information and examples to try, run `go doc` in the translate directory.
 
 ## Package transaction
 
 This package represents a financial transaction as an instance of type Transaction.
-A transaction is the transfer of an amount of currency from one account to another.
-The transfer takes place on a date.
+A transaction is the transfer of an amount of currency from one account to another on a date.
 It is described by a memo and code,
-also known as the description and transaction type respectively.
-A statement and its transactions belong to an account known as this account.
+also known as the transaction's description and type respectively.
+A transaction belong to an account known as this account.
 
 This package offers:
 
-  - parsing a transaction from a CSV record
+  - parsing a transaction from a CSV record; 
+    an instance of type CSVRecordFormat configures the parser for the record format
   - stringing a transaction to either a Ledger journal entry or this module's CSV record
-
-The parser is configured by an instance of type CSVRecordFormat.
 
 For more information, run `go doc -all` in the transaction directory.
 

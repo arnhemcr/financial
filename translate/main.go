@@ -65,8 +65,8 @@ The bank has its own CSV statement and record format.
 An [XML] file (-f flag) configures translate for that input format with
 the number and position of fields in the record and the date layout.
 
-National Bank statements have a header on the first line.
-Translate warns that the line does not contain values for a transaction.
+National Bank statements have a header on the first line,
+which translate warns is not a transaction record.
 
 ## CSV records without this account
 
