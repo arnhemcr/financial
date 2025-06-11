@@ -26,15 +26,14 @@ CSV2trn [filters] financial transactions from
 # Examples
 
 The following examples explain how to use csv2trn.
-The examples assume csv2trn is installed in a Unix-like environment
+They assume csv2trn is installed in a Unix-like environment
 and is being run from its source directory.
 
 ## Default input and output format
 
 Running:
 
-	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | \
-		csv2trn
+	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | csv2trn
 
 should produce the [Ledger] journal entry:
 
@@ -58,7 +57,7 @@ It then writes the transaction as a Ledger journal entry.
 
 ## Custom input format
 
-	csv2trn -f national_bank.xml <national_bank.csv
+	cat national_bank.csv | csv2trn -f national_bank.xml
 
 This example translates a CSV account statement from National Bank to Ledger journal entries.
 The bank has its own CSV statement and record format.
@@ -70,7 +69,7 @@ which csv2trn warns is not a transaction record.
 
 ## CSV records without this account
 
-	csv2trn -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv
+	cat local_CU.csv | csv2trn -f local_CU.xml -t Assets:Saving -o modcsv
 
 This example translates a CSV account statement from Local Credit Union to
 this module's CSV records (-o flag).
@@ -84,13 +83,16 @@ CSV2trn always writes transactions ordered by date ascending.
 
 ## Ledger journal from CSV account statements
 
-	csv2trn -f national_bank.xml -t Assets:Current -o modcsv <national_bank.csv >all.csv
-	csv2trn -f local_CU.xml -t Assets:Saving -o modcsv <local_CU.csv >>all.csv
+	cat national_bank.csv | csv2trn -f national_bank.xml -t Assets:Current -o modcsv >all.csv
+	cat local_CU.csv | csv2trn -f local_CU.xml -t Assets:Saving -o modcsv >>all.csv
 	sed -E -f adjust.sed all.csv | sort -t , -k 1 | csv2trn >all.journal
 	ledger -f all.journal balance
 
-Both statements are translated to a standard format: this module's CSV records.
-The stream editor (sed) replaces account numbers with names and removes mirrored transactions.
+Both statements are translated to this module's CSV records.
+For National Bank, the this account name from the command line
+overrides the account number from the CSV records.
+The stream editor (sed) replaces other account numbers with names
+and removes mirrored transactions.
 The records are sorted to date ascending then translated to Ledger journal entries.
 Finally, ledger reports balances for the journal.
 

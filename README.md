@@ -1,19 +1,16 @@
 # Arnhemcr/financial
 
 This Go module translates financial transactions 
-from an arbitrary [comma-separated values (CSV)] format to a standard format.
-It allows account statements, 
-with transactions in different CSV record formats,
+from arbitrary [comma-separated values (CSV)] to a standard format.
+It allows transactions from account statements with a variety of CSV record formats
 to be merged for analysis and reporting.
-This module contains a program and its supporting package.
 
 ## Program csv2trn
 
-CSV2trn [filters] transactions from CSV records in an account statement to a standard format.
-The format of the input CSV record is configured by an [XML] file,
-which contains the record's number and position of fields and its date layout.
-The output format for transactions is either
-[Ledger] journal entries or this module's CSV records.
+CSV2trn [filters] transactions from CSV records, in an account statement, to a standard format.
+The format of the input CSV records is configured by [XML].
+The format of the output transactions can be
+either [Ledger] journal entries or this module's CSV records.
 
 For more information and examples, see `go doc` in the csv2trn directory.
 
@@ -23,7 +20,7 @@ This package represents a financial transaction as an instance of type Transacti
 A transaction is the transfer of an amount of currency from one account to another on a date.
 It is described by a memo and code,
 also known as the transaction's description and type respectively.
-A transaction belong to an account known as this account.
+A transaction belongs to an account known as this account.
 
 This package offers:
 
