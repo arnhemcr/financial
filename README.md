@@ -2,7 +2,7 @@
 
 This Go module translates financial transactions 
 from arbitrary [comma-separated values (CSV)] to a standard format.
-It allows transactions from account statements with a variety of CSV record formats
+It allows transactions from account statements in a variety of CSV formats
 to be merged for analysis and reporting.
 
 ## Program csv2trn

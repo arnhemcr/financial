@@ -40,18 +40,24 @@ func (t Transaction) StringLedger() string {
 
 	a := stringAmount(t.Amount)
 
-	var co, cu string
+	cu := t.Currency
+	switch cu {
+	case "":
+		// There is no currency to associate with the amount.
+	case "$":
+		a = "$" + a
+	default:
+		a = a + sp + cu
+	}
+
+	var co string
 
 	if t.Code != "" {
 		co = sp + "(" + t.Code + ")"
 	}
 
-	if t.Currency != "" {
-		cu = sp + t.Currency
-	}
-
-	return fmt.Sprintf("%v%v %v\n%v%v%v%v%v\n%v%v\n",
+	return fmt.Sprintf("%v%v %v\n%v%v%v%v\n%v%v\n",
 		t.Date, co, t.Memo,
-		sp, t.ThisAccount, sp2, a, cu,
+		sp, t.ThisAccount, sp2, a,
 		sp, t.OtherAccount)
 }

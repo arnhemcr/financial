@@ -98,7 +98,11 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 		return err
 	}
 
-	t.Code, t.Currency = fs[crf.CodeI], fs[crf.CurrencyI]
+	t.Code = fs[crf.CodeI]
+
+	if t.Currency == "" {
+		t.Currency = fs[crf.CurrencyI]
+	}
 
 	t.Memo = fs[crf.MemoI]
 	if t.Memo == "" {
