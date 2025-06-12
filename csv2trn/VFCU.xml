@@ -1,0 +1,23 @@
+<!--
+  CSV record format of an account statement from ValuFirst Credit Union (VFCU).
+  A statement from VFCU is the example in "The convert command" section 
+  of the Ledger 3 Manual (https://ledger-cli.org/doc/).
+  -->
+<CSVRecordFormat>
+  <NFields>9</NFields><!--The number of fields in the record.-->
+
+  <!--
+    The indexes of fields in the record.
+    Index values are 1..NFields inclusive or 
+    zero if a field is not contained in the record.
+    -->
+  <DateI>2</DateI>  <DateLayout>01/02/2006</DateLayout><!--US style-->
+  <MemoI>4</MemoI>
+  <DebitI>5</DebitI>
+  <CreditI>6</CreditI>
+  <!--
+    The remaining fields are not contained in a ValuFirst record.
+    Their indexes, which default to zero, are
+    AmountI, CodeI, CurrencyI, OtherAccountI and ThisAccountI.
+    -->
+</CSVRecordFormat>
