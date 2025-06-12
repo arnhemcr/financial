@@ -197,13 +197,14 @@ func main() {
 func parseFlags() config {
 	var cfg config
 
-	flag.StringVar(&cfg.currency, "c", "", "currency for transaction amounts")
+	flag.StringVar(&cfg.currency, "c", "", fmt.Sprintf(
+		"currency for transaction amounts: %q or a currency code e.g. %q", "$", "GBP"))
 	flag.StringVar(&cfg.formatFileName, "f", "", "file name containing input CSV record format")
 	flag.BoolVar(&cfg.help, "h", false, "help text for this program then exit")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
 		fmt.Sprintf("output format name: %q or %q", aft.Ledger, aft.ModuleCSV))
-	flag.StringVar(&cfg.thisAccount, "t", "",
-		"this account name: account that transactions belong to")
+	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
+		"this account name: account the transactions belong to e.g. %q", "Assets:Current"))
 
 	flag.Usage = usage
 	flag.Parse()

@@ -15,14 +15,16 @@ either [Ledger] journal entries or this module's CSV records.
 More information and examples can be found in the csv2trn directory.
 Once there, run `go build`.
 For help text run `./csv2trn -h`, 
-and for the program's documentation and examples run `go doc`.
+and for csv2trn's documentation and examples run `go doc`.
 
 Translating arbitrary CSV account statements is a challenge for financial software.
 ["The convert command" Ledger 3 Manual] shows the issues
 with a statement from ValuFirst Credit Union.
-As an example of csv2trn, run
-`cat VFCU.csv | ./csv2trn -f VFCU.xml -t "VALUFIRST CHECKING" -c $`
-to translate that statement to Ledger journal entries.
+As an example of csv2trn, that statement can be translated to Ledger journal entries
+by running:
+```
+cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
+```
 
 ## Package transaction
 
