@@ -128,7 +128,6 @@ import (
 type config struct {
 	currency       string
 	formatFileName string
-	help           bool
 	outFormatName  string
 	thisAccount    string
 }
@@ -144,11 +143,6 @@ func main() {
 	log.SetFlags(0)
 
 	cfg := parseFlags()
-	if cfg.help {
-		usage()
-		os.Exit(0)
-	}
-
 	switch cfg.outFormatName {
 	case aft.Ledger, aft.ModuleCSV:
 		// This output format name is valid.
@@ -185,7 +179,7 @@ func main() {
 	r.FieldsPerRecord = -1
 	r.ReuseRecord = true
 
-	ts, err := parseTransactions(r, cfg.thisAccount, cfg.currency, inFormat)
+	ts, err := parseTransactions(r, cfg, inFormat)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -193,21 +187,35 @@ func main() {
 	stringTransactions(ts, os.Stdout, cfg.outFormatName)
 }
 
-// ParseFlags returns the values of flags from the command that ran csv2trn.
+/*
+ParseFlags returns the values of flags from the command that ran csv2trn.
+If the flags contain help, parseFlags writes the progam's used and exits with a zero status.
+If the flags are invalid, the program exits with a non-zero status.
+*/
 func parseFlags() config {
 	var cfg config
 
 	flag.StringVar(&cfg.currency, "c", "", fmt.Sprintf(
-		"currency for transaction amounts: %q or a currency code e.g. %q", "$", "GBP"))
-	flag.StringVar(&cfg.formatFileName, "f", "", "file name containing input CSV record format")
-	flag.BoolVar(&cfg.help, "h", false, "help text for this program then exit")
+		"currency for transaction amounts: symbol %q or a code e.g. %q", "$", "GBP"))
+	flag.StringVar(&cfg.formatFileName, "f", "",
+		"file name containing input CSV record format in XML")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
 		fmt.Sprintf("output format name: %q or %q", aft.Ledger, aft.ModuleCSV))
 	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
-		"this account name: account the transactions belong to e.g. %q", "Assets:Current"))
+		"this account name, which transactions belong to e.g. %q",
+		"Assets:Current"))
+
+	var help bool
+
+	flag.BoolVar(&help, "h", false, "write this help text then exit")
 
 	flag.Usage = usage
 	flag.Parse()
+
+	if help {
+		usage()
+		os.Exit(0)
+	}
 
 	return cfg
 }
@@ -218,8 +226,7 @@ parses a transaction's fields from those in the CSV record on each line
 then returns the transactions.
 If it fails to read the statement, parseTransactions returns an error.
 */
-func parseTransactions(r *csv.Reader, thisAccount, currency string,
-	crf aft.CSVRecordFormat) ([]aft.Transaction, error) {
+func parseTransactions(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]aft.Transaction, error) {
 	var ts []aft.Transaction
 
 	for {
@@ -232,8 +239,7 @@ func parseTransactions(r *csv.Reader, thisAccount, currency string,
 
 		var t aft.Transaction
 
-		t.Currency = currency
-		t.ThisAccount = thisAccount
+		t.Currency, t.ThisAccount = cfg.currency, cfg.thisAccount
 
 		err = t.ParseCSV(fs, crf)
 		if err != nil {

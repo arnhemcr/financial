@@ -13,9 +13,7 @@ The format of the output transactions can be
 either [Ledger] journal entries or this module's CSV records.
 
 More information and examples can be found in the csv2trn directory.
-Once there, run `go build`.
-For help text run `./csv2trn -h`, 
-and for csv2trn's documentation and examples run `go doc`.
+Once there and assuming [Go has been installed], build csv2trn by running `go build`.
 
 Translating arbitrary CSV account statements is a challenge for financial software.
 ["The convert command" Ledger 3 Manual] shows the issues
@@ -25,6 +23,8 @@ by running:
 ```
 cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
 ```
+For help on csv2trn run `./csv2trn -h`,
+and for documentation and further examples run `go doc`.
 
 ## Package transaction
 
@@ -44,6 +44,7 @@ For more information, see `go doc -all` in the transaction directory.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
+[Go has been installed]: https://go.dev/doc/install
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
 ["The convert command" Ledger 3 Manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
 [XML]: https://en.wikipedia.org/wiki/XML
