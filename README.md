@@ -24,7 +24,27 @@ by running:
 cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
 ```
 For help on csv2trn run `./csv2trn -h`,
-and for documentation and further examples run `go doc`.
+and for documentation including further examples run `go doc`.
+
+## Program mergetrn
+
+Mergetrn is another filter that merges transactions from Ledger journals:
+
+ - discarding mirrored transactions that have the code "(MT)"
+ - ordering the remaining transactions by date ascending
+
+It assumes the date layout of the journal entries is "YYYY-MM-DD"
+like the ones output by csv2trn.
+
+Mirrored transactions are an issue when merging journals of accounts that have
+transfers between those accounts.
+Each transfer has a debit transaction in one journal mirrored by a credit transaction in another.
+If one of the mirrored transactions is not discarded, the result is a double transfer.
+
+An example can be found in the mergetrn directory.
+Once there, build mergetrn by running `go build`.
+For help on mergetrn run `./mergetrn -h`,
+and for documentation including the example run `go doc`.
 
 ## Package transaction
 

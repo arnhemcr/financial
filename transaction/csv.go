@@ -88,7 +88,7 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	var err error
 
-	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
+	t.Date, err = ParseDate(fs[crf.DateI], crf.DateLayout)
 	if err != nil {
 		return err
 	}
