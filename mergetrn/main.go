@@ -24,7 +24,7 @@ Mergetrn [filters] financial transactions in the [Ledger] journal entry format:
   - discarding mirrored transactions that have the code "(MT)"
   - ordering the remaining transactions by date ascending
 
-It assumes the transaction date layout is "2006-01-02" also known as time.DateOnly.
+It assumes the date layout of journal entries is "YYYY-MM-DD".
 
 Mirrored transactions are an issue when merging journals of accounts
 that have transfers between those accounts.
@@ -42,10 +42,12 @@ and is being run from its source directory.
 
 Credit mirrored transactions have been marked with code "(MT)"
 in the National Bank emergency and Local Credit Union journals.
-Mergetrn discards those transactions.
+Mergetrn discards those transactions, and orders the remainder by date ascending.
 
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
+
+[Ledger 3 Manual]: https://ledger-cli.org/doc/ledger3.html
 */
 package main
 
@@ -73,7 +75,7 @@ func main() {
 
 	var discard bool // Whether to discard the current transaction.
 
-	// Map each date to the line of transactions made on that date.
+	// Map each date to the lines of transactions made on that date.
 	date2lines := make(map[string]string)
 
 	s := bufio.NewScanner(os.Stdin)
@@ -84,29 +86,39 @@ func main() {
 
 		n := len(fs)
 		if n == 0 {
-			continue // This line is blank.
+			continue // Discard this blank line.
 		}
 
 		const sp = ' '
 
 		if ln[0] == sp && !discard {
-			// This indented line belongs to the current transaction.
+			/*
+				This indented line belongs to the current transaction.
+				It could be an account line or a comment
+				(see "The Most Basic Entry" in [Ledger 3 Manual].
+			*/
 			date2lines[date] += ln + "\n"
 
 			continue
 		}
 
+		/*
+			This line is not indented,
+			so it does not belong to any previous transaction.
+		*/
+		discard = false
+
 		d, _ := aft.ParseDate(fs[0], time.DateOnly)
 		if d == "" {
 			/*
-				This line does not start with a date,
-				so by elimination it is probably a global comment.
+				Discard this line, which is probably a global comment
+				(see "Commenting on your Journal" in [Ledger 3 Manual]).
 			*/
 			continue
 		}
 
-		// This line is the first in the next transaction.
-		date, discard = d, false
+		// This is the first line in the next transaction.
+		date = d
 
 		if 2 <= n && fs[1] == mirrorCode {
 			// This mirrored transaction will be discarded.
@@ -132,7 +144,7 @@ func main() {
 	outputInOrder(date2lines)
 }
 
-// OutputInOrder prints the remaining transactions ordered by date ascending.
+// OutputInOrder prints the lines of the remaining transactions ordered by date ascending.
 func outputInOrder(date2lines map[string]string) {
 	var ds []string
 
