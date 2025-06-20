@@ -1,7 +1,7 @@
 <!--
   CSV record format of an account statement from ValuFirst Credit Union (VFCU).
 
-  A statement from VFCU is the example in "The convert command" Ledger 3 Manual
+  A statement from VFCU is the example in "The convert command" Ledger 3 manual
   (https://ledger-cli.org/doc/ledger3.html#The-convert-command).
   -->
 <CSVRecordFormat>

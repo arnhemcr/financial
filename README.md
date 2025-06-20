@@ -16,7 +16,7 @@ More information and examples can be found in the csv2trn directory.
 Once there and assuming [Go has been installed], build csv2trn by running `go build`.
 
 Translating arbitrary CSV account statements is a challenge for financial software.
-["The convert command" Ledger 3 Manual] shows the issues
+["The convert command" Ledger 3 manual] shows the issues
 with a statement from ValuFirst Credit Union.
 As an example of csv2trn, that statement can be translated to Ledger journal entries
 by running:
@@ -24,26 +24,27 @@ by running:
 cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
 ```
 For help on csv2trn run `./csv2trn -h`,
-and for the documentation, including further examples, run `go doc`.
+and for documentation, including further examples, run `go doc`.
 
 ## Program mergetrn
 
-Mergetrn is another filter that merges transactions from Ledger journals:
+Merge filters financial transactions from multiple Ledger journals:
 
-  - discarding mirrored transactions that have the code "(MT)"
-  - ordering the remaining transactions by date ascending
+ - discarding mirrored transactions that have been marked with the code "(MT)"
+ - ordering the remaining transactions by date ascending
 
-It assumes the date layout of the journal entries is "YYYY-MM-DD"
-like the ones output by csv2trn.
+It assumes the date layout of the journal entries is "YYYY-MM-DD".
 
-Mirrored transactions are an issue when merging journals of accounts that have
-transfers between those accounts.
-Each transfer has a debit transaction in one journal mirrored by a credit transaction in another.
-If one of the mirrored transactions is not discarded, the result is a double transfer.
+Assuming multiple accounts each with its own Ledger journal,
+transfers between those accounts will lead to mirrored transactions.
+A mirrored transaction is a debit in one journal mirrored by a credit in another.
+When those journals are merged,
+one side of each mirrored transaction must be discarded
+to avoid making the transfer twice.
 
-An example can be found in the mergetrn directory.
+The mergetrn directory contains an example.
 Once there, build mergetrn by running `go build`.
-For the documentation, including the example, run `go doc`.
+For documentation, including the example, run `go doc`.
 
 ## Package transaction
 
@@ -55,9 +56,9 @@ A transaction belongs to an account known as this account.
 
 This package offers:
 
-  - parsing a transaction from a CSV record; 
-    an instance of type CSVRecordFormat configures the parser for the record format
-  - stringing a transaction to either a Ledger journal entry or this module's CSV record
+ - parsing a transaction from a CSV record;
+   an instance of type CSVRecordFormat configures the parser for the record format
+ - stringing a transaction to either a Ledger journal entry or this module's CSV record
 
 For more information, see `go doc -all` in the transaction directory.
 
@@ -65,5 +66,5 @@ For more information, see `go doc -all` in the transaction directory.
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Go has been installed]: https://go.dev/doc/install
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-["The convert command" Ledger 3 Manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
+["The convert command" Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
 [XML]: https://en.wikipedia.org/wiki/XML

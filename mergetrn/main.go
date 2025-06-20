@@ -20,17 +20,18 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Mergetrn [filters] financial transactions in the [Ledger] journal entry format:
-  - discarding mirrored transactions that have the code "(MT)"
-  - ordering the remaining transactions by date ascending
+Merge [filters] financial transactions from multiple [Ledger] journals:
+ - discarding mirrored transactions that have been marked with the code "(MT)"
+ - ordering the remaining transactions by date ascending
 
 It assumes the date layout of journal entries is "YYYY-MM-DD".
 
-Mirrored transactions are an issue when merging journals of accounts
-that have transfers between those accounts.
-Each transfer has a debit transaction in one journal
-mirrored by a credit transaction in another.
-If one of the mirrored transactions is not discarded, the result is a double transfer.
+Assuming multiple accounts each with its own Ledger journal,
+transfers between those accounts will lead to mirrored transactions.
+A mirrored transaction is a debit in one journal mirrored by a credit in another.
+When those journals are merged,
+one side of each mirrored transaction must be discarded
+to avoid making the transfer twice.
 
 # Example
 
@@ -47,7 +48,7 @@ Mergetrn discards those transactions, and orders the remainder by date ascending
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
 
-[Ledger 3 Manual]: https://ledger-cli.org/doc/ledger3.html
+[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 package main
 
@@ -95,7 +96,7 @@ func main() {
 			/*
 				This indented line belongs to the current transaction.
 				It could be an account line or a comment
-				(see "The Most Basic Entry" in [Ledger 3 Manual].
+				(see "The Most Basic Entry" in [Ledger 3 manual].
 			*/
 			date2lines[date] += ln + "\n"
 
@@ -112,7 +113,7 @@ func main() {
 		if d == "" {
 			/*
 				Discard this line, which is probably a global comment
-				(see "Commenting on your Journal" in [Ledger 3 Manual]).
+				(see "Commenting on your Journal" in [Ledger 3 manual]).
 			*/
 			continue
 		}
@@ -175,8 +176,8 @@ func parseFlags() {
 
 func usage() {
 	fmt.Fprint(os.Stderr, `
-Mergetrn filters financial transactions in the Ledger journal format:
- - discarding mirrored transactions that have the code "(MT)"
+Merge filters financial transactions from multiple Ledger journals:
+ - discarding mirrored transactions that have been marked with the code "(MT)"
  - ordering the remaining transactions by date ascending
 
 It assumes the transaction's date layout is "2006-01-02" also known as time.DateOnly.

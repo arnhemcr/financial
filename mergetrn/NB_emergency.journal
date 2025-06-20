@@ -1,7 +1,6 @@
-; National Bank emergency account
 1982-10-01 Net interest
- Assets:Emergency  0.25 GBP
- Income:NetInterest
-1982-10-02 (MT) Emergency fund
- Assets:Emergency  10 GBP
+ Assets:Current  0.25 GBP
+ Income:Interest
+1982-10-02 Emergency fund
+ Assets:Current  10 GBP
  Assets:Current

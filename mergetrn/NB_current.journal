@@ -1,4 +1,3 @@
-; National Bank current account
 1982-10-01 (AP) Dent A salary BBC Radio
  Assets:Current  154.3 GBP
  Income:Salary
@@ -7,9 +6,8 @@
  Assets:Emergency
 1982-10-02 Holiday savings
  Assets:Current  -50 GBP
- Assets:Savings
+ Assets:Saving
 1982-10-07 (DD) 155 Country Lane rates CCC
- ; Prorated to date of demolition.
  Assets:Current  -10.37 GBP
  Expenses:Rates
 1982-10-07 Horse and Groom
