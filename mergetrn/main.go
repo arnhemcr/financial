@@ -21,8 +21,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 /*
 Merge [filters] financial transactions from multiple [Ledger] journals:
- - discarding mirrored transactions that have been marked with the code "(MT)"
- - ordering the remaining transactions by date ascending
+  - discarding mirrored transactions that have been marked with the code "(MT)"
+  - ordering the remaining transactions by date ascending
 
 It assumes the date layout of journal entries is "YYYY-MM-DD".
 
