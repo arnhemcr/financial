@@ -108,6 +108,8 @@ func main() {
 				continue
 			}
 
+			date = d
+
 			_, found := date2lines[date]
 			if !found {
 				date2lines[date] = ""
