@@ -64,7 +64,10 @@ import (
 	"time"
 )
 
-const mirrorCode = "(MT)"
+const (
+	mirrorCode = "(MT)"
+	sp         = ' '
+)
 
 func main() {
 	log.SetPrefix(os.Args[0] + ": ")
@@ -72,12 +75,9 @@ func main() {
 
 	parseFlags()
 
-	var date string // The date of the current transaction.
-
-	var discard bool // Whether to discard the current transaction.
-
-	// Map each date to the lines of transactions made on that date.
-	date2lines := make(map[string]string)
+	var date2lines = make(map[string]string) // lines of transactions made on a date
+	var date string                          // date of current transaction
+	var discard bool                         // whether to discard current transaction
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
@@ -87,51 +87,36 @@ func main() {
 
 		n := len(fs)
 		if n == 0 {
-			continue // Discard this blank line.
-		}
-
-		const sp = ' '
-
-		if ln[0] == sp && !discard {
-			/*
-				This indented line belongs to the current transaction.
-				It could be an account line or a comment
-				(see "The Most Basic Entry" in [Ledger 3 manual].
-			*/
-			date2lines[date] += ln + "\n"
-
+			// blank line
 			continue
 		}
 
-		/*
-			This line is not indented,
-			so it does not belong to any previous transaction.
-		*/
-		discard = false
+		if ln[0] != sp {
+			// global line
+			discard = false
 
-		d, _ := aft.ParseDate(fs[0], time.DateOnly)
-		if d == "" {
-			/*
-				Discard this line, which is probably a global comment
-				(see "Commenting on your Journal" in [Ledger 3 manual]).
-			*/
-			continue
-		}
+			if 2 <= n && fs[1] == mirrorCode {
+				// mirrored transaction
+				discard = true
 
-		// This is the first line in the next transaction.
-		date = d
+				continue
+			}
 
-		if 2 <= n && fs[1] == mirrorCode {
-			// This mirrored transaction will be discarded.
-			discard = true
+			d, _ := aft.ParseDate(fs[0], time.DateOnly)
+			if d == "" {
+				// probably a global comment
+				continue
+			}
 
-			continue
-		}
-
-		// Ensure there is a lines string for this date.
-		_, found := date2lines[date]
-		if !found {
-			date2lines[date] = ""
+			_, found := date2lines[date]
+			if !found {
+				date2lines[date] = ""
+			}
+		} else {
+			// transaction line: account or comment
+			if discard {
+				continue
+			}
 		}
 
 		date2lines[date] += ln + "\n"
