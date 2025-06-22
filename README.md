@@ -33,7 +33,7 @@ Merge filters financial transactions from multiple Ledger journals:
  - discarding mirrored transactions that have been marked with the code "(MT)"
  - ordering the remaining transactions by date ascending
 
-It assumes the date layout of the journal entries is "YYYY-MM-DD".
+It assumes the entries in the Ledger journals are valid, and their date layout is "YYYY-MM-DD".
 
 Assuming multiple accounts each with its own Ledger journal,
 transfers between those accounts will lead to mirrored transactions.

@@ -24,7 +24,7 @@ Merge [filters] financial transactions from multiple [Ledger] journals:
   - discarding mirrored transactions that have been marked with the code "(MT)"
   - ordering the remaining transactions by date ascending
 
-It assumes the date layout of journal entries is "YYYY-MM-DD".
+It assumes the entries in the Ledger journals are valid, and their date layout is "YYYY-MM-DD".
 
 Assuming multiple accounts each with its own Ledger journal,
 transfers between those accounts will lead to mirrored transactions.
@@ -76,49 +76,58 @@ func main() {
 	parseFlags()
 
 	var date2lines = make(map[string]string) // lines of transactions made on a date
-	var date string                          // date of current transaction
-	var discard bool                         // whether to discard current transaction
+
+	date := "0000-00-00" // date of current transaction
+	date2lines[date] = ""
+
+	var discard bool // whether to discard current transaction
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
 		ln := s.Text()
 
-		fs := strings.Fields(ln)
-
-		n := len(fs)
-		if n == 0 {
+		if len(ln) == 0 {
 			// blank line
+			discard = false
+			date2lines[date] += ln + "\n"
+
 			continue
 		}
 
-		if ln[0] != sp {
-			// global line
-			discard = false
-
-			if 2 <= n && fs[1] == mirrorCode {
-				// mirrored transaction
-				discard = true
-
-				continue
+		if ln[0] == sp {
+			// indented line that continues current transaction
+			if !discard {
+				date2lines[date] += ln + "\n"
 			}
 
-			d, _ := aft.ParseDate(fs[0], time.DateOnly)
-			if d == "" {
-				// probably a global comment
-				continue
-			}
+			continue
+		}
 
-			date = d
+		// global line, which is not indented
+		fs := strings.Fields(ln)
+		discard = false
 
-			_, found := date2lines[date]
-			if !found {
-				date2lines[date] = ""
-			}
-		} else {
-			// transaction line: account or comment
-			if discard {
-				continue
-			}
+		d, _ := aft.ParseDate(fs[0], time.DateOnly)
+		if d == "" {
+			// probably a comment
+			date2lines[date] += ln + "\n"
+
+			continue
+		}
+
+		date = d
+
+		// first line of next transaction
+		if 2 <= len(fs) && fs[1] == mirrorCode {
+			// transaction is mirrored
+			discard = true
+
+			continue
+		}
+
+		_, found := date2lines[date]
+		if !found {
+			date2lines[date] = ""
 		}
 
 		date2lines[date] += ln + "\n"
