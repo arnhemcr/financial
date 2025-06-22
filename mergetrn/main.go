@@ -84,18 +84,24 @@ func main() {
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
+		/*
+			For the layout of Ledger journal entries see
+			"The Most Basic Entry" and "Commenting on your Journal"
+			in the [Ledger 3 manual].
+		*/
 		ln := s.Text()
 
 		if len(ln) == 0 {
 			// blank line
 			discard = false
-			date2lines[date] += ln + "\n"
+			date2lines[date] += "\n"
 
 			continue
 		}
 
 		if ln[0] == sp {
-			// indented line that continues current transaction
+			// indented line that continues current transaction;
+			// it could be an account line or a transaction comment
 			if !discard {
 				date2lines[date] += ln + "\n"
 			}
@@ -109,7 +115,7 @@ func main() {
 
 		d, _ := aft.ParseDate(fs[0], time.DateOnly)
 		if d == "" {
-			// probably a comment
+			// probably a global comment
 			date2lines[date] += ln + "\n"
 
 			continue
@@ -117,9 +123,9 @@ func main() {
 
 		date = d
 
-		// first line of next transaction
+		// first line of the next transaction
 		if 2 <= len(fs) && fs[1] == mirrorCode {
-			// transaction is mirrored
+			// this transaction is mirrored
 			discard = true
 
 			continue
