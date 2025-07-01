@@ -2,7 +2,7 @@
 # adjust.sed
 #
 
-# Replace account numbers with names.
+# Replace account numbers with Ledger account names.
 s/,01-2345-6789012-34,/,Assets:Current,/
 s/,01-2345-6789012-35,/,Assets:Emergency,/
 s/,12-3456-7890123-45,/,Assets:Saving,/
@@ -13,10 +13,10 @@ s/,01-0101-0101010-10,/,Income:Salary,/
 /,Holiday savings,/s/,Imbalance,/,Assets:Current,/
 /,Net interest,/s/,Imbalance,/,Income:Interest,/
 
-# Transfers between asset and liability accounts
-# e.g. the current and saving asset accounts
-# appear as a transaction on both statements:
-# a debit from one account and a mirroring credit to the other.
-# To prevent a double transaction,
-# assume the debit exists and comment out the mirroring credit.
-/,(Assets|Liabilities):.*,(Assets|Liabilities):.*,.*,[0-9]/d
+# Transactions are loaded from the statements of the three asset accounts.
+# A transfer between those accounts will appear in two statements:
+# a debit on one and a mirroring credit on another.
+# To avoid making the transfer twice, one side of the mirror must be discarded.
+#
+# Delete credit side of a mirrored transfer between asset accounts.
+/,Assets:[^,]+,Assets:[^,]+,[^,]*,[^,]+,[0-9]/d

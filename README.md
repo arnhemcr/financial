@@ -12,8 +12,7 @@ The format of the input CSV records is configured by [XML].
 The format of the output transactions can be
 either [Ledger] journal entries or this module's CSV records.
 
-More information and examples can be found in the csv2trn directory.
-Once there and assuming [Go has been installed], build csv2trn by running `go build`.
+Assuming [Go has been installed], build csv2trn in its directory by running `go build`.
 
 Translating arbitrary CSV account statements is a challenge for financial software.
 ["The convert command" Ledger 3 manual] shows the issues
@@ -33,7 +32,7 @@ Merge filters financial transactions from multiple Ledger journals:
  - discarding mirrored transactions that have been marked with the code "(MT)"
  - ordering the remaining transactions by date ascending
 
-It assumes the entries in the Ledger journals are valid, and their date layout is "YYYY-MM-DD".
+It assumes the entries in the Ledger journals are valid and their date layout is "YYYY-MM-DD".
 
 Assuming multiple accounts each with its own Ledger journal,
 transfers between those accounts will lead to mirrored transactions.
@@ -42,9 +41,8 @@ When those journals are merged,
 one side of each mirrored transaction must be discarded
 to avoid making the transfer twice.
 
-The mergetrn directory contains an example.
-Once there, build mergetrn by running `go build`.
-For documentation, including the example, run `go doc`.
+Build mergetrn in its directory by running `go build`.
+For documentation, including an example, run `go doc`.
 
 ## Package transaction
 

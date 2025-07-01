@@ -88,6 +88,7 @@ If it fails to parse a positive number, parsePositiveFloat returns the first err
 */
 func parsePositiveFloat(s string) (float64, error) {
 	n, err := parseFloat(s)
+
 	switch {
 	case err != nil:
 		return 0, err

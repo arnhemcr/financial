@@ -23,6 +23,7 @@ package transaction
 
 import (
 	"fmt"
+	"strings"
 )
 
 const Ledger = "ledger" // The name of the Ledger journal entry format.
@@ -50,10 +51,21 @@ func (t Transaction) StringLedger() string {
 		a = a + sp + cu
 	}
 
+	const ob, cb = "(", ")" // brackets around transaction code
+
 	var co string
 
 	if t.Code != "" {
-		co = sp + "(" + t.Code + ")"
+		co = sp
+		if !strings.HasPrefix(t.Code, ob) {
+			co += ob
+		}
+
+		co += t.Code
+
+		if !strings.HasSuffix(t.Code, cb) {
+			co += cb
+		}
 	}
 
 	return fmt.Sprintf("%v%v %v\n%v%v%v%v\n%v%v\n",

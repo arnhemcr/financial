@@ -97,8 +97,8 @@ CSV2trn always writes transactions ordered by date ascending.
 
 All the statements are translated into this module's CSV format.
 None of them contain currency, so it is set from the command line (-c flag).
-For National Bank, the statement this account numbers
-are overridden with names from the command line.
+For National Bank, this account number from the statement is overridden by the name from the
+command line.
 
 The stream editor (sed) replaces other account numbers with names
 and removes mirrored records.
