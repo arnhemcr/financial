@@ -45,9 +45,11 @@ Credit mirrored transactions have been marked with code "(MT)"
 in the National Bank emergency and Local Credit Union journals.
 Mergetrn discards those transactions, and orders the remainder by date ascending.
 
+The format of a Ledger journal entry is described in the
+"Transactions and Comments" section of the [Ledger 3 manual].
+
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 package main
@@ -60,12 +62,10 @@ import (
 	"log"
 	"os"
 	"sort"
-	"strings"
-	"time"
 )
 
 const (
-	mirrorCode = aft.StartCode + "MT" + aft.EndCode
+	mirrorCode = "MT"
 	sp         = ' '
 )
 
@@ -84,11 +84,6 @@ func main() {
 
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
-		/*
-			For the layout of Ledger journal entries see
-			"The Most Basic Entry" and "Commenting on your Journal"
-			in the [Ledger 3 manual].
-		*/
 		ln := s.Text()
 
 		if len(ln) == 0 {
@@ -100,8 +95,7 @@ func main() {
 		}
 
 		if ln[0] == sp {
-			// indented line that continues current transaction;
-			// it could be an account line or a transaction comment
+			// indented line that continues current transaction
 			if !discard {
 				date2lines[date] += ln + "\n"
 			}
@@ -110,21 +104,21 @@ func main() {
 		}
 
 		// global line, which is not indented
-		fs := strings.Fields(ln)
 		discard = false
 
-		d, _ := aft.ParseDate(fs[0], time.DateOnly)
-		if d == "" {
-			// probably a global comment
+		var trn aft.Transaction
+
+		err := trn.ParseLedger([]string{ln})
+		if err != nil {
 			date2lines[date] += ln + "\n"
 
 			continue
 		}
 
-		date = d
+		date = trn.Date
 
 		// first line of the next transaction
-		if 2 <= len(fs) && fs[1] == mirrorCode {
+		if trn.Code == mirrorCode {
 			// this transaction is mirrored
 			discard = true
 
