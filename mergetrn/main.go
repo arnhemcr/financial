@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Merge [filters] financial transactions from multiple [Ledger] journals:
+Mergetrn [filters] multiple [Ledger] journals, containing financial transactions:
   - discarding mirrored transactions that have been marked with the code "(MT)"
   - ordering the remaining transactions by date ascending
 
@@ -65,7 +65,7 @@ import (
 )
 
 const (
-	mirrorCode = "(MT)"
+	mirrorCode = aft.StartCode + "MT" + aft.EndCode
 	sp         = ' '
 )
 

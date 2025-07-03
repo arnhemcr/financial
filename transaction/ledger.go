@@ -26,7 +26,11 @@ import (
 	"strings"
 )
 
-const Ledger = "ledger" // The name of the Ledger journal entry format.
+const (
+	Ledger = "ledger" // The name of the Ledger journal entry format.
+
+	StartCode, EndCode = "(", ")" // The delimiters for a transaction code.
+)
 
 /*
 StringLedger returns this transaction as a Ledger journal entry.
@@ -57,14 +61,14 @@ func (t Transaction) StringLedger() string {
 
 	if t.Code != "" {
 		co = sp
-		if !strings.HasPrefix(t.Code, ob) {
-			co += ob
+		if !strings.HasPrefix(t.Code, StartCode) {
+			co += StartCode
 		}
 
 		co += t.Code
 
-		if !strings.HasSuffix(t.Code, cb) {
-			co += cb
+		if !strings.HasSuffix(t.Code, EndCode) {
+			co += EndCode
 		}
 	}
 

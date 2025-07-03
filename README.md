@@ -27,7 +27,7 @@ and for documentation, including further examples, run `go doc`.
 
 ## Program mergetrn
 
-Merge filters financial transactions from multiple Ledger journals:
+Mergetrn [filters] multiple [Ledger] journals, containing transactions:
 
  - discarding mirrored transactions that have been marked with the code "(MT)"
  - ordering the remaining transactions by date ascending
