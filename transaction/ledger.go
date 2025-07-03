@@ -111,7 +111,9 @@ func (t Transaction) StringLedger() string {
 }
 
 // The first line of a Ledger journal entry must start with a number.
-var errStartNumber = errors.New("trn.parseledger: line must start with number")
+var (
+	errStartNumber = errors.New("trn.parseledger: line must start with number")
+)
 
 /*
 GetCode returns a transaction code from a Ledger journal entry string.
@@ -128,18 +130,14 @@ func getCode(s string) string {
 }
 
 /*
-GetDate returns a date from a Ledger journal entry date string.
+GetDate returns the actual date from a Ledger journal entry date string.
 The date string syntax is "actual[=effective]".
-GetDate returns the effective date if present, or the actual date if not.
-If the actual or effective string does not contain a date, getDate returns the error.
+If the actual string does not contain a date, getDate returns the error.
 */
 func getDate(s string) (string, error) {
 	const sep = "="
 
-	d, e, found := strings.Cut(s, sep)
-	if found {
-		d = e
-	}
+	d, _, _ := strings.Cut(s, sep)
 
 	return ParseDate(d, time.DateOnly)
 }

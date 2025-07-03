@@ -62,11 +62,7 @@ import (
 	"log"
 	"os"
 	"sort"
-)
-
-const (
-	mirrorCode = "MT"
-	sp         = ' '
+	"strings"
 )
 
 func main() {
@@ -75,10 +71,8 @@ func main() {
 
 	parseFlags()
 
-	var date2lines = make(map[string]string) // lines of transactions made on a date
-
-	date := "0000-00-00" // date of current transaction
-	date2lines[date] = ""
+	date := "0000-00-00"                      // date of current transaction
+	date2lines := map[string]string{date: ""} // lines of transactions made on a date
 
 	var discard bool // whether to discard current transaction
 
@@ -86,16 +80,10 @@ func main() {
 	for s.Scan() {
 		ln := s.Text()
 
-		if len(ln) == 0 {
-			// blank line
-			discard = false
-			date2lines[date] += "\n"
+		const sp = " "
 
-			continue
-		}
-
-		if ln[0] == sp {
-			// indented line that continues current transaction
+		if strings.HasPrefix(ln, sp) {
+			// This indented line is a continuation of the current entry.
 			if !discard {
 				date2lines[date] += ln + "\n"
 			}
@@ -103,7 +91,7 @@ func main() {
 			continue
 		}
 
-		// global line, which is not indented
+		// This global line ends the current entry.
 		discard = false
 
 		var trn aft.Transaction
@@ -115,19 +103,23 @@ func main() {
 			continue
 		}
 
-		date = trn.Date
+		// This line is the first in the next entry.
+		const mirrorCode = "MT"
 
-		// first line of the next transaction
 		if trn.Code == mirrorCode {
-			// this transaction is mirrored
+			// This entry is mirrored, so will be discarded.
 			discard = true
 
 			continue
 		}
 
-		_, found := date2lines[date]
-		if !found {
-			date2lines[date] = ""
+		if date != trn.Date {
+			date = trn.Date
+
+			_, found := date2lines[date]
+			if !found {
+				date2lines[date] = ""
+			}
 		}
 
 		date2lines[date] += ln + "\n"
