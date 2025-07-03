@@ -157,7 +157,7 @@ func (t Transaction) StringModuleCSV() string {
 
 /*
 Validate returns nil if this CSV record format is valid.
-If not, validate returns the first error.
+If not, Validate returns the first error.
 */
 func (crf CSVRecordFormat) Validate() error {
 	if crf.NFields < minNFields || maxNFields < crf.NFields {

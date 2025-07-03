@@ -52,7 +52,7 @@ const DefaultOtherAccount = "Imbalance" // The default value for other account.
 
 /*
 StringFormat returns this transaction in the named format.
-If the name is not known, stringFormat returns the empty string.
+If the name is not known, StringFormat returns the empty string.
 */
 func (t Transaction) StringFormat(name string) string {
 	switch name {

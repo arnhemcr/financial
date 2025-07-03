@@ -22,24 +22,58 @@ If not, see <https://www.gnu.org/licenses/>.
 package transaction
 
 import (
+	"errors"
 	"fmt"
 	"strings"
+	"time"
+	"unicode"
 )
 
 const (
 	Ledger = "ledger" // The name of the Ledger journal entry format.
 
-	StartCode, EndCode = "(", ")" // The delimiters for a transaction code.
+	// The transaction code delimiters.
+	StartCode = "("
+	EndCode   = ")"
 )
 
 /*
-StringLedger returns this transaction as a Ledger journal entry.
+ParseLedger parses the date and optional code for this transaction
+from the lines of a Ledger journal entry.
+If it fails to parse those fields, ParseLedger returns the first error.
 
-The format of a Ledger journal entry is described in sections
-4.1 "The Most Basic Entry" and 5.4 "Codes" of the [Ledger 3 manual].
+The format of a Ledger journal entry is described in the
+"Transactions and Comments" section of the [Ledger 3 manual].
 
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
+func (t *Transaction) ParseLedger(lines []string) error {
+	if len(lines) == 0 || len(lines[0]) == 0 || !unicode.IsDigit(rune(lines[0][0])) {
+		return errStartNumber
+	}
+
+	fs := strings.Fields(lines[0])
+
+	var err error
+
+	t.Date, err = getDate(fs[0])
+	if err != nil {
+		return err
+	}
+
+	n := len(fs)
+
+	switch {
+	case 3 <= n && isStatusMark(fs[1]):
+		t.Code = getCode(fs[2])
+	case 2 <= n:
+		t.Code = getCode(fs[1])
+	}
+
+	return nil
+}
+
+// StringLedger returns this transaction as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
 	const sp, sp2 = " ", "  " // single and double space
 
@@ -54,8 +88,6 @@ func (t Transaction) StringLedger() string {
 	default:
 		a = a + sp + cu
 	}
-
-	const ob, cb = "(", ")" // brackets around transaction code
 
 	var co string
 
@@ -76,4 +108,50 @@ func (t Transaction) StringLedger() string {
 		t.Date, co, t.Memo,
 		sp, t.ThisAccount, sp2, a,
 		sp, t.OtherAccount)
+}
+
+// The first line of a Ledger journal entry must start with a number.
+var errStartNumber = errors.New("trn.parseledger: line must start with number")
+
+/*
+GetCode returns a transaction code from a Ledger journal entry string.
+A transaction code appears in brackets in an entry e.g. "MT" appears as "(MT)".
+If the string does not contain a code, getCode returns empty string.
+*/
+func getCode(s string) string {
+	n := len(s)
+	if n < 3 || !strings.HasPrefix(s, StartCode) || !strings.HasSuffix(s, EndCode) {
+		return ""
+	}
+
+	return s[1 : n-1]
+}
+
+/*
+GetDate returns a date from a Ledger journal entry date string.
+The date string syntax is "actual[=effective]".
+GetDate returns the effective date if present, or the actual date if not.
+If the actual or effective string does not contain a date, getDate returns the error.
+*/
+func getDate(s string) (string, error) {
+	const sep = "="
+
+	d, e, found := strings.Cut(s, sep)
+	if found {
+		d = e
+	}
+
+	return ParseDate(d, time.DateOnly)
+}
+
+// IsStatusMark reports whether the string is a Ledger journal entry status mark.
+func isStatusMark(s string) bool {
+	const cleared, pending = "*", "!" // transaction status marks
+
+	switch s {
+	case cleared, pending:
+		return true
+	default:
+		return false
+	}
 }
