@@ -38,8 +38,8 @@ const (
 )
 
 /*
-ParseLedger parses the date and optional code for this transaction
-from the lines of a Ledger journal entry.
+ParseLedger parses this transaction's date, code and memo
+from the first line of a Ledger journal entry.
 If it fails to parse those fields, ParseLedger returns the first error.
 
 The format of a Ledger journal entry is described in the
@@ -63,11 +63,24 @@ func (t *Transaction) ParseLedger(lines []string) error {
 
 	n := len(fs)
 
+	var i int
+
 	switch {
 	case 3 <= n && isStatusMark(fs[1]):
-		t.Code = getCode(fs[2])
+		i = 2
 	case 2 <= n:
-		t.Code = getCode(fs[1])
+		i = 1
+	default:
+		return nil
+	}
+
+	t.Code = getCode(fs[i])
+	if t.Code != "" {
+		i++
+	}
+
+	if i < n {
+		t.Memo = strings.Join(fs[i:n], " ")
 	}
 
 	return nil
@@ -75,8 +88,6 @@ func (t *Transaction) ParseLedger(lines []string) error {
 
 // StringLedger returns this transaction as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
-	const sp, sp2 = " ", "  " // single and double space
-
 	a := stringAmount(t.Amount)
 
 	cu := t.Currency
@@ -86,13 +97,13 @@ func (t Transaction) StringLedger() string {
 	case "$":
 		a = "$" + a
 	default:
-		a = a + sp + cu
+		a = a + " " + cu
 	}
 
 	var co string
 
 	if t.Code != "" {
-		co = sp
+		co = " "
 		if !strings.HasPrefix(t.Code, StartCode) {
 			co += StartCode
 		}
@@ -104,21 +115,21 @@ func (t Transaction) StringLedger() string {
 		}
 	}
 
-	return fmt.Sprintf("%v%v %v\n%v%v%v%v\n%v%v\n",
+	return fmt.Sprintf("%v%v %v\n %v  %v\n %v\n",
 		t.Date, co, t.Memo,
-		sp, t.ThisAccount, sp2, a,
-		sp, t.OtherAccount)
+		t.ThisAccount, a,
+		t.OtherAccount)
 }
 
-// The first line of a Ledger journal entry must start with a number.
 var (
+	// The first line of a Ledger journal entry must start with a number.
 	errStartNumber = errors.New("trn.parseledger: line must start with number")
 )
 
 /*
-GetCode returns a transaction code from a Ledger journal entry string.
-A transaction code appears in brackets in an entry e.g. "MT" appears as "(MT)".
-If the string does not contain a code, getCode returns empty string.
+GetCode returns a transaction code from the Ledger journal entry string.
+In an entry, a transaction code is in brackets e.g. code "MT" appears in the entry as "(MT)".
+If the string does not contain the code, getCode returns an empty string.
 */
 func getCode(s string) string {
 	n := len(s)
@@ -130,9 +141,9 @@ func getCode(s string) string {
 }
 
 /*
-GetDate returns the actual date from a Ledger journal entry date string.
+GetDate returns an actual date from a Ledger journal entry date string.
 The date string syntax is "actual[=effective]".
-If the actual string does not contain a date, getDate returns the error.
+If the actual string does not contain the date, getDate returns an error.
 */
 func getDate(s string) (string, error) {
 	const sep = "="

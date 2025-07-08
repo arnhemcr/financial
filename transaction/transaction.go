@@ -33,8 +33,8 @@ It offers:
 package transaction
 
 /*
-A transaction represents a financial transaction.
-It is the transfer of an amount of currency from one account to another on a date.
+A Transaction represents a financial transaction:
+a transfer of an amount of currency from one account to another on a date.
 It is described by a memo and code, also known as the description and type respectively.
 A transaction belong to an account known as this account.
 */
@@ -44,7 +44,7 @@ type Transaction struct {
 	Currency     string // can be empty string
 	Date         string
 	Memo         string // or description
-	OtherAccount string // defaults to "Imbalance"
+	OtherAccount string // defaults to DefaultOtherAccount
 	ThisAccount  string
 }
 
