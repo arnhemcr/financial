@@ -15,7 +15,7 @@ either [Ledger] journal entries or this module's CSV records.
 Assuming [Go has been installed], build csv2trn in its directory by running `go build`.
 
 Translating arbitrary CSV account statements is a challenge for financial software.
-["The convert command" Ledger 3 manual] shows the issues
+["The convert command" in the Ledger 3 manual] shows the issues
 with a statement from ValuFirst Credit Union.
 As an example of csv2trn, that statement can be translated to Ledger journal entries
 by running:
@@ -29,14 +29,14 @@ and for documentation, including further examples, run `go doc`.
 
 Mrglent filters multiple Ledger financial journals containing entries,
 also known as transactions. It:
-  - removes mirrored entries that have been marked with the transaction code "MT"
+  - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
 
 Assuming multiple accounts each with its own Ledger journal,
-transfers between those accounts will lead to mirrored entries.
-A mirrored entry is a debit in one journal mirrored by a credit in another.
+transfers between those accounts will lead to mirror entries.
+A mirror entry is a debit in one journal mirror by a credit in another.
 When those journals are merged,
-one side of each mirrored entry must be removed to avoid making the transfer twice.
+one side of each mirror entry must be removed to avoid making the transfer twice.
 
 Install mrglent by running `go install`.
 For documentation, including an example, run `go doc`.
@@ -61,5 +61,5 @@ For more information, see `go doc -all` in the transaction directory.
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Go has been installed]: https://go.dev/doc/install
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-["The convert command" Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
+["The convert command" in the Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
 [XML]: https://en.wikipedia.org/wiki/XML

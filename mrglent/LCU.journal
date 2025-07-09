@@ -4,16 +4,15 @@ Local Credit Union
 
 end comment
 
-; A
-# very,
-% very,
-| very
-* heavily commented Ledger journal.
+1982-10-01 Opening balance
+ Assets:Saving  75.38 GBP
+ Equity:OpeningBalance
+
 1982-10-01 Net interest
- Assets:Saving  0.42 GBP
+ Assets:Saving  0.04 GBP
  Income:NetInterest
 
-1982-10-05 (MT) Holiday savings
- Assets:Saving  50 GBP
+1982-10-06 (MT) Holiday
+ Assets:Saving  25 GBP
  Assets:Current
 

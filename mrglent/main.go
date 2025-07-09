@@ -23,14 +23,14 @@ If not, see <https://www.gnu.org/licenses/>.
 Mrglent [filters] multiple [Ledger] financial journals containing entries,
 also known as transactions.
 It:
-  - removes mirrored entries that have been marked with the transaction code "MT"
+  - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
 
 Assuming multiple accounts each with its own Ledger journal,
-transfers between those accounts will lead to mirrored entries.
-A mirrored entry is a debit in one journal mirrored by a credit in another.
+transfers between those accounts will lead to mirror entries.
+A mirror entry is a debit in one journal mirrored by a credit in another.
 When those journals are merged,
-one side of each mirrored entry must be removed to avoid making the transfer twice.
+one side of each mirror entry must be removed to avoid making the transfer twice.
 
 Mrglent only merges entries: transactions which have dates.
 Automatic transactions, comments and ommand directives in the input journals
@@ -44,12 +44,21 @@ The following example shows how to use mrglent.
 It assumes mrglent is installed in a Unix-like environment
 and is being run from its source directory.
 
-	cat LCU.journal NB_current.journal NB_emergency.journal | mrglent >general.journal
-	ledger -f general.journal balance
+Start by concatenating the three journals into one:
 
-Credit mirrored entries have been marked with code "MT"
-in the National Bank emergency and Local Credit Union journals.
-Mrglent removes those entries, and orders the remainder by date ascending.
+	cat *.journal >g01
+	ledger -f g01 register emergency
+
+The output has six lines, the last four are a pair of mirror entries,
+and the second to last line is out of date order.
+
+Now use mrglent:
+
+	cat *.journal | mrglent >g02
+	ledger -f g02 register emergency
+
+Mrglent removes both credit mirror entries, which have been marked with code "MT",
+then sorts the remaining four entries by date ascending.
 
 The format of a Ledger journal entry is described in the
 "Transactions and Comments" section of the [Ledger 3 manual].
@@ -112,7 +121,7 @@ func usage() {
 	fmt.Fprint(os.Stderr, `
 Mrglent filters multiple Ledger financial journals containing entries,
 also known as transactions. It:
-  - removes mirrored entries that have been marked with the transaction code "MT"
+  - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
 
 The only flag is:
@@ -248,7 +257,7 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 	return nil
 }
 
-// Sort sorts the entries in this Ledger journal into date order ascending.
+// Sort sorts the entries in this Ledger journal by date ascending.
 func (j *ledgerJournal) sort() {
 	d2es := make(map[string][]ledgerEntry)
 

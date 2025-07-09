@@ -1,0 +1,13 @@
+; National Bank emergency fund
+1982-10-01 Opening balance
+ Assets:Emergency  32.40 GBP
+ Equity:OpeningBalance
+1982-10-01 Net interest
+ Assets:Emergency  0.02 GBP
+ Income:NetInterest
+1982-10-04 * (MT) From current
+ Assets:Emergency  10 GBP
+ Assets:Current
+1982-10-07 To current
+ Assets:Emergency  -42.42 GBP
+ Assets:Current
