@@ -25,23 +25,20 @@ cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
 For help on csv2trn run `./csv2trn -h`,
 and for documentation, including further examples, run `go doc`.
 
-## Program mergetrn
+## Program mrglent
 
-Mergetrn [filters] multiple [Ledger] journals, containing transactions:
-
- - discarding mirrored transactions that have been marked with the code "(MT)"
- - ordering the remaining transactions by date ascending
-
-It assumes the entries in the Ledger journals are valid and their date layout is "YYYY-MM-DD".
+Mrglent filters multiple Ledger financial journals containing entries,
+also known as transactions. It:
+  - removes mirrored entries that have been marked with the transaction code "MT"
+  - sorts the remaining entries by date ascending
 
 Assuming multiple accounts each with its own Ledger journal,
-transfers between those accounts will lead to mirrored transactions.
-A mirrored transaction is a debit in one journal mirrored by a credit in another.
+transfers between those accounts will lead to mirrored entries.
+A mirrored entry is a debit in one journal mirrored by a credit in another.
 When those journals are merged,
-one side of each mirrored transaction must be discarded
-to avoid making the transfer twice.
+one side of each mirrored entry must be removed to avoid making the transfer twice.
 
-Build mergetrn in its directory by running `go build`.
+Install mrglent by running `go install`.
 For documentation, including an example, run `go doc`.
 
 ## Package transaction

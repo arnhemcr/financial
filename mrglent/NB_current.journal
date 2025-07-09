@@ -1,15 +1,27 @@
+= /^Income/
+  (Liabilities:Tax)                    0.33
+
 1982-10-01 * (AP) Dent A salary BBC Radio
  Assets:Current  154.3 GBP
  Income:Salary
+apply tag hastag: true
+apply tag nestedtag: true
 1982-10-02=1982-10-04 * Emergency fund
  Assets:Current  -10 GBP
  Assets:Emergency
+end tag
 1982-10-03=1982-10-05 * Holiday savings
  Assets:Current  -50 GBP
  Assets:Saving
 1982-10-04 (DD) 155 Country Lane rates CCC
  Assets:Current  -10.37 GBP
  Expenses:Rates
+end tag
 1982-10-07 ! Horse and Groom
  Assets:Current  -4.38 GBP
  Imbalance
+comment
+
+After this point, it's all a bit improbable.
+
+endcomment
