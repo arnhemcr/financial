@@ -33,10 +33,10 @@ When those journals are merged,
 one side of each mirror entry must be removed to avoid making the transfer twice.
 
 Mrglent only merges entries: transactions which have dates.
-Automatic transactions, comments and ommand directives in the input journals
+Automatic transactions, comments and command directives in the input journals
 are not currently copied to the output journal.
 It uses the same "YYYY-MM-DD" date layout, for input and output,
-as used by other arnhemcr/financial programs for output.
+that other arnhemcr/financial programs use for output.
 
 # Example
 

@@ -29,14 +29,15 @@ and for documentation, including further examples, run `go doc`.
 
 Mrglent filters multiple Ledger financial journals containing entries,
 also known as transactions. It:
-  - removes mirror entries that have been marked with the transaction code "MT"
+  - removes mirror entries, that have been marked with the transaction code "MT",
+    to avoid double transfers between accounts with journals
   - sorts the remaining entries by date ascending
 
-Assuming multiple accounts each with its own Ledger journal,
-transfers between those accounts will lead to mirror entries.
-A mirror entry is a debit in one journal mirror by a credit in another.
-When those journals are merged,
-one side of each mirror entry must be removed to avoid making the transfer twice.
+Mrglent only merges entries: transactions which have dates.
+Automatic transactions, comments and command directives in the input journals
+are not currently copied to the output journal.
+It uses the same "YYYY-MM-DD" date layout, for input and output,
+that other arnhemcr/financial programs use for output.
 
 Install mrglent by running `go install`.
 For documentation, including an example, run `go doc`.
