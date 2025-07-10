@@ -38,7 +38,7 @@ const (
 )
 
 /*
-ParseLedger parses this transaction's date, code and memo
+ParseLedger parses this transaction's date, code and memo fields
 from the first line of a Ledger journal entry.
 If it fails to parse those fields, ParseLedger returns the first error.
 
@@ -48,8 +48,8 @@ The format of a Ledger journal entry is described in the
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 func (t *Transaction) ParseLedger(lines []string) error {
-	if len(lines) == 0 || len(lines[0]) == 0 || !unicode.IsDigit(rune(lines[0][0])) {
-		return errStartNumber
+	if len(lines) == 0 || !startsDigit(lines[0]) {
+		return errEntryStart
 	}
 
 	fs := strings.Fields(lines[0])
@@ -93,7 +93,7 @@ func (t Transaction) StringLedger() string {
 	cu := t.Currency
 	switch cu {
 	case "":
-		// There is no currency to associate with the amount.
+		// There is no currency for the amount.
 	case "$":
 		a = "$" + a
 	default:
@@ -122,8 +122,8 @@ func (t Transaction) StringLedger() string {
 }
 
 var (
-	// The first line of a Ledger journal entry must start with a number.
-	errStartNumber = errors.New("trn.parseledger: line must start with number")
+	errEntryStart = errors.New("first line of Ledger journal entry " +
+		"must start with decimal digit")
 )
 
 /*
@@ -131,36 +131,46 @@ GetCode returns a transaction code from the Ledger journal entry string.
 In an entry, a transaction code is in brackets e.g. code "MT" appears in the entry as "(MT)".
 If the string does not contain the code, getCode returns an empty string.
 */
-func getCode(s string) string {
-	n := len(s)
-	if n < 3 || !strings.HasPrefix(s, StartCode) || !strings.HasSuffix(s, EndCode) {
+func getCode(code string) string {
+	n := len(code)
+	if n < 3 ||
+		!strings.HasPrefix(code, StartCode) || !strings.HasSuffix(code, EndCode) {
 		return ""
 	}
 
-	return s[1 : n-1]
+	return code[1 : n-1]
 }
 
 /*
-GetDate returns an actual date from a Ledger journal entry date string.
-The date string syntax is "actual[=effective]".
-If the actual string does not contain the date, getDate returns an error.
+GetDate returns the actual date from a Ledger journal entry dates string.
+The dates string syntax is "actual[=effective]".
+If the actual string does not contain a date, getDate returns an error.
 */
-func getDate(s string) (string, error) {
-	const sep = "="
+func getDate(dates string) (string, error) {
+	const separator = "="
 
-	d, _, _ := strings.Cut(s, sep)
+	d, _, _ := strings.Cut(dates, separator)
 
 	return ParseDate(d, time.DateOnly)
 }
 
 // IsStatusMark reports whether the string is a Ledger journal entry status mark.
-func isStatusMark(s string) bool {
-	const cleared, pending = "*", "!" // transaction status marks
+func isStatusMark(mark string) bool {
+	const cleared, pending = "*", "!"
 
-	switch s {
+	switch mark {
 	case cleared, pending:
 		return true
 	default:
 		return false
 	}
+}
+
+// StartsDigit reports whether the string starts with a decimal digit.
+func startsDigit(line string) bool {
+	if 0 < len(line) && unicode.IsDigit(rune(line[0])) {
+		return true
+	}
+
+	return false
 }

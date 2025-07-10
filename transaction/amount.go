@@ -23,14 +23,13 @@ package transaction
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 )
 
 var (
-	errAmount      = errors.New("t.parsecsv: amount cannot be zero")
-	errCreditDebit = errors.New("t.parsecsv: credit and debit cannot both be empty string or both non-empty string")
-	errNotPositive = errors.New("t.parsecsv: number must be positive")
+	errAmount         = errors.New("amount cannot be zero")
+	errCreditDebit    = errors.New("credit and debit cannot both be empty string or both non-empty string")
+	errPositiveNumber = errors.New("number must be positive")
 )
 
 /*
@@ -42,9 +41,10 @@ If it fails to parse a non-zero value, parseAmount returns the first error.
 func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
 	a, c, d := fields[crf.AmountI], fields[crf.CreditI], fields[crf.DebitI]
 
-	var v float64
-
-	var err error
+	var (
+		v   float64
+		err error
+	)
 
 	switch {
 	case a != "":
@@ -76,7 +76,7 @@ If it fails to parse a number, parseFloat returns the error.
 func parseFloat(s string) (float64, error) {
 	n, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, fmt.Errorf("t.parsecsv: %w", err)
+		return 0, err
 	}
 
 	return n, nil
@@ -93,7 +93,7 @@ func parsePositiveFloat(s string) (float64, error) {
 	case err != nil:
 		return 0, err
 	case n <= 0:
-		return 0, errNotPositive
+		return 0, errPositiveNumber
 	default:
 		return n, nil
 	}

@@ -21,20 +21,17 @@ If not, see <https://www.gnu.org/licenses/>.
 
 package transaction
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
 /*
-ParseDate returns the date parsed from s as a string.
-It assumes the date layout is valid e.g. "2006-01-02".
+ParseDate returns the date parsed from the string according to the layout.
+It assumes the layout is valid e.g. "2006-01-02".
 If ParseDate fails to parse a date, it returns the error.
 */
-func ParseDate(s, layout string) (string, error) {
-	d, err := time.Parse(layout, s)
+func ParseDate(date, layout string) (string, error) {
+	d, err := time.Parse(layout, date)
 	if err != nil {
-		return "", fmt.Errorf("t.parsecsv: %w", err)
+		return "", err
 	}
 
 	return d.Format(time.DateOnly), nil
