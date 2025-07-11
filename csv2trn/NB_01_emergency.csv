@@ -1,0 +1,4 @@
+Account number,Date,Memo/Description,Source Code (payment type),TP ref,TP part,TP code,OP ref,OP part,OP code,OP name,OP Bank Account Number,Amount (credit),Amount (debit),Amount,Balance
+01-2345-6789012-35,01-10-1982,Net interest,,,,,,,,,,0.02,,0.02,32.42
+01-2345-6789012-35,04-10-1982,From current,,Emergency,,,,,,,01-2345-6789012-34,10.00,,10.00,42.42
+01-2345-6789012-35,07-10-1982,To current,,Emergency,,,,,,,01-2345-6789012-34,,42.42,-42.42,0.00

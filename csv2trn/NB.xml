@@ -16,7 +16,7 @@
   <DebitI>14</DebitI>
   <AmountI>15</AmountI>
   <!--
-    The other field, not contained in the record, is currency.
+    The last field is currency, which is optional and not usually contained in a record.
     Its index CurrencyI defaults to zero.
     -->
 

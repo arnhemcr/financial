@@ -29,81 +29,61 @@ The following examples explain how to use csv2trn.
 They assume csv2trn is installed in a Unix-like environment
 and is being run from its source directory.
 
-## Default input and output format
+## National Bank
 
-Running:
+Try:
 
-	echo "1982-10-08,Assets:Saving,Assets:Current,DB,Daily allowance,-30,ALD" | csv2trn
+	cat NB_01_emergency.csv | csv2trn -f NB.xml 
 
-should produce the [Ledger] journal entry:
-
-	1982-10-08 (DB) Daily allowance
-	 Assets:Saving  -30 ALD
-	 Assets:Current
-
-In csv2trn, a transaction has the following fields:
-
+This module's transactions have the following fields:
   - Date
-  - This account, which the transaction belongs to e.g. "Assets:Saving"
-  - That account e.g. "Assets:Current"
-  - Code, also known as the type of transaction
-  - Memo, also known as the description
+  - This account, which is the account this transaction belongs to
+  - Other account, which is optional
+  - Code, which is also known as the type and is optional
+  - Memo, which is also known as the description
   - Amount
-  - Currency
+  - Currency, which is optional
 
-This example shows the default input and output formats.
-CSV2trn reads fields from the CSV record, in this module's format, into a transaction.
-It then writes the transaction as a Ledger journal entry.
+National Bank CSV account statements contain all these fields except currency.
+In this example, csv2trn reads CSV records from a National Bank account statement.
+A transaction is parsed from the record on each line according to the input format in [XML].
+Each transaction is written in the default output format: [Ledger] journal entry.
+A warning is written about the unparseable header line, but csv2trn continues.
 
-## Custom input format
+Try:
 
-	cat NB_current.csv | ./csv2trn -f NB.xml
-	cat NB_emergency.csv | ./csv2trn -f NB.xml
+	cat NB_02_current.csv | csv2trn -f NB.xml -c GBP -t Assets:Current
 
-This example translates two CSV account statements
-from National Bank to Ledger journal entries.
-The bank has its own CSV statement and record format.
-An [XML] file (-f flag) configures csv2trn for the input format with
-the number and position of fields in the record and the date layout.
+In this example, command line flags set the currency 
+and override this account number, from the CSV records, with a Ledger hierachical name.
 
-The example highlights a couple of points.
-First, if a line in a statement cannot be interpreted as a transaction,
-for example a header line, csv2trn writes a warning and continues.
-Second, the transfer from current to emergency accounts appears as two mirrored entries:
-a debit from the current account and a credit to the emergency account.
+## Local Credit Union
 
-## CSV records without this account
+Try:
 
-	cat LCU.csv | csv2trn -f LCU.xml -t Assets:Saving -o modcsv
+	cat LCU.csv | csv2trn -f LCU.xml -t Assets:Saving
 
-This example translates a CSV account statement from Local Credit Union to
-this module's CSV records (-o flag).
-The credit union's CSV records do not contain this account,
-so its value is set from the command line (-t flag).
-Instead of an amount field, the records contain credit and debit fields
-from which amount is calculated.
+Local Credit Union statements contain debit and credit instead of amount,
+and they do not contain this or other account.
+In this example, the XML input format configures csv2trn to get the amount from credit and debit. 
+And this account must be set with a flag.
 
-Records in Local Credit Union account statements are ordered by date descending.
-CSV2trn always writes transactions ordered by date ascending.
+## Towards Ledger
 
-## Ledger journal from CSV account statements
+Try:
 
-	cat NB_current.csv | ./csv2trn -f NB.xml -t Assets:Current -c GBP -o modcsv >all.csv
-	cat NB_emergency.csv | ./csv2trn -f NB.xml -t Assets:Emergency -c GBP -o modcsv >>all.csv
-	cat LCU.csv | ./csv2trn -f LCU.xml -t Assets:Saving -c GBP -o modcsv >>all.csv
+	cat NB_02_current.csv | csv2trn -f NB.xml -o modcsv | sed -f adjust.sed | csv2trn
 
-	sed -E -f adjust.sed all.csv | sort -t , -k 1 | ./csv2trn >all.journal
-	ledger -f all.journal balance
+Ledger expects both this and other accounts to be hierarchical names.
+If a CSV record contains an other account number, it can be mapped to the name.
+If other account is blank, which csv2trn translates into "Imbalance", 
+its name can often be inferred from the memo.
+In this example, the output format is set to this module's CSV.
+The Unix stream editor maps and infers.
+Finally, csv2trn filters from its default input to its default output format:
+this module's CSV to Ledger journal.
 
-All the statements are translated into this module's CSV format.
-None of them contain currency, so it is set from the command line (-c flag).
-For National Bank, this account number from the statement is overridden by the name from the
-command line.
-
-The stream editor (sed) replaces other account numbers with names
-and removes mirrored records.
-The records are sorted to date ascending then translated to Ledger journal entries.
-Finally, ledger reports balances for the journal.
+To merge multiple Ledger journals into one, see this module's program mrglent.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
@@ -133,13 +113,13 @@ type config struct {
 }
 
 var (
-	errOutFormatName = errors.New("no such output format name")
+	errOutFormatName = errors.New("invalid output format name")
 	errThisAccount   = errors.New("cannot get this account: " +
 		"CSV records do not contain that field and its flag is empty string")
 )
 
 func main() {
-	log.SetPrefix(os.Args[0] + ": ")
+	log.SetPrefix("csv2trn: ")
 	log.SetFlags(0)
 
 	cfg := parseFlags()
@@ -171,15 +151,13 @@ func main() {
 
 	r := csv.NewReader(os.Stdin)
 	/*
-		The number of fields in a record is checked by function aft.ParseCSV,
+		The number of fields in a record is checked by aft.ParseCSV,
 		so disable the reader's check.
-		Set the reader to reuse its record, instead of reallocating,
-		to improve performance.
 	*/
 	r.FieldsPerRecord = -1
 	r.ReuseRecord = true
 
-	ts, err := parseTransactions(r, cfg, inFormat)
+	ts, err := parseCSVStatement(r, cfg, inFormat)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -188,9 +166,9 @@ func main() {
 }
 
 /*
-ParseFlags returns the values of flags from the command that ran csv2trn.
-If the flags contain help, parseFlags writes the progam's used and exits with a zero status.
-If the flags are invalid, the program exits with a non-zero status.
+ParseFlags returns this program's configuration parsed from command line flags.
+If help was requested, parseFlags writes this program's help text then exits.
+If the flags are invalid, this program exits with a non-zero status.
 */
 func parseFlags() config {
 	var cfg config
@@ -221,12 +199,13 @@ func parseFlags() config {
 }
 
 /*
-ParseTransactions reads a CSV account statement,
+ParseCSVStatement reads a CSV account statement,
 parses a transaction's fields from those in the CSV record on each line
 then returns the transactions.
-If it fails to read the statement, parseTransactions returns an error.
+If it fails to read the statement, parseCSVStatement returns an error.
+If it fails to parse a transaction, parseCSVStatement logs a warning then continues.
 */
-func parseTransactions(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]aft.Transaction, error) {
+func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]aft.Transaction, error) {
 	var ts []aft.Transaction
 
 	for {
@@ -234,7 +213,7 @@ func parseTransactions(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 		if errors.Is(err, io.EOF) {
 			break
 		} else if err != nil {
-			return ts, fmt.Errorf("r.Read: %w", err)
+			return ts, err
 		}
 
 		var t aft.Transaction
@@ -243,8 +222,8 @@ func parseTransactions(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 
 		err = t.ParseCSV(fs, crf)
 		if err != nil {
-			i, _ := r.FieldPos(0)
-			log.Printf("%v on line %v", err, i)
+			n, _ := r.FieldPos(0)
+			log.Printf("%v on line %v", err, n)
 
 			continue
 		}
@@ -257,7 +236,7 @@ func parseTransactions(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 
 /*
 StringTransactions writes the transactions in the named format.
-It assumes the transactions are in date order either ascending or descending.
+It assumes the transactions are in date order ascending or descending.
 If the first transaction is later than the last one,
 stringTransactions reverses the order.
 */
@@ -274,7 +253,7 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 	}
 }
 
-// Usage prints the help text for csv2trn.
+// Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
 CSV2trn filters financial transactions from comma-separated values (CSV) records,

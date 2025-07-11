@@ -21,7 +21,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 /*
 Mrglent [filters] multiple [Ledger] financial journals containing entries,
-also known as transactions.
+also known as transactions, into one journal.
 It:
   - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
@@ -120,7 +120,7 @@ func parseFlags() {
 func usage() {
 	fmt.Fprint(os.Stderr, `
 Mrglent filters multiple Ledger financial journals containing entries,
-also known as transactions. It:
+also known as transactions, into one journal. It:
   - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
 

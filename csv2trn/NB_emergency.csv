@@ -1,3 +1,0 @@
-Account number,Date,Memo/Description,Source Code (payment type),TP ref,TP part,TP code,OP ref,OP part,OP code,OP name,OP Bank Account Number,Amount (credit),Amount (debit),Amount,Balance
-01-2345-6789012-35,01-10-1982,Net interest,,,,,,,,,,0.25,,0.25,17.38
-01-2345-6789012-35,02-10-1982,Emergency fund,,Emergency,,,,,,,01-2345-6789012-34,10.00,,10.00,27.38

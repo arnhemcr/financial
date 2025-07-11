@@ -11,12 +11,4 @@ s/,01-0101-0101010-10,/,Income:Salary,/
 
 # Infer other account name from memo.
 /,Holiday savings,/s/,Imbalance,/,Assets:Current,/
-/,Net interest,/s/,Imbalance,/,Income:Interest,/
-
-# Transactions are loaded from the statements of the three asset accounts.
-# A transfer between those accounts will appear in two statements:
-# a debit on one and a mirroring credit on another.
-# To avoid making the transfer twice, one side of the mirror must be discarded.
-#
-# Delete credit side of a mirrored transfer between asset accounts.
-/,Assets:[^,]+,Assets:[^,]+,[^,]*,[^,]+,[0-9]/d
+/,Net interest,/s/,Imbalance,/,Income:NetInterest,/
