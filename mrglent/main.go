@@ -20,9 +20,9 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Mrglent [filters] multiple [Ledger] financial journals containing entries,
-also known as transactions, into one journal.
-It:
+Mrglent merges multiple [Ledger] financial journals,
+containing entries also known as transactions, into one journal.
+It is a [filter] that:
   - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
 
@@ -44,28 +44,25 @@ The following example shows how to use mrglent.
 It assumes mrglent is installed in a Unix-like environment
 and is being run from its source directory.
 
-Start by concatenating the three journals into one:
+Start by concatenating three journals into one:
 
-	cat *.journal >g01
-	ledger -f g01 register emergency
+	cat LCU.journal NB_emergency.journal NB_current.journal >general.journal
+	ledger -f general.journal register emergency
 
 The output has six lines, the last four are a pair of mirror entries,
 and the second to last line is out of date order.
 
 Now use mrglent:
 
-	cat *.journal | mrglent >g02
-	ledger -f g02 register emergency
+	cat LCU.journal NB_emergency.journal NB_current.journal | mrglent >general.journal
+	ledger -f general.journal register emergency
 
 Mrglent removes both credit mirror entries, which have been marked with code "MT",
 then sorts the remaining four entries by date ascending.
 
-The format of a Ledger journal entry is described in the
-"Transactions and Comments" section of the [Ledger 3 manual].
+[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
 
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
-[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 package main
 
@@ -81,14 +78,14 @@ import (
 )
 
 func main() {
-	log.SetPrefix(os.Args[0] + ": ")
+	log.SetPrefix("mrglent: ")
 	log.SetFlags(0)
 
 	parseFlags()
 
-	s := bufio.NewScanner(os.Stdin)
-
 	var j ledgerJournal
+
+	s := bufio.NewScanner(os.Stdin)
 
 	err := j.parse(s)
 	if err != nil {
@@ -103,6 +100,11 @@ func main() {
 	}
 }
 
+/*
+ParseFlags parses this program's command line flags.
+If help was requested, parseFlags writes this program's help text then exits.
+If the flags are invalid, this program exits with a non-zero status.
+*/
 func parseFlags() {
 	var help bool
 
@@ -117,10 +119,11 @@ func parseFlags() {
 	}
 }
 
+// Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-Mrglent filters multiple Ledger financial journals containing entries,
-also known as transactions, into one journal. It:
+Mrglent merges multiple Ledger financial journals containing entries,
+also known as transactions, into one journal. It is a filter that:
   - removes mirror entries that have been marked with the transaction code "MT"
   - sorts the remaining entries by date ascending
 
@@ -138,12 +141,8 @@ See also "Transactions and Comments" in the [Ledger 3 manual].
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 type ledgerEntry struct {
-	Lines []string // this entry's lines
-	/*
-		Trn contains copies of this entry's date, code and memo fields.
-		See also aft.ParseLedger.
-	*/
-	Trn aft.Transaction
+	Lines []string        // The lines of this entry.
+	Trn   aft.Transaction // Copies of this entry's date, code and memo.
 }
 
 /*
@@ -153,17 +152,17 @@ In future, fields may be added to represent other Ledger journal elements
 including automatic transactions, comments and command directives.
 */
 type ledgerJournal struct {
-	Entries []ledgerEntry // this journal's entries
+	Entries []ledgerEntry
 }
 
 /*
-Parse parses this Ledger entry from its lines in a journal.
+Parse parses this Ledger entry from its lines read from a journal.
 If it fails to parse the entry, parse returns an error.
 */
 func (e *ledgerEntry) parse(lines []string) error {
 	err := e.Trn.ParseLedger(lines)
 	if err != nil {
-		return fmt.Errorf("e.parse: %w", err)
+		return err
 	}
 
 	e.Lines = lines
@@ -182,12 +181,14 @@ func (e *ledgerEntry) string() string {
 	return s
 }
 
-// Demirror removes any entries which are marked as mirrored from this Ledger journal.
+// Demirror removes any entries marked as mirrors from this Ledger journal.
 func (j *ledgerJournal) demirror() {
+	const mirrorCode = "MT"
+
 	es := make([]ledgerEntry, len(j.Entries))
 
 	for _, e := range j.Entries {
-		if e.Trn.Code == "MT" {
+		if e.Trn.Code == mirrorCode {
 			continue
 		}
 
@@ -204,7 +205,7 @@ If it fails to parse the journal, parse returns the first error.
 func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 	var (
 		e   ledgerEntry
-		lns []string // lines of the current entry
+		lns []string // The lines of the current entry.
 		err error
 	)
 
@@ -215,13 +216,13 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 
 		if 0 < len(lns) {
 			if r0 == ' ' || r0 == '\t' {
-				// This line continues the current entry.
+				// This indented line continues the current entry.
 				lns = append(lns, ln)
 
 				continue
 			}
 
-			// This line is the first one after the current entry.
+			// This global (non-indented) line is the first after the current entry.
 			err = e.parse(lns)
 			if err != nil {
 				return err
@@ -235,14 +236,12 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 		if unicode.IsDigit(r0) {
 			// This line starts an entry.
 			lns = append(lns, ln)
-
-			continue
 		}
 	}
 
 	err = s.Err()
 	if err != nil {
-		return fmt.Errorf("j.parse: %w", err)
+		return err
 	}
 
 	if 0 < len(lns) {

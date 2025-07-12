@@ -27,8 +27,8 @@ and for documentation, including further examples, run `go doc`.
 
 ## Program mrglent
 
-Mrglent filters multiple Ledger financial journals containing entries,
-also known as transactions, into one journal. It:
+Mrglent merges multiple Ledger financial journals containing entries,
+also known as transactions, into one journal. It is a filter that:
   - removes mirror entries, that have been marked with the transaction code "MT",
     to avoid double transfers between accounts with journals
   - sorts the remaining entries by date ascending

@@ -114,6 +114,9 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 	}
 
 	switch {
+	case t.ThisAccount == DefaultOtherAccount ||
+		fs[crf.ThisAccountI] == DefaultOtherAccount:
+		return errThisAccount
 	case t.ThisAccount != "":
 		// This account already has a value, which takes precedence over its field.
 		return nil
@@ -190,7 +193,8 @@ const (
 var (
 	errMemo        = errors.New("memo cannot be empty string")
 	errNFields     = errors.New("unexpected number of fields in CSV record")
-	errThisAccount = errors.New("this account cannot be empty string")
+	errThisAccount = errors.New(
+		"this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
 
 	errAmountOption = errors.New("amount field index, or credit and debit indexes cannot both be zero")
 	errDateI        = errors.New("date field index cannot be zero")
