@@ -24,6 +24,7 @@ package transaction
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"os"
 	"slices"
 	"strings"
@@ -75,8 +76,10 @@ It assumes the format is valid.
 If ParseCSV fails to parse the transaction, it returns the first error.
 */
 func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
+	const fName = "t.ParseCSV"
+
 	if len(fields) != int(crf.NFields) {
-		return errNFields
+		return fmt.Errorf("%v: %v", fName, errNFields)
 	}
 
 	/*
@@ -89,12 +92,12 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	t.Date, err = ParseDate(fs[crf.DateI], crf.DateLayout)
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %v", fName, err)
 	}
 
 	t.Amount, err = parseAmount(fs, crf)
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %v", fName, err)
 	}
 
 	t.Code = fs[crf.CodeI]
@@ -105,7 +108,7 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 	t.Memo = fs[crf.MemoI]
 	if t.Memo == "" {
-		return errMemo
+		return fmt.Errorf("%v: %v", fName, errMemo)
 	}
 
 	t.OtherAccount = fs[crf.OtherAccountI]
@@ -116,7 +119,8 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 	switch {
 	case t.ThisAccount == DefaultOtherAccount ||
 		fs[crf.ThisAccountI] == DefaultOtherAccount:
-		return errThisAccount
+
+		return fmt.Errorf("%v: %v", fName, errThisAccount)
 	case t.ThisAccount != "":
 		// This account already has a value, which takes precedence over its field.
 		return nil
@@ -125,7 +129,7 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 
 		return nil
 	default:
-		return errThisAccount
+		return fmt.Errorf("%v: %v", fName, errThisAccount)
 	}
 }
 
@@ -162,23 +166,26 @@ Validate returns nil if this CSV record format is valid.
 If not, Validate returns the first error.
 */
 func (crf CSVRecordFormat) Validate() error {
+	const fName = "crf.validate"
+
 	if crf.NFields < minNFields || maxNFields < crf.NFields {
-		return errNFieldsRange
+		return fmt.Errorf("%v: %v (%v <= n <= %v)", fName, errNFieldsRange,
+			minNFields, maxNFields)
 	}
 
 	err := crf.validateIndexes()
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %v", fName, err)
 	}
 
 	err = crf.validateOptions()
 	if err != nil {
-		return err
+		return fmt.Errorf("%v: %v", fName, err)
 	}
 
 	d, _ := time.Parse(crf.DateLayout, crf.DateLayout)
 	if d.Format(time.DateOnly) != time.DateOnly {
-		return errDateLayout
+		return fmt.Errorf("%v: %v", fName, errDateLayout)
 	}
 
 	return nil
@@ -196,13 +203,13 @@ var (
 	errThisAccount = errors.New(
 		"this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
 
-	errAmountOption = errors.New("amount field index, or credit and debit indexes cannot both be zero")
-	errDateI        = errors.New("date field index cannot be zero")
-	errDateLayout   = errors.New("date layout in CSV record must be Go style e.g. \"02/01/2006\"")
-	errIndexUnique  = errors.New("field indexes cannot share a non-zero value")
-	errIndexRange   = errors.New("field index is out of range")
-	errMemoI        = errors.New("memo field index cannot be zero")
-	errNFieldsRange = errors.New("number of fields in CSV record is out of range")
+	errAmountOption = errors.New("amount field index, or credit and debit indexes in CSV record format cannot both be zero")
+	errDateI        = errors.New("date field index in CSV record format cannot be zero")
+	errDateLayout   = errors.New("date layout in CSV record format must be Go style e.g. \"02/01/2006\"")
+	errIndexUnique  = errors.New("field indexes in CSV record format cannot share a non-zero value")
+	errIndexRange   = errors.New("field index in CSV record format is out of range")
+	errMemoI        = errors.New("memo field index in CSV record format cannot be zero")
+	errNFieldsRange = errors.New("number of fields in CSV record format is out of range")
 )
 
 /*
