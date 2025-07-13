@@ -33,7 +33,7 @@ and is being run from its source directory.
 
 Try:
 
-	cat NB_01_emergency.csv | csv2trn -f NB.xml 
+	cat NB_01_emergency.csv | csv2trn -f NB.xml
 
 This module's transactions have the following fields:
   - Date
@@ -54,7 +54,7 @@ Try:
 
 	cat NB_02_current.csv | csv2trn -f NB.xml -c GBP -t Assets:Current
 
-In this example, command line flags set the currency 
+In this example, command line flags set the currency
 and override this account number, from the CSV records, with a Ledger hierachical name.
 
 ## Local Credit Union
@@ -65,7 +65,7 @@ Try:
 
 Local Credit Union statements contain debit and credit instead of amount,
 and they do not contain this or other account.
-In this example, the XML input format configures csv2trn to get the amount from credit and debit. 
+In this example, the XML input format configures csv2trn to get the amount from credit and debit.
 And this account must be set with a flag.
 
 ## Towards Ledger
@@ -76,7 +76,7 @@ Try:
 
 Ledger expects both this and other accounts to be hierarchical names.
 If a CSV record contains an other account number, it can be mapped to the name.
-If other account is blank, which csv2trn translates into "Imbalance", 
+If other account is blank, which csv2trn translates into "Imbalance",
 its name can often be inferred from the memo.
 In this example, the output format is set to this module's CSV.
 The Unix stream editor maps and infers.
@@ -138,11 +138,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	}
-
-	err = inFormat.Validate()
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	if cfg.thisAccount == "" && inFormat.ThisAccountI == 0 {

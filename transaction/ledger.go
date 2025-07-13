@@ -48,10 +48,8 @@ The format of a Ledger journal entry is described in the
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 func (t *Transaction) ParseLedger(lines []string) error {
-	const fName = "t.ParseLedger"
-
 	if len(lines) == 0 || !startsDigit(lines[0]) {
-		return fmt.Errorf("%v: %v:", fName, errEntryStart)
+		return errEntryStart
 	}
 
 	fs := strings.Fields(lines[0])
@@ -60,7 +58,7 @@ func (t *Transaction) ParseLedger(lines []string) error {
 
 	t.Date, err = getDate(fs[0])
 	if err != nil {
-		return fmt.Errorf("%v: %v:", fName, err)
+		return err
 	}
 
 	n := len(fs)
