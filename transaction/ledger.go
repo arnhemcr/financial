@@ -33,8 +33,8 @@ const (
 	Ledger = "ledger" // The name of the Ledger journal entry format.
 
 	// The transaction code delimiters.
-	StartCode = "("
-	EndCode   = ")"
+	StartCode = "(" // Deprecated: will not be exported in v2.
+	EndCode   = ")" // Deprecated: will not be exported in v2.
 )
 
 /*

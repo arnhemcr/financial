@@ -241,7 +241,7 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 
 	err = s.Err()
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot read Ledger journals: %w", err)
 	}
 
 	if 0 < len(lns) {

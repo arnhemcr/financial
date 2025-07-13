@@ -24,6 +24,7 @@ package transaction
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 )
@@ -76,12 +77,12 @@ func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
 
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return crf, err
+		return crf, fmt.Errorf("cannot read CSV record format from file: %w", err)
 	}
 
 	err = xml.Unmarshal(bs, &crf)
 	if err != nil {
-		return crf, err
+		return crf, fmt.Errorf("cannot parse CSV record format from file: %w", err)
 	}
 
 	err = crf.Validate()

@@ -33,7 +33,7 @@ and is being run from its source directory.
 
 Try:
 
-	cat NB_01_emergency.csv | csv2trn -f NB.xml
+	cat NB_emergency.csv | csv2trn -f NB.xml
 
 This module's transactions have the following fields:
   - Date
@@ -52,7 +52,7 @@ A warning is written about the unparseable header line, but csv2trn continues.
 
 Try:
 
-	cat NB_02_current.csv | csv2trn -f NB.xml -c GBP -t Assets:Current
+	cat NB_current.csv | csv2trn -f NB.xml -c GBP -t Assets:Current
 
 In this example, command line flags set the currency
 and override this account number, from the CSV records, with a Ledger hierachical name.
@@ -208,7 +208,7 @@ func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 		if errors.Is(err, io.EOF) {
 			break
 		} else if err != nil {
-			return ts, err
+			return ts, fmt.Errorf("cannot read CSV statement: %v", err)
 		}
 
 		var t aft.Transaction

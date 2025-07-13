@@ -21,17 +21,22 @@ If not, see <https://www.gnu.org/licenses/>.
 
 package transaction
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 /*
 ParseDate returns the date parsed from the string according to the layout.
 It assumes the layout is valid e.g. "2006-01-02".
 If ParseDate fails to parse a date, it returns the error.
+
+Deprecated: will not be exported in v2.
 */
 func ParseDate(date, layout string) (string, error) {
 	d, err := time.Parse(layout, date)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot parse date: %w", err)
 	}
 
 	return d.Format(time.DateOnly), nil
