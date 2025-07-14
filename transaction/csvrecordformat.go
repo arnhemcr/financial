@@ -53,26 +53,20 @@ type CSVRecordFormat struct {
 	DateLayout string
 }
 
-// GetModuleCSVFormat returns this module's CSV record format.
+/*
+GetModuleCSVFormat returns this module's CSV record format.
+
+Deprecated: replaced by NewModuleCSVRecordFormat, and will be removed in v2.
+*/
 func GetModuleCSVFormat() CSVRecordFormat {
-	return CSVRecordFormat{
-		NFields:       7,
-		DateI:         1,
-		ThisAccountI:  2,
-		OtherAccountI: 3,
-		CodeI:         4,
-		MemoI:         5,
-		AmountI:       6,
-		CurrencyI:     7,
-		DateLayout:    "2006-01-02",
-	}
+	return NewModuleCSVRecordFormat()
 }
 
 /*
-ReadCSVFormat returns a valid CSV record format read from the named file.
-If it fails to read or validate the format, ReadCSVFormat returns the first error.
+NewCSVRecordFormat returns a valid CSV record format read from the named file.
+If it fails to read or validate the format, NewCSVRecordFormat returns the first error.
 */
-func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
+func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
 	var crf CSVRecordFormat
 
 	bs, err := os.ReadFile(fileName)
@@ -91,6 +85,31 @@ func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
 	}
 
 	return crf, nil
+}
+
+// NewModuleCSVRecordFormat return this module's CSV record format.
+func NewModuleCSVRecordFormat() CSVRecordFormat {
+	return CSVRecordFormat{
+		NFields:       7,
+		DateI:         1,
+		ThisAccountI:  2,
+		OtherAccountI: 3,
+		CodeI:         4,
+		MemoI:         5,
+		AmountI:       6,
+		CurrencyI:     7,
+		DateLayout:    "2006-01-02",
+	}
+}
+
+/*
+ReadCSVFormat returns a valid CSV record format read from the named file.
+If it fails to read or validate the format, ReadCSVFormat returns the first error.
+
+Deprecated: replaced by NewCSVRecordFormat, and will be removed in v2.
+*/
+func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
+	return NewCSVRecordFormat(fileName)
 }
 
 /*
