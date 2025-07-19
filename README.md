@@ -33,7 +33,7 @@ also known as transactions, into one journal. It is a filter that:
     to avoid double transfers between accounts with journals
   - sorts the remaining entries by date ascending
 
-Mrglent only merges entries: transactions which have dates.
+Mrglent only merges entries: transactions that have dates.
 Automatic transactions, comments and command directives in the input journals
 are not currently copied to the output journal.
 It uses the same "YYYY-MM-DD" date layout, for input and output,

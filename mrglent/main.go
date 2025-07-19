@@ -204,9 +204,10 @@ If it fails to parse the journal, parse returns the first error.
 */
 func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 	var (
-		e   ledgerEntry
-		lns []string // The lines of the current entry.
-		err error
+		e    ledgerEntry
+		lns  []string // The lines of the current entry.
+		err  error
+		inBlockComment bool
 	)
 
 	for s.Scan() {
@@ -231,6 +232,23 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 			lns = nil
 
 			j.Entries = append(j.Entries, e)
+		}
+
+		const startBlockComment = "comment\n"
+		const endBlockComment = "end comment\n"
+
+		if ln == startBlockComment {
+			inBlockComment = true
+
+			continue
+		}
+
+		if inBlockComment {
+			if ln == endBlockComment {
+				inBlockComment = false
+			}
+
+			continue
 		}
 
 		if unicode.IsDigit(r0) {
