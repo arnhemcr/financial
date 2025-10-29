@@ -49,6 +49,13 @@ type CSVRecordFormat struct {
 	OtherAccountI            uint8
 	ThisAccountI             uint8
 
+	// A set of punctuation bytes to remove from the value of
+	// an amount, credit or debit field
+	// so the value of a transaction can be parsed from that field.
+	// With punctuation bytes "$,", amount field "$5,432.10" becomes "5432.10"
+	// from which 5432.10 can be parsed.
+	AmountPuncts string
+
 	// The layout of the date field in the records e.g. "02/01/2006".
 	DateLayout string
 }

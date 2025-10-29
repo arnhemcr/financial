@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -32,6 +33,30 @@ var (
 	errCreditDebit    = errors.New("credit and debit cannot both be empty string or both non-empty string")
 	errPositiveNumber = errors.New("number must be positive")
 )
+
+/*
+DepunctAmount removes any punctuation bytes from an amount so it can be parsed as a value.
+It returns the depunctuated amount.
+
+With punctuation bytes "$," and amount "$5,432.10",
+depunctAmount returns "5342.10 from which value 5432.10 can be parsed.
+*/
+func depunctAmount(amount, puncts string) string {
+	if puncts == "" {
+		return amount
+	}
+
+	bs, cs := []byte(amount), []byte{}
+	for _, b := range bs {
+		if 0 <= strings.IndexByte(puncts, b) {
+			continue
+		}
+
+		cs = append(cs, b)
+	}
+
+	return string(cs)
+}
 
 /*
 ParseAmount parses the value of a transaction
@@ -47,13 +72,15 @@ func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
 		err error
 	)
 
+	ps := crf.AmountPuncts
+
 	switch {
 	case a != "":
-		v, err = parseFloat(a)
+		v, err = parseFloat(depunctAmount(a, ps))
 	case c != "" && d == "":
-		v, err = parsePositiveFloat(c)
+		v, err = parsePositiveFloat(depunctAmount(c, ps))
 	case d != "" && c == "":
-		v, err = parsePositiveFloat(d)
+		v, err = parsePositiveFloat(depunctAmount(d, ps))
 
 		v *= -1
 	default:
