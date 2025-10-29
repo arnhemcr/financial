@@ -87,7 +87,7 @@ func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
 	return crf, nil
 }
 
-// NewModuleCSVRecordFormat return this module's CSV record format.
+// NewModuleCSVRecordFormat returns this module's CSV record format.
 func NewModuleCSVRecordFormat() CSVRecordFormat {
 	return CSVRecordFormat{
 		NFields:       7,
