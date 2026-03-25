@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"unicode"
 )
 
 const ModuleCSV = "modcsv" // The name of this module's CSV record format.
@@ -53,7 +54,8 @@ type CSVRecordFormat struct {
 	// an amount, credit or debit field
 	// so the value of a transaction can be parsed from that field.
 	// With punctuation bytes "$,", amount field "$5,432.10" becomes "5432.10"
-	// from which 5432.10 can be parsed.
+	// which parses as 5432.10.
+	// Punctuation bytes cannot include decimal digits, '.', '-' or '+'.
 	AmountPuncts string
 
 	// The layout of the date field in the records e.g. "02/01/2006".
@@ -105,7 +107,8 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 		MemoI:         5,
 		AmountI:       6,
 		CurrencyI:     7,
-		DateLayout:    "2006-01-02",
+		// AmountPuncts is empty string.
+		DateLayout: "2006-01-02",
 	}
 }
 
@@ -138,6 +141,11 @@ func (crf CSVRecordFormat) Validate() error {
 		return err
 	}
 
+	err = crf.validateAmountPuncts()
+	if err != nil {
+		return err
+	}
+
 	d, _ := time.Parse(crf.DateLayout, crf.DateLayout)
 	if d.Format(time.DateOnly) != time.DateOnly {
 		return errDateLayout
@@ -155,6 +163,8 @@ const (
 var (
 	errAmountOption = errors.New("amount field index, " +
 		"or credit and debit indexes in CSV record format cannot both be zero")
+	errAmountPuncts = errors.New("punctuation bytes to remove from amounts " +
+		"cannot include decimal digits, '.', '-' or '+'")
 	errDateI        = errors.New("date field index in CSV record format cannot be zero")
 	errDateLayout   = errors.New("date layout in CSV record format must be Go style e.g. \"02/01/2006\"")
 	errIndexUnique  = errors.New("field indexes in CSV record format cannot share a non-zero value")
@@ -162,6 +172,22 @@ var (
 	errMemoI        = errors.New("memo field index in CSV record format cannot be zero")
 	errNFieldsRange = errors.New("number of fields in CSV record format is out of range")
 )
+
+/*
+ValidateAmountPuncts() returns the error if amount punctuations
+contains a decimal digit, '.', '-' or '+'.
+If not, validateAmountPunct returns nil.
+*/
+func (crf CSVRecordFormat) validateAmountPuncts() error {
+	for _, b := range crf.AmountPuncts {
+		switch {
+		case unicode.IsDigit(b) || b == '.' || b == '-' || b == '+':
+			return errAmountPuncts
+		}
+	}
+
+	return nil
+}
 
 /*
 ValidateIndexes returns nil if the field indexes in this CSV record format are valid.
