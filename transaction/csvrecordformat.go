@@ -55,7 +55,8 @@ type CSVRecordFormat struct {
 	// so the value of a transaction can be parsed from that field.
 	// With punctuation bytes "$,", amount field "$5,432.10" becomes "5432.10"
 	// which parses as 5432.10.
-	// Punctuation bytes cannot include decimal digits, '.', '-' or '+'.
+	// Punctuation bytes cannot include amount bytes:
+	// decimal digits, minus, plus or point.
 	AmountPuncts string
 
 	// The layout of the date field in the records e.g. "02/01/2006".
@@ -163,8 +164,8 @@ const (
 var (
 	errAmountOption = errors.New("amount field index, " +
 		"or credit and debit indexes in CSV record format cannot both be zero")
-	errAmountPuncts = errors.New("punctuation bytes to remove from amounts " +
-		"cannot include decimal digits, '.', '-' or '+'")
+	errAmountPuncts = errors.New("punctuation to remove from amounts " +
+		"cannot include amount runes: decimal digits, minus, plus or point")
 	errDateI        = errors.New("date field index in CSV record format cannot be zero")
 	errDateLayout   = errors.New("date layout in CSV record format must be Go style e.g. \"02/01/2006\"")
 	errIndexUnique  = errors.New("field indexes in CSV record format cannot share a non-zero value")
@@ -173,15 +174,31 @@ var (
 	errNFieldsRange = errors.New("number of fields in CSV record format is out of range")
 )
 
+// IsAmount reports whether rune is valid in an amount.
+func isAmount(r rune) bool {
+	if unicode.IsDigit(r) {
+		return true
+	}
+
+	const minus, plus, point = '-', '+', '.'
+
+	switch r {
+	case minus, plus, point:
+		return true
+	default:
+		return false
+	}
+}
+
 /*
-ValidateAmountPuncts() returns the error if amount punctuations
-contains a decimal digit, '.', '-' or '+'.
+ValidateAmountPuncts() returns nil if the amount punctuations
+in this CSV record format are valid.
+Amount punctuations cannot contain amount runes: decimal digits, minus, plus or point.
 If not, validateAmountPunct returns nil.
 */
 func (crf CSVRecordFormat) validateAmountPuncts() error {
-	for _, b := range crf.AmountPuncts {
-		switch {
-		case unicode.IsDigit(b) || b == '.' || b == '-' || b == '+':
+	for _, r := range crf.AmountPuncts {
+		if isAmount(r) {
 			return errAmountPuncts
 		}
 	}
