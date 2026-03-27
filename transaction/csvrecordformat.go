@@ -64,15 +64,6 @@ type CSVRecordFormat struct {
 }
 
 /*
-GetModuleCSVFormat returns this module's CSV record format.
-
-Deprecated: replaced by NewModuleCSVRecordFormat, and will be removed in v2.
-*/
-func GetModuleCSVFormat() CSVRecordFormat {
-	return NewModuleCSVRecordFormat()
-}
-
-/*
 NewCSVRecordFormat returns a valid CSV record format read from the named file.
 If it fails to read or validate the format, NewCSVRecordFormat returns the first error.
 */
@@ -111,16 +102,6 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 		// AmountPuncts is empty string.
 		DateLayout: "2006-01-02",
 	}
-}
-
-/*
-ReadCSVFormat returns a valid CSV record format read from the named file.
-If it fails to read or validate the format, ReadCSVFormat returns the first error.
-
-Deprecated: replaced by NewCSVRecordFormat, and will be removed in v2.
-*/
-func ReadCSVFormat(fileName string) (CSVRecordFormat, error) {
-	return NewCSVRecordFormat(fileName)
 }
 
 /*

@@ -29,13 +29,7 @@ import (
 	"unicode"
 )
 
-const (
-	Ledger = "ledger" // The name of the Ledger journal entry format.
-
-	// The transaction code delimiters.
-	StartCode = "(" // Deprecated: will not be exported in v2.
-	EndCode   = ")" // Deprecated: will not be exported in v2.
-)
+const Ledger = "ledger" // The name of the Ledger journal entry format.
 
 /*
 ParseLedger parses this transaction's date, code and memo fields
@@ -104,14 +98,14 @@ func (t Transaction) StringLedger() string {
 
 	if t.Code != "" {
 		co = " "
-		if !strings.HasPrefix(t.Code, StartCode) {
-			co += StartCode
+		if !strings.HasPrefix(t.Code, startCode) {
+			co += startCode
 		}
 
 		co += t.Code
 
-		if !strings.HasSuffix(t.Code, EndCode) {
-			co += EndCode
+		if !strings.HasSuffix(t.Code, endCode) {
+			co += endCode
 		}
 	}
 
@@ -120,6 +114,12 @@ func (t Transaction) StringLedger() string {
 		t.ThisAccount, a,
 		t.OtherAccount)
 }
+
+const (
+	// The transaction code delimiters.
+	startCode = "("
+	endCode   = ")"
+)
 
 var (
 	errEntryStart = errors.New("first line of Ledger journal entry " +
@@ -134,7 +134,7 @@ If the string does not contain the code, getCode returns an empty string.
 func getCode(code string) string {
 	n := len(code)
 	if n < 3 ||
-		!strings.HasPrefix(code, StartCode) || !strings.HasSuffix(code, EndCode) {
+		!strings.HasPrefix(code, startCode) || !strings.HasSuffix(code, endCode) {
 		return ""
 	}
 
@@ -151,7 +151,7 @@ func getDate(dates string) (string, error) {
 
 	d, _, _ := strings.Cut(dates, separator)
 
-	return ParseDate(d, time.DateOnly)
+	return parseDate(d, time.DateOnly)
 }
 
 // IsStatusMark reports whether the string is a Ledger journal entry status mark.
