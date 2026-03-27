@@ -50,15 +50,6 @@ type CSVRecordFormat struct {
 	OtherAccountI            uint8
 	ThisAccountI             uint8
 
-	// A set of punctuation bytes to remove from the value of
-	// an amount, credit or debit field
-	// so the value of a transaction can be parsed from that field.
-	// With punctuation bytes "$,", amount field "$5,432.10" becomes "5432.10"
-	// which parses as 5432.10.
-	// Punctuation bytes cannot include amount bytes:
-	// decimal digits, minus, plus or point.
-	AmountPuncts string
-
 	// The layout of the date field in the records e.g. "02/01/2006".
 	DateLayout string
 }
@@ -99,7 +90,6 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 		MemoI:         5,
 		AmountI:       6,
 		CurrencyI:     7,
-		// AmountPuncts is empty string.
 		DateLayout: "2006-01-02",
 	}
 }
@@ -123,11 +113,6 @@ func (crf CSVRecordFormat) Validate() error {
 		return err
 	}
 
-	err = crf.validateAmountPuncts()
-	if err != nil {
-		return err
-	}
-
 	d, _ := time.Parse(crf.DateLayout, crf.DateLayout)
 	if d.Format(time.DateOnly) != time.DateOnly {
 		return errDateLayout
@@ -145,8 +130,6 @@ const (
 var (
 	errAmountOption = errors.New("amount field index, " +
 		"or credit and debit indexes in CSV record format cannot both be zero")
-	errAmountPuncts = errors.New("punctuation to remove from amounts " +
-		"cannot include amount runes: decimal digits, minus, plus or point")
 	errDateI        = errors.New("date field index in CSV record format cannot be zero")
 	errDateLayout   = errors.New("date layout in CSV record format must be Go style e.g. \"02/01/2006\"")
 	errIndexUnique  = errors.New("field indexes in CSV record format cannot share a non-zero value")
@@ -169,22 +152,6 @@ func isAmount(r rune) bool {
 	default:
 		return false
 	}
-}
-
-/*
-ValidateAmountPuncts() returns nil if the amount punctuations
-in this CSV record format are valid.
-Amount punctuations cannot contain amount runes: decimal digits, minus, plus or point.
-If not, validateAmountPunct returns nil.
-*/
-func (crf CSVRecordFormat) validateAmountPuncts() error {
-	for _, r := range crf.AmountPuncts {
-		if isAmount(r) {
-			return errAmountPuncts
-		}
-	}
-
-	return nil
 }
 
 /*

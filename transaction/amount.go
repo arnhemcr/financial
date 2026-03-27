@@ -72,15 +72,13 @@ func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
 		err error
 	)
 
-	ps := crf.AmountPuncts
-
 	switch {
 	case a != "":
-		v, err = parseFloat(depunctAmount(a, ps))
+		v, err = parseFloat(a)
 	case c != "" && d == "":
-		v, err = parsePositiveFloat(depunctAmount(c, ps))
+		v, err = parsePositiveFloat(c)
 	case d != "" && c == "":
-		v, err = parsePositiveFloat(depunctAmount(d, ps))
+		v, err = parsePositiveFloat(d)
 
 		v *= -1
 	default:
