@@ -1,29 +1,47 @@
 # Arnhemcr/financial
 
 This Go module translates financial transactions 
-from arbitrary [comma-separated values (CSV)] to a standard format.
-It allows transactions from account statements in a variety of CSV formats
+from an arbitrary [comma-separated values (CSV)] format to a standard format.
+It allows transactions from account statements in various CSV formats
 to be merged for analysis and reporting.
 
 ## Program csv2trn
 
 CSV2trn [filters] transactions from CSV records, in an account statement, to a standard format.
-The format of the input CSV records is configured by [XML].
-The format of the output transactions can be
-either [Ledger] journal entries or this module's CSV records.
+The input CSV record format is configured by [XML].
+The output format is either [Ledger] journal entries or this module's CSV records.
 
-Assuming [Go has been installed], build csv2trn in its directory by running `go build`.
+Assuming [Go has been installed], build csv2trn in its directory with `go build`.
 
 Translating arbitrary CSV account statements is a challenge for financial software.
 ["The convert command" in the Ledger 3 manual] shows the issues
 with a statement from ValuFirst Credit Union.
-As an example of csv2trn, that statement can be translated to Ledger journal entries
-by running:
+As an example of csv2trn, that statement can be translated to Ledger journal entries with:
 ```
 cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
 ```
-For help on csv2trn run `./csv2trn -h`,
-and for documentation, including further examples, run `go doc`.
+which outputs:
+```
+...
+Errors for header lines that are not transaction records.
+...
+2011-12-12 Tuscan IT #00037657
+ Assets:ValuFirst:Checking  $-29.73
+ Imbalance
+2011-12-13 ID: 1741472662 CO: XXAA.COM PAYMNT
+ Assets:ValuFirst:Checking  $-236.65
+ Imbalance
+...
+```
+or this module's CSV records by adding `-o modcsv` to the csv2trn command,
+which outputs transactions:
+```
+2011-12-12,Assets:ValuFirst:Checking,Imbalance,,Tuscan IT #00037657,-29.73,$
+2011-12-13,Assets:ValuFirst:Checking,Imbalance,,ID: 1741472662 CO: XXAA.COM PAYMNT,-236.65,$
+...
+```
+Get help on csv2trn with `./csv2trn -h`,
+and get documentation, including further examples, with `go doc`.
 
 ## Program mrglent
 
@@ -39,8 +57,8 @@ are not currently copied to the output journal.
 It uses the same "YYYY-MM-DD" date layout, for input and output,
 that other arnhemcr/financial programs use for output.
 
-Install mrglent by running `go install`.
-For documentation, including an example, run `go doc`.
+Install mrglent with `go install`.
+Get documentation, including an example, with `go doc`.
 
 ## Package transaction
 
@@ -56,7 +74,7 @@ This package offers:
    an instance of type CSVRecordFormat configures the parser for the record format
  - stringing a transaction to either a Ledger journal entry or this module's CSV record
 
-For more information, see `go doc -all` in the transaction directory.
+Get more information with `go doc -all` in the transaction directory.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)

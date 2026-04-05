@@ -55,7 +55,7 @@ Try:
 	cat NB_current.csv | csv2trn -f NB.xml -c GBP -t Assets:Current
 
 In this example, command line flags set the currency
-and override this account number, from the CSV records, with a Ledger hierachical name.
+and override this account number, from the CSV records, with a Ledger hierarchical name.
 
 ## Local Credit Union
 
@@ -169,14 +169,15 @@ func parseFlags() config {
 	var cfg config
 
 	flag.StringVar(&cfg.currency, "c", "", fmt.Sprintf(
-		"currency for transaction amounts: symbol %q or a code e.g. %q", "$", "GBP"))
+		"currency for transaction amounts: symbol %q or a code e.g. %q%s",
+		"$", "GBP", "; overrides currency field in CSV record"))
 	flag.StringVar(&cfg.formatFileName, "f", "",
-		"file name containing input CSV record format in XML")
+		"name of file containing input CSV record format in XML")
 	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
 		fmt.Sprintf("output format name: %q or %q", aft.Ledger, aft.ModuleCSV))
 	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
-		"this account name, which transactions belong to e.g. %q",
-		"Assets:Current"))
+		"this account name, which transactions belong to e.g. %q%s",
+		"Assets:Current", "; overrides this account field in CSV record"))
 
 	var help bool
 
@@ -208,7 +209,7 @@ func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 		if errors.Is(err, io.EOF) {
 			break
 		} else if err != nil {
-			return ts, fmt.Errorf("cannot read CSV statement: %v", err)
+			return ts, fmt.Errorf("cannot read CSV statement: %w", err)
 		}
 
 		var t aft.Transaction

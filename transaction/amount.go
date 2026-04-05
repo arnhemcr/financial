@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 var (
@@ -33,30 +32,6 @@ var (
 	errCreditDebit    = errors.New("credit and debit cannot both be empty string or both non-empty string")
 	errPositiveNumber = errors.New("number must be positive")
 )
-
-/*
-DepunctAmount removes any punctuation bytes from an amount so it can be parsed as a value.
-It returns the depunctuated amount.
-
-With punctuation bytes "$," and amount "$5,432.10",
-depunctAmount returns "5342.10 from which value 5432.10 can be parsed.
-*/
-func depunctAmount(amount, puncts string) string {
-	if puncts == "" {
-		return amount
-	}
-
-	bs, cs := []byte(amount), []byte{}
-	for _, b := range bs {
-		if 0 <= strings.IndexByte(puncts, b) {
-			continue
-		}
-
-		cs = append(cs, b)
-	}
-
-	return string(cs)
-}
 
 /*
 ParseAmount parses the value of a transaction

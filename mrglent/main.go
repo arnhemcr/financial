@@ -162,7 +162,7 @@ If it fails to parse the entry, parse returns an error.
 func (e *ledgerEntry) parse(lines []string) error {
 	err := e.Trn.ParseLedger(lines)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot parse Ledger entry: %w", err)
 	}
 
 	e.Lines = lines
@@ -204,9 +204,9 @@ If it fails to parse the journal, parse returns the first error.
 */
 func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 	var (
-		e    ledgerEntry
-		lns  []string // The lines of the current entry.
-		err  error
+		e              ledgerEntry
+		lns            []string // The lines of the current entry.
+		err            error
 		inBlockComment bool
 	)
 
@@ -234,8 +234,7 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 			j.Entries = append(j.Entries, e)
 		}
 
-		const startBlockComment = "comment\n"
-		const endBlockComment = "end comment\n"
+		const startBlockComment, endBlockComment = "comment\n", "end comment\n"
 
 		if ln == startBlockComment {
 			inBlockComment = true

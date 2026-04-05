@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"os"
 	"time"
-	"unicode"
 )
 
 const ModuleCSV = "modcsv" // The name of this module's CSV record format.
@@ -90,7 +89,7 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 		MemoI:         5,
 		AmountI:       6,
 		CurrencyI:     7,
-		DateLayout: "2006-01-02",
+		DateLayout:    "2006-01-02",
 	}
 }
 
@@ -137,22 +136,6 @@ var (
 	errMemoI        = errors.New("memo field index in CSV record format cannot be zero")
 	errNFieldsRange = errors.New("number of fields in CSV record format is out of range")
 )
-
-// IsAmount reports whether rune is valid in an amount.
-func isAmount(r rune) bool {
-	if unicode.IsDigit(r) {
-		return true
-	}
-
-	const minus, plus, point = '-', '+', '.'
-
-	switch r {
-	case minus, plus, point:
-		return true
-	default:
-		return false
-	}
-}
 
 /*
 ValidateIndexes returns nil if the field indexes in this CSV record format are valid.
