@@ -33,13 +33,14 @@ Errors for header lines that are not transaction records.
  Imbalance
 ...
 ```
-or this module's CSV records by adding `-o modcsv` to the csv2trn command,
-which outputs transactions:
+Adding `-o modcsv` to the csv2trn command above translates that statement to this module's CSV records:
 ```
+...
 2011-12-12,Assets:ValuFirst:Checking,Imbalance,,Tuscan IT #00037657,-29.73,$
 2011-12-13,Assets:ValuFirst:Checking,Imbalance,,ID: 1741472662 CO: XXAA.COM PAYMNT,-236.65,$
 ...
 ```
+
 Get help on csv2trn with `./csv2trn -h`,
 and get documentation, including further examples, with `go doc`.
 
