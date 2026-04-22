@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Andrew Flint.
+Copyright (C) 2025-2026 Andrew Flint.
 
 This file is part of arnhemcr/financial.
 
@@ -72,7 +72,7 @@ And this account must be set with a flag.
 
 Try:
 
-	cat NB_02_current.csv | csv2trn -f NB.xml -o modcsv | sed -f adjust.sed | csv2trn
+	cat NB_current.csv | csv2trn -f NB.xml -o modcsv | sed -f adjust.sed | csv2trn
 
 Ledger expects both this and other accounts to be hierarchical names.
 If a CSV record contains an other account number, it can be mapped to the name.
@@ -149,8 +149,7 @@ func main() {
 		The number of fields in a record is checked by aft.ParseCSV,
 		so disable the reader's check.
 	*/
-	r.FieldsPerRecord = -1
-	r.ReuseRecord = true
+	r.FieldsPerRecord, r.ReuseRecord = -1, true
 
 	ts, err := parseCSVStatement(r, cfg, inFormat)
 	if err != nil {

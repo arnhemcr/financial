@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Andrew Flint.
+Copyright (C) 2025-2026 Andrew Flint.
 
 This file is part of arnhemcr/financial.
 
@@ -30,6 +30,9 @@ import (
 )
 
 const Ledger = "ledger" // The name of the Ledger journal entry format.
+
+// The starting and ending lines for Ledger block comments.
+const StartBlockComment, EndBlockComment = "comment\n", "end comment\n"
 
 /*
 ParseLedger parses this transaction's date, code and memo fields

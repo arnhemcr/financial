@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Andrew Flint.
+Copyright (C) 2025-2026 Andrew Flint.
 
 This file is part of arnhemcr/financial.
 

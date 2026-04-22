@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Andrew Flint.
+Copyright (C) 2025-2026 Andrew Flint.
 
 This file is part of arnhemcr/financial.
 
@@ -234,16 +234,14 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 			j.Entries = append(j.Entries, e)
 		}
 
-		const startBlockComment, endBlockComment = "comment\n", "end comment\n"
-
-		if ln == startBlockComment {
+		if ln == aft.StartBlockComment {
 			inBlockComment = true
 
 			continue
 		}
 
 		if inBlockComment {
-			if ln == endBlockComment {
+			if ln == aft.EndBlockComment {
 				inBlockComment = false
 			}
 

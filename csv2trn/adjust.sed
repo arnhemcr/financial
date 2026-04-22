@@ -2,7 +2,7 @@
 # adjust.sed
 #
 
-# Replace account numbers with Ledger account names.
+# Replace account number with Ledger account name.
 s/,01-2345-6789012-34,/,Assets:Current,/
 s/,01-2345-6789012-35,/,Assets:Emergency,/
 s/,12-3456-7890123-45,/,Assets:Saving,/
