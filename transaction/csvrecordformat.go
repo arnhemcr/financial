@@ -36,18 +36,19 @@ type CSVRecordFormat struct {
 	NFields uint8 // The number of fields in a record.
 
 	// The indexes of fields in the record.
-	// Some fields are required; the others are optional.
+	// Some fields are required, while the rest are optional.
 	// The index for a required field is between 1 and NFields inclusive.
 	// If a field is not contained in a record, its index is zero.
 	//
 	// Either amount, or both credit and debit are required.
-	AmountI, CreditI, DebitI uint8
-	CurrencyI                uint8
-	CodeI                    uint8
-	DateI                    uint8 // This field is required.
-	MemoI                    uint8 // This field is required.
-	OtherAccountI            uint8
-	ThisAccountI             uint8
+	AmountI         uint8 // Either this field is required or
+	CreditI, DebitI uint8 // these two.
+	CurrencyI       uint8
+	CodeI           uint8
+	DateI           uint8 // This field is required.
+	MemoI           uint8 // This field is required.
+	OtherAccountI   uint8
+	ThisAccountI    uint8
 
 	// The layout of the date field in the records e.g. "02/01/2006".
 	DateLayout string
@@ -82,6 +83,7 @@ func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
 func NewModuleCSVRecordFormat() CSVRecordFormat {
 	return CSVRecordFormat{
 		NFields:       7,
+
 		DateI:         1,
 		ThisAccountI:  2,
 		OtherAccountI: 3,
@@ -89,6 +91,7 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 		MemoI:         5,
 		AmountI:       6,
 		CurrencyI:     7,
+
 		DateLayout:    "2006-01-02",
 	}
 }
@@ -98,7 +101,8 @@ Validate returns nil if this CSV record format is valid.
 If not, Validate returns the first error.
 */
 func (crf CSVRecordFormat) Validate() error {
-	if crf.NFields < minNFields || maxNFields < crf.NFields {
+	n := crf.NFields
+	if n < minNFields || maxNFields < n {
 		return errNFieldsRange
 	}
 
@@ -149,7 +153,7 @@ func (crf CSVRecordFormat) validateIndexes() error {
 	is := [...]uint8{crf.AmountI, crf.CodeI, crf.CreditI, crf.DateI, crf.DebitI,
 		crf.MemoI, crf.OtherAccountI, crf.ThisAccountI}
 
-	var inUse [maxNFields + 1]bool
+	var used [maxNFields + 1]bool
 
 	for _, i := range is {
 		switch {
@@ -157,10 +161,10 @@ func (crf CSVRecordFormat) validateIndexes() error {
 			return errIndexRange
 		case i == 0:
 			// These CSV records do not contain this field.
-		case inUse[i]:
+		case used[i]:
 			return errIndexUnique
 		default:
-			inUse[i] = true
+			used[i] = true
 		}
 	}
 

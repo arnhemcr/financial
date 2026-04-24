@@ -43,48 +43,50 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 	*/
 	fs := slices.Insert(fields, 0, "")
 
+	// required fields
 	var err error
-
-	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
-	if err != nil {
-		return err
-	}
 
 	t.Amount, err = parseAmount(fs, crf)
 	if err != nil {
 		return err
 	}
 
-	t.Code = fs[crf.CodeI]
-
-	if t.Currency == "" {
-		t.Currency = fs[crf.CurrencyI]
+	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
+	if err != nil {
+		return err
 	}
 
-	t.Memo = fs[crf.MemoI]
+	t.Memo, t.OtherAccount = fs[crf.MemoI], fs[crf.OtherAccountI]
 	if t.Memo == "" {
 		return errMemo
 	}
 
-	t.OtherAccount = fs[crf.OtherAccountI]
 	if t.OtherAccount == "" {
 		t.OtherAccount = DefaultOtherAccount
 	}
 
+	a := fs[crf.ThisAccountI]
+
 	switch {
-	case t.ThisAccount == DefaultOtherAccount ||
-		fs[crf.ThisAccountI] == DefaultOtherAccount:
+	case t.ThisAccount == DefaultOtherAccount || a == DefaultOtherAccount:
 		return errThisAccount
 	case t.ThisAccount != "":
-		// This account already has a value, which takes precedence over its field.
-		return nil
-	case fs[crf.ThisAccountI] != "":
-		t.ThisAccount = fs[crf.ThisAccountI]
-
-		return nil
+		// This account already has a value which takes precedence over its field.
+	case a != "":
+		t.ThisAccount = a
 	default:
 		return errThisAccount
 	}
+
+	// optional fields
+	t.Code = fs[crf.CodeI]
+
+	// Currency may already have a value which takes precedence over its field.
+	if t.Currency == "" {
+		t.Currency = fs[crf.CurrencyI]
+	}
+
+	return nil
 }
 
 // StringModuleCSV returns this transaction as this module's CSV record.

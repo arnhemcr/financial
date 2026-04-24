@@ -32,7 +32,10 @@ import (
 const Ledger = "ledger" // The name of the Ledger journal entry format.
 
 // The starting and ending lines for Ledger block comments.
-const StartBlockComment, EndBlockComment = "comment\n", "end comment\n"
+const (
+	StartBlockComment = "comment\n"
+	EndBlockComment   = "end comment\n"
+)
 
 /*
 ParseLedger parses this transaction's date, code and memo fields
@@ -50,30 +53,30 @@ func (t *Transaction) ParseLedger(lines []string) error {
 	}
 
 	fs := strings.Fields(lines[0])
+	n := len(fs)
 
-	var err error
+	var (
+		err error
+		i   int
+	)
 
-	t.Date, err = getDate(fs[0])
-	if err != nil {
+	t.Date, err = getDate(fs[i])
+	if err == nil {
+		i++
+	} else {
 		return err
 	}
 
-	n := len(fs)
-
-	var i int
-
-	switch {
-	case 3 <= n && isStatusMark(fs[1]):
-		i = 2
-	case 2 <= n:
-		i = 1
-	default:
-		return nil
+	if i < n && isStatusMark(fs[i]) {
+		// skip status mark
+		i++
 	}
 
-	t.Code = getCode(fs[i])
-	if t.Code != "" {
-		i++
+	if i < n {
+		t.Code = getCode(fs[i])
+		if t.Code != "" {
+			i++
+		}
 	}
 
 	if i < n {
@@ -124,10 +127,8 @@ const (
 	endCode   = ")"
 )
 
-var (
-	errEntryStart = errors.New("first line of Ledger journal entry " +
-		"must start with decimal digit")
-)
+var errEntryStart = errors.New(
+	"first line of Ledger journal entry must start with decimal digit")
 
 /*
 GetCode returns a transaction code from the Ledger journal entry string.

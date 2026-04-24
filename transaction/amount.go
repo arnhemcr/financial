@@ -34,8 +34,7 @@ var (
 )
 
 /*
-ParseAmount parses the value of a transaction
-from either the amount, credit or debit fields.
+ParseAmount parses the value of a transaction from either the amount, credit or debit fields.
 The value cannot be zero.
 If it fails to parse a non-zero value, parseAmount returns the first error.
 */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Andrew Flint.
+Copyright (C) 2025-2026 Andrew Flint.
 
 This file is part of arnhemcr/financial.
 
@@ -37,14 +37,14 @@ package transaction
 /*
 A Transaction represents a financial transaction:
 the transfer of an amount of currency from one account to another on a date.
-It is described by a memo and code, also known as the description and
-transaction type respectively.
+It is described by a memo and code, also known as the description and transaction type respectively.
 A transaction belongs to an account known as this account.
+Optional fields may have the value empty string, while the rest must have non-zero values.
 */
 type Transaction struct {
 	Amount       float64
-	Code         string // This field is optional, and its value can be empty string.
-	Currency     string // This field is optional, and its value can be empty string.
+	Code         string // This field is optional.
+	Currency     string // This field is optional.
 	Date         string
 	Memo         string
 	OtherAccount string // The default value of this field is DefaultOtherAccount.
