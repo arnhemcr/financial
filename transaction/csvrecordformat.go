@@ -82,7 +82,7 @@ func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
 // NewModuleCSVRecordFormat returns this module's CSV record format.
 func NewModuleCSVRecordFormat() CSVRecordFormat {
 	return CSVRecordFormat{
-		NFields:       7,
+		NFields: 7,
 
 		DateI:         1,
 		ThisAccountI:  2,
@@ -92,7 +92,7 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 		AmountI:       6,
 		CurrencyI:     7,
 
-		DateLayout:    "2006-01-02",
+		DateLayout: "2006-01-02",
 	}
 }
 
