@@ -21,10 +21,12 @@ If not, see <https://www.gnu.org/licenses/>.
 
 /*
 Mrglent merges multiple [Ledger] financial journals,
-containing entries also known as transactions, into one journal.
-It is a [filter] that:
-  - removes mirror entries that have been marked with the transaction code "MT"
-  - sorts the remaining entries by date ascending
+containing entries, also known as transactions, into one journal.
+It is a [filter] that removes mirror entries that have been marked in one of two ways:
+  - comment lines "# mirror entry" and "# end mirror entry" before and after the entry or
+  - the entry's code field is set to "MT"
+
+Mrglent sorts the remaining entries by date ascending.
 
 Assuming multiple accounts each with its own Ledger journal,
 transfers between those accounts will lead to mirror entries.
@@ -202,10 +204,10 @@ If it fails to parse the journal, parse returns the first error.
 */
 func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 	var (
-		e              ledgerEntry
-		lns            []string // The lines of the current entry.
-		err            error
-		inBlockComment bool
+		e                             ledgerEntry
+		lns                           []string // The lines of the current entry.
+		err                           error
+		inBlockComment, inMirrorEntry bool
 	)
 
 	for s.Scan() {
@@ -241,6 +243,20 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 		if inBlockComment {
 			if ln == aft.EndBlockComment {
 				inBlockComment = false
+			}
+
+			continue
+		}
+
+		if ln == aft.StartMirror {
+			inMirrorEntry = true
+
+			continue
+		}
+
+		if inMirrorEntry {
+			if ln == aft.EndMirror {
+				inMirrorEntry = false
 			}
 
 			continue

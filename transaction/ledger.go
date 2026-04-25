@@ -31,10 +31,19 @@ import (
 
 const Ledger = "ledger" // The name of the Ledger journal entry format.
 
-// The starting and ending lines for Ledger block comments.
 const (
+	/*
+		The start and end lines for Ledger block comments
+		(see the "Commenting Your Journal" section of the [Ledger 3 Manual].
+
+		[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
+	*/
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
+
+	// The start and end Ledger global comment lines around mirror transactions.
+	StartMirror = "# mirror entry\n"
+	EndMirror   = "# end mirror entry\n"
 )
 
 /*
@@ -44,8 +53,6 @@ If it fails to parse those fields, ParseLedger returns the first error.
 
 The format of a Ledger journal entry is described in the
 "Transactions and Comments" section of the [Ledger 3 manual].
-
-[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 func (t *Transaction) ParseLedger(lines []string) error {
 	if len(lines) == 0 || !startsDigit(lines[0]) {

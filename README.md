@@ -52,8 +52,7 @@ and get documentation, including further examples, with `go doc`.
 
 Mrglent merges multiple Ledger financial journals containing entries,
 also known as transactions, into one journal. It is a filter that:
-  - removes mirror entries, that have been marked with the transaction code "MT",
-    to avoid double transfers between accounts with journals
+  - removes entries marked as mirrors to avoid double transfers between accounts with journals
   - sorts the remaining entries by date ascending
 
 Mrglent only merges entries: transactions with dates.
