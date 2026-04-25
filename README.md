@@ -1,21 +1,24 @@
 # Arnhemcr/financial
 
-This Go module translates financial transactions 
-from an arbitrary [comma-separated values (CSV)] format to a standard format.
-It allows transactions from account statements in various CSV formats
-to be merged for analysis and reporting.
+This Go module:
+
+  - translates a [comma-separated values (CSV)] financial transaction statement
+    with records in an arbitrary format
+    to a selection of standard formats including [Ledger] (program csv2trn)
+  - merges Ledger entries (containing transactions) from multiple journals
+    into one for analysis and reporting (program mrglent)
 
 ## Program csv2trn
 
-CSV2trn [filters] transactions from CSV records, in an account statement, to a standard format.
+CSV2trn [filters] transactions from CSV records in a statement to a standard format.
 The input CSV record format is configured by [XML].
-The output format is either [Ledger] journal entries or this module's CSV records.
+The output format is either Ledger journal entries (the default) or this module's CSV records.
 
 Assuming [Go has been installed], build csv2trn in its directory with `go build`.
 
-Translating arbitrary CSV account statements is a challenge for financial software.
-["The convert command" in the Ledger 3 manual] shows the issues
-with a statement from ValuFirst Credit Union.
+Translating statements in arbitrary CSV formats is a challenge for financial software.
+As an example, the Ledger manual has a statement from the ValuFirst Credit Union
+(see ["The convert command" in the Ledger 3 manual]).
 As an example of csv2trn, that statement can be translated to Ledger journal entries with:
 ```
 cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
@@ -36,7 +39,7 @@ Errors for header lines that are not transaction records.
  Assets:ValuFirst:Checking  $45
  Imbalance
 ```
-Adding `-o modcsv` to the csv2trn command above translates that statement to this module's CSV records:
+Adding `-o modcsv` to the command above translates that statement to this module's CSV records:
 ```
 ...
 2011-12-12,Assets:ValuFirst:Checking,Imbalance,,Tuscan IT #00037657,-29.73,$
@@ -50,8 +53,9 @@ and get documentation, including further examples, with `go doc`.
 
 ## Program mrglent
 
-Mrglent merges multiple Ledger financial journals containing entries,
-also known as transactions, into one journal. It is a filter that:
+Mrglent merges multiple Ledger financial journals containing entries
+(containing transactions) into one journal.
+It is a filter that:
   - removes entries marked as mirrors to avoid double transfers between accounts with journals
   - sorts the remaining entries by date ascending
 
@@ -59,7 +63,7 @@ Mrglent only merges entries: transactions with dates.
 Automatic transactions, comments and command directives in the input journals
 are not currently copied to the output journal.
 It uses the same "YYYY-MM-DD" date layout, for input and output,
-that other arnhemcr/financial programs use for output.
+which other arnhemcr/financial programs use for output.
 
 Install mrglent with `go install`.
 Get documentation, including an example, with `go doc`.
