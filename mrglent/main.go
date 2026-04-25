@@ -183,12 +183,10 @@ func (e *ledgerEntry) string() string {
 
 // Demirror removes any entries marked as mirrors from this Ledger journal.
 func (j *ledgerJournal) demirror() {
-	const mirrorCode = "MT"
-
 	es := make([]ledgerEntry, len(j.Entries))
 
 	for _, e := range j.Entries {
-		if e.Trn.Code == mirrorCode {
+		if e.Trn.Code == aft.MirrorCode {
 			continue
 		}
 

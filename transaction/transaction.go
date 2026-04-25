@@ -43,7 +43,7 @@ Optional fields may have the value empty string, while the rest must have non-ze
 */
 type Transaction struct {
 	Amount       float64
-	Code         string // This field is optional.
+	Code         string // This field is optional. See also MirrorCode.
 	Currency     string // This field is optional.
 	Date         string
 	Memo         string
@@ -51,7 +51,10 @@ type Transaction struct {
 	ThisAccount  string
 }
 
-const DefaultOtherAccount = "Imbalance" // The default value for other account.
+const (
+	DefaultOtherAccount = "Imbalance" // The default value for other account.
+	MirrorCode          = "MT"        // The code value for a mirror transaction.
+)
 
 /*
 StringFormat returns this transaction in the named format.

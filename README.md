@@ -32,6 +32,9 @@ Errors for header lines that are not transaction records.
  Assets:ValuFirst:Checking  $-236.65
  Imbalance
 ...
+2011-12-13 CASH DEPOSIT
+ Assets:ValuFirst:Checking  $45
+ Imbalance
 ```
 Adding `-o modcsv` to the csv2trn command above translates that statement to this module's CSV records:
 ```
@@ -39,6 +42,7 @@ Adding `-o modcsv` to the csv2trn command above translates that statement to thi
 2011-12-12,Assets:ValuFirst:Checking,Imbalance,,Tuscan IT #00037657,-29.73,$
 2011-12-13,Assets:ValuFirst:Checking,Imbalance,,ID: 1741472662 CO: XXAA.COM PAYMNT,-236.65,$
 ...
+2011-12-13,Assets:ValuFirst:Checking,Imbalance,,CASH DEPOSIT,45,$
 ```
 
 Get help on csv2trn with `./csv2trn -h`,
