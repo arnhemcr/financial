@@ -2,8 +2,8 @@
 
 This Go module:
 
-  - translates a [comma-separated values (CSV)] financial transaction statement
-    with records in an arbitrary format
+  - translates a [comma-separated values (CSV)] financial statement
+    with transaction records in an arbitrary format
     to a selection of standard formats including [Ledger] (program csv2trn)
   - merges Ledger entries (containing transactions) from multiple journals
     into one for analysis and reporting (program mrglent)
