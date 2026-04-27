@@ -22,8 +22,10 @@ If not, see <https://www.gnu.org/licenses/>.
 package transaction
 
 import (
+	"encoding/xml"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 	"unicode"
@@ -45,6 +47,36 @@ const (
 	StartMirror = "# mirror entry\n"
 	EndMirror   = "# end mirror entry\n"
 )
+
+/*
+LedgerAccounts returns a list of Ledger account names read from the named XML file.
+If it fails to read the list, LedgerAccounts returns the first error.
+
+For example, file LedgerAccountsWithJournals.xml might contain three asset account names:
+
+ <Accounts>
+   <Account>Assets:Current</Account>
+   <Account>Assets:Emergency</Account>
+   <Account>Assets:Savings</Account>
+ </Accounts>
+*/
+func LedgerAccounts(fileName string) ([]string, error) {
+	var as struct {
+		Accounts []string `xml:"Account"`
+	}
+
+	bs, err := os.ReadFile(fileName)
+	if err != nil {
+		return as.Accounts, fmt.Errorf("cannot read list of Ledger account names: %w", err)
+	}
+
+	err = xml.Unmarshal(bs, &as)
+	if err != nil {
+		return as.Accounts, fmt.Errorf("cannot parse list of Ledger account names: %w", err)
+	}
+
+	return as.Accounts, nil
+}
 
 /*
 ParseLedger parses this transaction's date, code and memo fields

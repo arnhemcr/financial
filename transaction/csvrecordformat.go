@@ -55,7 +55,7 @@ type CSVRecordFormat struct {
 }
 
 /*
-NewCSVRecordFormat returns a valid CSV record format read from the named file.
+NewCSVRecordFormat returns a valid CSV record format read from the named XML file.
 If it fails to read or validate the format, NewCSVRecordFormat returns the first error.
 */
 func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
@@ -63,12 +63,12 @@ func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
 
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return crf, fmt.Errorf("cannot read CSV record format from file: %w", err)
+		return crf, fmt.Errorf("cannot read CSV record format: %w", err)
 	}
 
 	err = xml.Unmarshal(bs, &crf)
 	if err != nil {
-		return crf, fmt.Errorf("cannot parse CSV record format from file: %w", err)
+		return crf, fmt.Errorf("cannot parse CSV record format: %w", err)
 	}
 
 	err = crf.Validate()
