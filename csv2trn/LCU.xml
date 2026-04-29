@@ -1,4 +1,4 @@
-<!--CSV record format of the fictional Local Credit Union's account statements.-->
+<!-- The CSV record format of the fictional Local Credit Union's financial statements. -->
 <CSVRecordFormat>
   <NFields>5</NFields>
 

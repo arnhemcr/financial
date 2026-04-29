@@ -124,7 +124,7 @@ func main() {
 
 	cfg := parseFlags()
 	switch cfg.outFormatName {
-	case aft.Ledger, aft.ModuleCSV:
+	case aft.Ledger, aft.Ledger_, aft.ModuleCSV, aft.ModuleCSV_:
 		// This output format name is valid.
 	default:
 		log.Fatalf("%q: %v", cfg.outFormatName, errOutFormatName)
@@ -172,8 +172,9 @@ func parseFlags() config {
 		"$", "GBP", "; overrides currency field in CSV record"))
 	flag.StringVar(&cfg.formatFileName, "f", "",
 		"name of file containing input CSV record format in XML")
-	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
-		fmt.Sprintf("output format name: %q or %q", aft.Ledger, aft.ModuleCSV))
+	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger_,
+		fmt.Sprintf("output format name: %q or %q, or %q or %q",
+			aft.Ledger, aft.Ledger_, aft.ModuleCSV, aft.ModuleCSV_))
 	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
 		"this account name, which transactions belong to e.g. %q%s",
 		"Assets:Current", "; overrides this account field in CSV record"))

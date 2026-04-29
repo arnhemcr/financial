@@ -1,45 +1,55 @@
 # Arnhemcr/financial
 
-This Go module:
+This [Go] module offers programs to:
 
-  - translates a [comma-separated values (CSV)] financial statement
-    with transaction records in an arbitrary format
-    to a selection of standard formats including [Ledger] (program csv2trn)
-  - merges Ledger entries (containing transactions) from multiple journals
-    into one for analysis and reporting (program mrglent)
+ * translate a financial transaction statement
+   from an arbitrary [comma-separated values (CSV)] format to a [Ledger] journal
+ * merge multiple Ledger journals into one general journal for reporting and analysis
 
-## Program csv2trn
+According to the Ledger 3 manual:
 
-CSV2trn [filters] transactions from CSV records in a statement to a standard format.
-The input CSV record format is configured by [XML].
-The output format is either Ledger journal entries (the default) or this module's CSV records.
+> "Importing csv files is a lot of work, ..."
+>
+> &mdash; [The `convert` command]
+
+This module aims to make it a little easier.
+Its sole dependency is the [Go standard library].
+
+## One CSV statement to one Ledger journal
+
+Program csv2trn reads a statement, extracts a transaction from each CSV record
+and writes the transactions in a standard format/
+The format of the input CSV record is configured in an [XML] file.
+The output format is either Ledger entry (the default) or this module's CSV record.
 
 Assuming [Go has been installed], build csv2trn in its directory with `go build`.
 
-Translating statements in arbitrary CSV formats is a challenge for financial software.
-As an example, the Ledger manual has a statement from the ValuFirst Credit Union
+As an example of a CSV statement, the Ledger manual gives one from ValuFirst Credit Union
 (see ["The convert command" in the Ledger 3 manual]).
-As an example of csv2trn, that statement can be translated to Ledger journal entries with:
+As an example of csv2trn, that statement can be translated to a Ledger journal with:
 ```
-cat VFCU.csv | ./csv2trn -f VFCU.xml -t Assets:ValuFirst:Checking -c $
+cat VFCU.csv | ./csv2trn -t Assets:ValuFirst:Checking -f VFCU.xml >VFCU.journal
 ```
-which outputs:
+Command flags name this account, the Ledger account this statement belongs to,
+and the XML configuration file.
+The statement contains lines which are not transaction records, so csv2trn warns about them.
+Print the journal with `cat VFCU.journal` :
 ```
-...
-Errors for header lines that are not transaction records.
-...
 2011-12-12 Tuscan IT #00037657
- Assets:ValuFirst:Checking  $-29.73
+ Assets:ValuFirst:Checking  -29.73
  Imbalance
 2011-12-13 ID: 1741472662 CO: XXAA.COM PAYMNT
- Assets:ValuFirst:Checking  $-236.65
+ Assets:ValuFirst:Checking  -236.65
  Imbalance
 ...
 2011-12-13 CASH DEPOSIT
- Assets:ValuFirst:Checking  $45
+ Assets:ValuFirst:Checking  45
  Imbalance
 ```
-Adding `-o modcsv` to the command above translates that statement to this module's CSV records:
+Note the CSV records do not give the other account in each transaction,
+so other account defaults to Imbalance.
+<!--
+Adding `-o mcsv` to the command above translates that statement to this module's CSV records:
 ```
 ...
 2011-12-12,Assets:ValuFirst:Checking,Imbalance,,Tuscan IT #00037657,-29.73,$
@@ -47,10 +57,14 @@ Adding `-o modcsv` to the command above translates that statement to this module
 ...
 2011-12-13,Assets:ValuFirst:Checking,Imbalance,,CASH DEPOSIT,45,$
 ```
+-->
 
-Get help on csv2trn with `./csv2trn -h`,
+Get help on csv2trn with `./csv2trn -h`
 and get documentation, including further examples, with `go doc`.
 
+## Multiple statements each to its own journal then merged to one general journal
+
+<!--
 ## Program mrglent
 
 Mrglent merges multiple Ledger financial journals containing entries
@@ -67,6 +81,7 @@ which other arnhemcr/financial programs use for output.
 
 Install mrglent with `go install`.
 Get documentation, including an example, with `go doc`.
+-->
 
 ## Package transaction
 
@@ -86,7 +101,9 @@ Get more information with `go doc -all` in the transaction directory.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
+[Go]: https://go.dev
 [Go has been installed]: https://go.dev/doc/install
-[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
+[Go standard library]: https://pkg.go.dev/std
+[Ledger]: https://ledger-cli.org
 ["The convert command" in the Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
 [XML]: https://en.wikipedia.org/wiki/XML

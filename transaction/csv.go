@@ -27,6 +27,11 @@ import (
 	"strings"
 )
 
+const (
+	ModuleCSV  = "mcsv"   // The name of this module's CSV record format.
+	ModuleCSV_ = "modcsv" // An alias for the name of this module's CSV record format.
+)
+
 /*
 ParseCSV parses this transaction from the CSV record fields according to the format.
 It assumes the format is valid.

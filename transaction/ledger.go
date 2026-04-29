@@ -31,7 +31,10 @@ import (
 	"unicode"
 )
 
-const Ledger = "ledger" // The name of the Ledger journal entry format.
+const (
+	Ledger  = "lent"   // The name of the Ledger journal entry format.
+	Ledger_ = "ledger" // An alias for the Ledger journal entry format.
+)
 
 const (
 	/*
@@ -54,11 +57,11 @@ If it fails to read the list, LedgerAccounts returns the first error.
 
 For example, file LedgerAccountsWithJournals.xml might contain three asset account names:
 
- <Accounts>
-   <Account>Assets:Current</Account>
-   <Account>Assets:Emergency</Account>
-   <Account>Assets:Savings</Account>
- </Accounts>
+	<Accounts>
+	  <Account>Assets:Current</Account>
+	  <Account>Assets:Emergency</Account>
+	  <Account>Assets:Savings</Account>
+	</Accounts>
 */
 func LedgerAccounts(fileName string) ([]string, error) {
 	var as struct {

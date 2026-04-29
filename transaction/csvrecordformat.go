@@ -29,8 +29,6 @@ import (
 	"time"
 )
 
-const ModuleCSV = "modcsv" // The name of this module's CSV record format.
-
 // A CSVRecordFormat defines the format of CSV records representing financial transactions.
 type CSVRecordFormat struct {
 	NFields uint8 // The number of fields in a record.
