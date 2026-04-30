@@ -27,44 +27,6 @@ It is a [filter] that removes mirror entries that have been marked in one of two
   - the entry's code field is set to "MT"
 
 Mrglent sorts the remaining entries by date ascending.
-
-Assuming multiple accounts each with its own Ledger journal,
-transfers between those accounts will lead to mirror entries.
-A mirror entry is a debit in one journal mirrored by a credit in another.
-When those journals are merged,
-one side of each mirror entry must be removed to avoid making the transfer twice.
-
-Mrglent only merges entries: transactions which have dates.
-Automatic transactions, comments and command directives in the input journals
-are not currently copied to the output journal.
-It uses the same "YYYY-MM-DD" date layout, for input and output,
-that other arnhemcr/financial programs use for output.
-
-# Example
-
-The following example shows how to use mrglent.
-It assumes mrglent is installed in a Unix-like environment
-and is being run from its source directory.
-
-Start by concatenating three journals into one:
-
-	cat LCU.journal NB_emergency.journal NB_current.journal >general_.journal
-	ledger -f general_.journal register emergency
-
-The output has six lines, the last four are a pair of mirror entries,
-and the second to last line is out of date order.
-
-Add mrglent to the command line above:
-
-	cat LCU.journal NB_emergency.journal NB_current.journal | mrglent >general.journal
-	ledger -f general.journal register emergency
-
-Mrglent removes the credit mirror entries then sorts the remaining entries by date ascending.
-The output has four lines in date order.
-
-[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-
-[filters]: https://en.wikipedia.org/wiki/Filter_(software)
 */
 package main
 

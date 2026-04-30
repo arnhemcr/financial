@@ -84,8 +84,7 @@ A transfer between those accounts has an entry in both journals:
 a debit entry from one mirroring a credit to the other
 (see the entry with memo "To emergency fund" in the journals).
 To merge these journals into a general journal,
-one entry for each mirrored transfer must be removed
-so the transfer happens once not twice.
+one mirror entry must be removed so the transfer happens once not twice.
 
 Program mcsv2lent marks the credit entry of transfers between Ledger accounts with journals.
 The names of Ledger accounts with journals are read from an XML file.
@@ -105,12 +104,12 @@ cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.s
 The credit "To emergency fund" entry in LCU.journal is marked with mirror entry comments,
 while the debit entry in NB.journal is as before.
 
-## Merge Ledger journals to a general journal
+## Merge Ledger journals into a general journal
 
 Build, install and verify mrglent from its directory.
 
 ```
-cat ../sed/NB.journal ../sed/LCU.journal >general.journal | mrglent >general.journal
+cat ../sed/NB.journal ../sed/LCU.journal | mrglent >general.journal
 ```
 
 ## Package transaction
