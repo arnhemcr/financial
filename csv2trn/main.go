@@ -21,74 +21,12 @@ If not, see <https://www.gnu.org/licenses/>.
 
 /*
 CSV2trn [filters] financial transactions from [comma-separated values (CSV)] records,
-in an account statement, to a standard format.
-
-# Examples
-
-The following examples explain how to use csv2trn.
-They assume csv2trn is installed in a Unix-like environment
-and is being run from its source directory.
-
-## National Bank
-
-Try:
-
-	cat NB_emergency.csv | csv2trn -f NB.xml
-
-This module's transactions have the following fields:
-  - Date
-  - This account, which is the account this transaction belongs to
-  - Other account, which is optional
-  - Code, which is also known as the type and is optional
-  - Memo, which is also known as the description
-  - Amount
-  - Currency, which is optional
-
-National Bank CSV account statements contain all these fields except currency.
-In this example, csv2trn reads CSV records from a National Bank account statement.
-A transaction is parsed from the record on each line according to the input format in [XML].
-Each transaction is written in the default output format: [Ledger] journal entry.
-A warning is written about the unparseable header line, but csv2trn continues.
-
-Try:
-
-	cat NB_current.csv | csv2trn -f NB.xml -c GBP -t Assets:Current
-
-In this example, command line flags set the currency
-and override this account number, from the CSV records, with a Ledger hierarchical name.
-
-## Local Credit Union
-
-Try:
-
-	cat LCU.csv | csv2trn -f LCU.xml -t Assets:Saving
-
-Local Credit Union statements contain debit and credit instead of amount,
-and they do not contain this or other account.
-In this example, the XML input format configures csv2trn to get the amount from credit and debit.
-And this account must be set with a flag.
-
-## Towards Ledger
-
-Try:
-
-	cat NB_current.csv | csv2trn -f NB.xml -o modcsv | sed -f adjust.sed | csv2trn
-
-Ledger expects both this and other accounts to be hierarchical names.
-If a CSV record contains an other account number, it can be mapped to the name.
-If other account is blank, which csv2trn translates into "Imbalance",
-its name can often be inferred from the memo.
-In this example, the output format is set to this module's CSV.
-The Unix stream editor maps and infers.
-Finally, csv2trn filters from its default input to its default output format:
-this module's CSV to Ledger journal.
-
-To merge multiple Ledger journals into one, see this module's program mrglent.
+in an account statement, to a standard format: 
+[Ledger] journal entries or this module's CSV records.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-[XML]: https://en.wikipedia.org/wiki/XML
 */
 package main
 

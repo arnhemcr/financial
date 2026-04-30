@@ -2,38 +2,37 @@
 
 This [Go] module offers programs to:
 
- * translate a financial transaction statement
-   from an arbitrary [comma-separated values (CSV)] format to a [Ledger] journal
+ * translate a [comma-separated values (CSV)] financial transaction statement
+   in an arbitrary format to a [Ledger] journal
  * merge multiple Ledger journals into one general journal for reporting and analysis
 
 According to the Ledger 3 manual:
 
 > "Importing csv files is a lot of work, ..."
 >
-> &mdash; [The `convert` command]
+> &mdash; [The convert command]
 
 This module aims to make it a little easier.
 Its sole dependency is the [Go standard library].
 
-## One CSV statement to one Ledger journal
+## Translating CSV transaction records to Ledger journal entries
 
 Program csv2trn reads a statement, extracts a transaction from each CSV record
-and writes the transactions in a standard format/
+and writes the transactions in a standard format.
 The format of the input CSV record is configured in an [XML] file.
 The output format is either Ledger entry (the default) or this module's CSV record.
 
-Assuming [Go has been installed], build csv2trn in its directory with `go build`.
+Assuming [Go has been installed], build csv2trn in its directory with `go build` .
 
-As an example of a CSV statement, the Ledger manual gives one from ValuFirst Credit Union
+As an example of a CSV statement,
+the Ledger manual gives one from ValuFirst Credit Union (VFCU)
 (see ["The convert command" in the Ledger 3 manual]).
 As an example of csv2trn, that statement can be translated to a Ledger journal with:
 ```
-cat VFCU.csv | ./csv2trn -t Assets:ValuFirst:Checking -f VFCU.xml >VFCU.journal
+cat VFCU.csv | ./csv2trn -t Assets:ValuFirst:Checking -f VFCU.xml
 ```
-Command flags name this account, the Ledger account this statement belongs to,
-and the XML configuration file.
-The statement contains lines which are not transaction records, so csv2trn warns about them.
-Print the journal with `cat VFCU.journal` :
+CSV2trn warns about lines which are not transaction records.
+Entries in the journal include:
 ```
 2011-12-12 Tuscan IT #00037657
  Assets:ValuFirst:Checking  -29.73
@@ -46,21 +45,36 @@ Print the journal with `cat VFCU.journal` :
  Assets:ValuFirst:Checking  45
  Imbalance
 ```
-Note the CSV records do not give the other account in each transaction,
-so other account defaults to Imbalance.
-<!--
-Adding `-o mcsv` to the command above translates that statement to this module's CSV records:
-```
-...
-2011-12-12,Assets:ValuFirst:Checking,Imbalance,,Tuscan IT #00037657,-29.73,$
-2011-12-13,Assets:ValuFirst:Checking,Imbalance,,ID: 1741472662 CO: XXAA.COM PAYMNT,-236.65,$
-...
-2011-12-13,Assets:ValuFirst:Checking,Imbalance,,CASH DEPOSIT,45,$
-```
--->
+Ledger entries require names for both this and other account.
+However, VFCU transaction records do not contain these details.
+So this account, the Ledger account that the statement belongs to, is set with a command flag,
+while other account defaults to Imbalance.
 
-Get help on csv2trn with `./csv2trn -h`
-and get documentation, including further examples, with `go doc`.
+Install csv2trn with `go install` then verify by getting the help text with `csv2trn -h` .
+
+## Setting Ledger account names
+
+CSV transaction records contain a memo or description, and some contain account numbers.
+The stream editor sed can be configured to set Ledger account names from these details.
+
+In the sed directory,
+the following example adds entries from an individual's
+current account at National Bank (NB) and emergency fund at Local Credit Union (LCU)
+to their Ledger journals for those accounts:
+```
+# Initialise the journals with opening balances.
+cp NB_0.journal NB.journal
+cp LCU_0.journal LCU.journal
+
+# Add entries translated from the statements to the journals.
+cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | csv2trn >>NB.journal
+cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | \
+	sed -f accounts.sed | csv2trn >>LCU.journal
+```
+View the journals with `cat NB.journal` and `cat LCU.journal` .
+In the example, sed's input and output are in this module's CSV record format.
+
+## Marking mirror transactions
 
 ## Multiple statements each to its own journal then merged to one general journal
 
