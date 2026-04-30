@@ -15,12 +15,13 @@ According to the Ledger 3 manual:
 This module aims to make it a little easier.
 Its sole dependency is the [Go standard library].
 
-## Translating CSV transaction records to Ledger journal entries
+## Translate CSV transaction records to Ledger journal entries
 
 Program csv2trn reads a statement, extracts a transaction from each CSV record
 and writes the transactions in a standard format.
 The format of the input CSV record is configured in an [XML] file.
-The output format is either Ledger entry (the default) or this module's CSV record.
+The output format is either Ledger entry (the default "lent")
+or this module's CSV record ("mcsv").
 
 Assuming [Go has been installed], build csv2trn in its directory with `go build` .
 
@@ -48,11 +49,11 @@ Entries in the journal include:
 Ledger entries require names for both this and other account.
 However, VFCU transaction records do not contain these details.
 So this account, the Ledger account that the statement belongs to, is set with a command flag,
-while other account defaults to Imbalance.
+while other account defaults to "Imbalance".
 
 Install csv2trn with `go install` then verify by getting the help text with `csv2trn -h` .
 
-## Setting Ledger account names
+## Set Ledger account names
 
 CSV transaction records contain a memo or description, and some contain account numbers.
 The stream editor sed can be configured to set Ledger account names from these details.
@@ -68,34 +69,49 @@ cp LCU_0.journal LCU.journal
 
 # Add entries translated from the statements to the journals.
 cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | csv2trn >>NB.journal
-cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | \
-	sed -f accounts.sed | csv2trn >>LCU.journal
+cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | \
+	csv2trn >>LCU.journal
 ```
 View the journals with `cat NB.journal` and `cat LCU.journal` .
-In the example, sed's input and output are in this module's CSV record format.
+In the example, sed modifies transactions in this module's CSV record format ("mcsv"),
+which is also the default input for csv2trn.
 
-## Marking mirror transactions
+## Mark mirror Ledger journal entries
 
-## Multiple statements each to its own journal then merged to one general journal
+In the example above,
+Ledger accounts Assets:Current and Assets:Emergency each have a journal.
+A transfer between those accounts has an entry in both journals:
+a debit entry from one mirroring a credit to the other
+(see the entry with memo "To emergency fund" in the journals).
+To merge these journals into a general journal,
+one entry for each mirrored transfer must be removed
+so the transfer happens once not twice.
 
-<!--
-## Program mrglent
+Program mcsv2lent marks the credit entry of transfers between Ledger accounts with journals.
+The names of Ledger accounts with journals are read from an XML file.
+Marked entries are removed during merging.
 
-Mrglent merges multiple Ledger financial journals containing entries
-(containing transactions) into one journal.
-It is a filter that:
-  - removes entries marked as mirrors to avoid double transfers between accounts with journals
-  - sorts the remaining entries by date ascending
+Build, install and verify mcsv2lent from its directory. Then in the sed directory,
+repeat the last example replacing the second csv2trn with mcsv2lent:
+```
+cp NB_0.journal NB.journal
+cp LCU_0.journal LCU.journal
 
-Mrglent only merges entries: transactions with dates.
-Automatic transactions, comments and command directives in the input journals
-are not currently copied to the output journal.
-It uses the same "YYYY-MM-DD" date layout, for input and output,
-which other arnhemcr/financial programs use for output.
+cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | \
+	mcsv2lent -f ../mcsv2lent/journalAccounts.xml >>NB.journal
+cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | \
+	mcsv2lent -f ../mcsv2lent/journalAccounts.xml >>LCU.journal
+```
+The credit "To emergency fund" entry in LCU.journal is marked with mirror entry comments,
+while the debit entry in NB.journal is as before.
 
-Install mrglent with `go install`.
-Get documentation, including an example, with `go doc`.
--->
+## Merge Ledger journals to a general journal
+
+Build, install and verify mrglent from its directory.
+
+```
+cat ../sed/NB.journal ../sed/LCU.journal >general.journal | mrglent >general.journal
+```
 
 ## Package transaction
 

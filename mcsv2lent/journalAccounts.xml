@@ -1,0 +1,5 @@
+<!-- A list of Ledger accounts with journals. -->
+<LedgerAccountsWithJournals>
+  <Account>Assets:Current</Account>    <!-- NB.journal -->
+  <Account>Assets:Emergency</Account>  <!-- LCU.journal -->
+</LedgerAccountsWithJournals>
