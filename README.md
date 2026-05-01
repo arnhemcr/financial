@@ -1,6 +1,6 @@
 # Arnhemcr/financial
 
-This [Go] module offers programs to:
+This [Go] module offers [filter] programs to:
 
  * translate a [comma-separated values (CSV)] financial transaction statement
    in an arbitrary format to a [Ledger] journal
@@ -15,22 +15,22 @@ According to the Ledger 3 manual:
 This module aims to make it a little easier.
 Its sole dependency is the [Go standard library].
 
-## Translate CSV transaction records to Ledger journal entries
+## Translate transactions from CSV records to Ledger journal entries
 
-Program csv2trn reads a statement, extracts a transaction from each CSV record
-and writes the transactions in a standard format.
-The output format is either Ledger entry (the default "lent") or this module's CSV record ("mcsv").
-The format of the input CSV record can be configured in an [XML] file (the default is "mcsv").
+Program csv2trn reads a financial statement, attempts to parse a transaction from each line
+then writes the transactions in a standard format.
+The output format is either Ledger journal entry ("lent" the default) or this module's CSV record ("mcsv").
+The format of the input CSV record can be configured in an [XML] file (or left as "mcsv" the default).
 
 Assuming [Go has been installed], build csv2trn in its directory with `go build` .
 
-As an example of a CSV statement,
-the Ledger manual gives one from ValuFirst Credit Union (VFCU) (see "[The convert command]").
-As an example of csv2trn, that statement can be translated to a Ledger journal with:
+The Ledger manual contains an example of a CSV statement from ValuFirst Credit Union (VFCU) 
+(see "[The convert command]").
+Program csv2trn can translate that statement into a Ledger journal with:
 ```
 cat VFCU.csv | ./csv2trn -t Assets:ValuFirst:Checking -f VFCU.xml
 ```
-Program csv2trn warns about lines in the statement which are not transaction records.
+The program warns about lines in the statement which are not CSV transaction records.
 It writes Ledger journal entries including:
 ```
 2011-12-12 Tuscan IT #00037657
@@ -44,12 +44,12 @@ It writes Ledger journal entries including:
  Assets:ValuFirst:Checking  45
  Imbalance
 ```
-A Ledger entry requires names for both this and other account.
-However, VFCU transaction records do not contain these details.
-So this account, the Ledger account that the statement belongs to, is set with a command flag,
+Each entry requires names for both this and other account.
+However, VFCU do not provide these details in their statements.
+So this account, the Ledger account that the statement belongs to, is set by a command flag,
 while other account defaults to "Imbalance".
 
-Install csv2trn with `go install` then verify by getting the help text with `csv2trn -h` .
+Install csv2trn with `go install` then verify by getting its help text with `csv2trn -h` .
 
 ## Set Ledger account names
 
@@ -77,19 +77,27 @@ Program csv2trn orders its output by date ascending.
 ## Mark mirror Ledger journal entries
 
 In the example above,
-Ledger accounts Assets:Current and Assets:Emergency each have a journal.
-A transfer between those accounts has an entry in both journals:
-a debit entry from one mirroring a credit to the other
-(see the entry with memo "To emergency fund" in the journals).
-To merge these journals into a general journal,
-one mirror entry must be removed so the transfer happens once not twice.
+Ledger accounts Assets:Current and Assets:Emergency each have their own journal.
+The "To emergency fund" transfer between those accounts has an entry in both journals:
+a debit in one mirroring a credit in the other:
+```
+NB.journal                    |  LCU.journal
+------------------------------|------------------------------
+...                           |  ...
+1982-10-06 To emergency fund  |  1982-10-07 To emergency fund
+ Assets:Current  -15          >   Assets:Emergency  15
+ Assets:Emergency             |   Assets:Current
+...                           |  ...
+```
+To merge these journals into one general journal,
+one of those entries must be removed so the transfer happens once not twice.
 
 Program mcsv2lent marks the credit entry of transfers between Ledger accounts with journals.
 The names of Ledger accounts with journals are listed in an XML file.
 Marked entries are removed during merging.
 
 Build, install and verify mcsv2lent from its directory. Then in the sed directory,
-repeat the last example with mcsv2lent instead of csv2trn:
+repeat the last example with mcsv2lent instead of the second csv2trn:
 ```
 # Copy the list of Ledger accounts with journals to this directory.
 cp ../mcsv2lent/journalAccounts.xml .
@@ -102,8 +110,19 @@ cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | \
 cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | \
 	mcsv2lent -f journalAccounts.xml >>LCU.journal
 ```
-In LCU.journal, the credit "To emergency fund" entry is now marked with mirror entry comment,
-while, in NB.journal, the debit entry is as before.
+The credit "To emergency fund" entry is now marked as a mirror entry,
+while the debit entry is as before:
+```
+NB.journal                    |  LCU.journal
+------------------------------|------------------------------
+                              |  ...
+...                           |  # mirror entry
+1982-10-06 To emergency fund  |  1982-10-07 To emergency fund
+ Assets:Current  -15          >   Assets:Emergency  15
+ Assets:Emergency             |   Assets:Current
+...                           |  # end mirror entry
+                              |  ...
+```
 
 ## Merge Ledger journals into a general journal
 
@@ -136,7 +155,7 @@ This package offers:
 Get more information with `go doc -all` in the transaction directory.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
-[filters]: https://en.wikipedia.org/wiki/Filter_(software)
+[filter]: https://en.wikipedia.org/wiki/Filter_(software)
 [Go]: https://go.dev
 [Go has been installed]: https://go.dev/doc/install
 [Go standard library]: https://pkg.go.dev/std
