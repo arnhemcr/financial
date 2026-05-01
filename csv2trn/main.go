@@ -21,12 +21,18 @@ If not, see <https://www.gnu.org/licenses/>.
 
 /*
 CSV2trn [filters] financial transactions from [comma-separated values (CSV)] records,
-in an account statement, to a standard format: 
-[Ledger] journal entries or this module's CSV records.
+in an account statement, to a standard format.
+
+The output format is either [Ledger] entry (the default "lent") or
+this module's CSV record ("mcsv").
+The format of the input CSV record can be configured in an XML file (the default is "mcsv").
+
+For further information, see [this package's README].
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
-[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
+[Ledger]: https://ledger-cli.org
+[this package's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
 
@@ -106,15 +112,15 @@ func parseFlags() config {
 	var cfg config
 
 	flag.StringVar(&cfg.currency, "c", "", fmt.Sprintf(
-		"currency for transaction amounts: symbol %q or a code e.g. %q%s",
+		"currency for transaction amounts: symbol %q or code e.g. %q%s",
 		"$", "GBP", "; overrides currency field in CSV record"))
 	flag.StringVar(&cfg.formatFileName, "f", "",
-		"name of file containing input CSV record format in XML")
-	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger_,
+		fmt.Sprintf("name of XML file containing input CSV record format (default is this module's CSV record %q)", aft.ModuleCSV))
+	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
 		fmt.Sprintf("output format name: %q or %q, or %q or %q",
 			aft.Ledger, aft.Ledger_, aft.ModuleCSV, aft.ModuleCSV_))
 	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
-		"this account name, which transactions belong to e.g. %q%s",
+		"this account name, name of Ledger account these transactions belong to e.g. %q%s",
 		"Assets:Current", "; overrides this account field in CSV record"))
 
 	var help bool

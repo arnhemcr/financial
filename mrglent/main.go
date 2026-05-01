@@ -20,13 +20,13 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Mrglent merges multiple [Ledger] financial journals,
-containing entries, also known as transactions, into one journal.
-It is a [filter] that removes mirror entries that have been marked in one of two ways:
-  - comment lines "# mirror entry" and "# end mirror entry" before and after the entry or
-  - the entry's code field is set to "MT"
+Mrglent [filters] financial transaction entries from multiple [Ledger] journals into one general journal.
 
-Mrglent sorts the remaining entries by date ascending.
+For further information, see [this package's README].
+
+[filters]: https://en.wikipedia.org/wiki/Filter_(software)
+[Ledger]: https://ledger-cli.org
+[this package's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
 
@@ -86,10 +86,10 @@ func parseFlags() {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-Mrglent merges multiple Ledger financial journals containing entries,
-also known as transactions, into one journal. It is a filter that:
-  - removes mirror entries that have been marked with the transaction code "MT"
-  - sorts the remaining entries by date ascending
+Mrglent filters financial transaction entries from multiple Ledger journals into one general journal.
+It discards entries between comment lines StartMirror and EndMirror or with code "MT".
+Mrglent sorts the general ledger entries by date ascending.
+See also program mcsv2lent.
 
 The only flag is:
 

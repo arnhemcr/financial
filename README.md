@@ -67,8 +67,7 @@ cp LCU_0.journal LCU.journal
 
 # Add entries translated from the statements to the journals.
 cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | csv2trn >>NB.journal
-cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | \
-	csv2trn >>LCU.journal
+cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | csv2trn >>LCU.journal
 ```
 View the journals with `cat NB.journal` and `cat LCU.journal` .
 
@@ -117,7 +116,8 @@ Then in the sed directory, merge the journals from the last example into a gener
 ```
 cat NB.journal LCU.journal | mrglent >general.journal
 ```
-The debit "To emergency fund" entry is in general.journal, but the credit entry is not.
+For the "To emergency fund" transfer, the debit entry is in general.journal
+but the credit is not.
 
 ## Package transaction
 

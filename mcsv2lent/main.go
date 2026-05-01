@@ -20,14 +20,15 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-MCSV2lent:
-  - [filters] financial transactions from [comma-separated values (CSV)] records
-    in this module's CSV format to [Ledger] journal entries
-  - optionally, marks credits between Ledger accounts with journals as mirrored
+MCSV2lent [filters] financial transactions 
+from this module's [comma-separated values (CSV)] records to [Ledger] journal entries.
+
+For further information, see [this package's README].
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
+[this package's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
 
@@ -120,7 +121,11 @@ func parseFlags() string {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-MCSV2lent
+MCSV2lent filters financial transactions
+from this module's comma-separated values (CSV) records to Ledger journal entries.
+For transfers between Ledger accounts with journals, mcsv2lent marks the credit entry
+with comment line StartMirror before and EndMirror after.
+See also program mrg2lent.
 
 Usage:
 
