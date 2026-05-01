@@ -10,7 +10,7 @@ According to the Ledger 3 manual:
 
 > "Importing csv files is a lot of work, ..."
 >
-> &mdash; [The convert command]
+> &mdash; "[The convert command]"
 
 This module aims to make it a little easier.
 Its sole dependency is the [Go standard library].
@@ -19,21 +19,19 @@ Its sole dependency is the [Go standard library].
 
 Program csv2trn reads a statement, extracts a transaction from each CSV record
 and writes the transactions in a standard format.
-The format of the input CSV record is configured in an [XML] file.
-The output format is either Ledger entry (the default "lent")
-or this module's CSV record ("mcsv").
+The output format is either Ledger entry (the default "lent") or this module's CSV record ("mcsv").
+The format of the input CSV record can be configured in an [XML] file (the default is "mcsv").
 
 Assuming [Go has been installed], build csv2trn in its directory with `go build` .
 
 As an example of a CSV statement,
-the Ledger manual gives one from ValuFirst Credit Union (VFCU)
-(see ["The convert command" in the Ledger 3 manual]).
+the Ledger manual gives one from ValuFirst Credit Union (VFCU) (see "[The convert command]").
 As an example of csv2trn, that statement can be translated to a Ledger journal with:
 ```
 cat VFCU.csv | ./csv2trn -t Assets:ValuFirst:Checking -f VFCU.xml
 ```
-CSV2trn warns about lines which are not transaction records.
-Entries in the journal include:
+Program csv2trn warns about lines in the statement which are not transaction records.
+It writes Ledger journal entries including:
 ```
 2011-12-12 Tuscan IT #00037657
  Assets:ValuFirst:Checking  -29.73
@@ -46,7 +44,7 @@ Entries in the journal include:
  Assets:ValuFirst:Checking  45
  Imbalance
 ```
-Ledger entries require names for both this and other account.
+A Ledger entry requires names for both this and other account.
 However, VFCU transaction records do not contain these details.
 So this account, the Ledger account that the statement belongs to, is set with a command flag,
 while other account defaults to "Imbalance".
@@ -73,8 +71,9 @@ cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.s
 	csv2trn >>LCU.journal
 ```
 View the journals with `cat NB.journal` and `cat LCU.journal` .
-In the example, sed modifies transactions in this module's CSV record format ("mcsv"),
-which is also the default input for csv2trn.
+
+In the example, sed modifies transactions in this module's CSV record format ("mcsv").
+Program csv2trn orders its output by date ascending.
 
 ## Mark mirror Ledger journal entries
 
@@ -87,30 +86,38 @@ To merge these journals into a general journal,
 one mirror entry must be removed so the transfer happens once not twice.
 
 Program mcsv2lent marks the credit entry of transfers between Ledger accounts with journals.
-The names of Ledger accounts with journals are read from an XML file.
+The names of Ledger accounts with journals are listed in an XML file.
 Marked entries are removed during merging.
 
 Build, install and verify mcsv2lent from its directory. Then in the sed directory,
-repeat the last example replacing the second csv2trn with mcsv2lent:
+repeat the last example with mcsv2lent instead of csv2trn:
 ```
+# Copy the list of Ledger accounts with journals to this directory.
+cp ../mcsv2lent/journalAccounts.xml .
+
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
 
 cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | \
-	mcsv2lent -f ../mcsv2lent/journalAccounts.xml >>NB.journal
+	mcsv2lent -f journalAccounts.xml >>NB.journal
 cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | \
-	mcsv2lent -f ../mcsv2lent/journalAccounts.xml >>LCU.journal
+	mcsv2lent -f journalAccounts.xml >>LCU.journal
 ```
-The credit "To emergency fund" entry in LCU.journal is marked with mirror entry comments,
-while the debit entry in NB.journal is as before.
+In LCU.journal, the credit "To emergency fund" entry is now marked with mirror entry comment,
+while, in NB.journal, the debit entry is as before.
 
 ## Merge Ledger journals into a general journal
 
-Build, install and verify mrglent from its directory.
+Program mrglent merges Ledger journals.
+Entries with dates, except those marked as mirrors, are copied from input to output.
+The program orders its output by date ascending.
 
+Build, install and verify mrglent from its directory.
+Then in the sed directory, merge the journals from the last example into a general journal with:
 ```
-cat ../sed/NB.journal ../sed/LCU.journal | mrglent >general.journal
+cat NB.journal LCU.journal | mrglent >general.journal
 ```
+The debit "To emergency fund" entry is in general.journal, but the credit entry is not.
 
 ## Package transaction
 
@@ -134,5 +141,5 @@ Get more information with `go doc -all` in the transaction directory.
 [Go has been installed]: https://go.dev/doc/install
 [Go standard library]: https://pkg.go.dev/std
 [Ledger]: https://ledger-cli.org
-["The convert command" in the Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
+[The convert command]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
 [XML]: https://en.wikipedia.org/wiki/XML
