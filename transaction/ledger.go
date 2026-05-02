@@ -34,9 +34,7 @@ import (
 const (
 	Ledger  = "lent"   // The name of the Ledger journal entry format.
 	Ledger_ = "ledger" // An alias for the Ledger journal entry format.
-)
 
-const (
 	/*
 		The start and end lines for Ledger block comments
 		(see the "Commenting Your Journal" section of the [Ledger 3 Manual].

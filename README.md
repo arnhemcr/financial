@@ -1,6 +1,6 @@
 # Arnhemcr/financial
 
-This [Go] module offers [filter] programs to:
+This [Go] module offers programs to:
 
  * translate a [comma-separated values (CSV)] financial transaction statement
    in an arbitrary format to a [Ledger] journal
@@ -12,8 +12,11 @@ According to the Ledger 3 manual:
 >
 > &mdash; "[The convert command]"
 
-This module aims to make it a little easier.
-Its sole dependency is the [Go standard library].
+This module aims to make it a little easier; its sole dependency is the [Go standard library].
+
+The programs are [filters] which run in pipelines with output redirected to files.
+One of the examples below uses the stream editor [sed].
+A Unix-like environment would offer these features.
 
 ## Translate transactions from CSV records to Ledger journal entries
 
@@ -56,7 +59,7 @@ Install csv2trn with `go install` then verify by getting its help text with `csv
 CSV transaction records contain a memo or description, and some contain account numbers.
 The stream editor sed can be configured to set Ledger account names from these details.
 
-In the sed directory,
+In the examples directory,
 the following example adds entries from an individual's
 current account at National Bank (NB) and emergency fund at Local Credit Union (LCU)
 to their Ledger journals for those accounts:
@@ -78,7 +81,7 @@ Program csv2trn orders its output by date ascending.
 
 In the example above,
 Ledger accounts Assets:Current and Assets:Emergency each have their own journal.
-The "To emergency fund" transfer between those accounts has an entry in both journals:
+A transfer between those accounts has an entry in both journals:
 a debit in one mirroring a credit in the other:
 ```
 NB.journal                    |  LCU.journal
@@ -90,18 +93,15 @@ NB.journal                    |  LCU.journal
 ...                           |  ...
 ```
 To merge these journals into one general journal,
-one of those entries must be removed so the transfer happens once not twice.
+one of those entries must be discarded so the transfer happens once not twice.
 
 Program mcsv2lent marks the credit entry of transfers between Ledger accounts with journals.
 The names of Ledger accounts with journals are listed in an XML file.
-Marked entries are removed during merging.
+Marked entries are discarded during merging.
 
-Build, install and verify mcsv2lent from its directory. Then in the sed directory,
+Build, install and verify mcsv2lent from its directory. Then in the examples directory,
 repeat the last example with mcsv2lent instead of the second csv2trn:
 ```
-# Copy the list of Ledger accounts with journals to this directory.
-cp ../mcsv2lent/journalAccounts.xml .
-
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
 
@@ -110,8 +110,7 @@ cat NB.csv | csv2trn -o mcsv -f NB.xml | sed -f accounts.sed | \
 cat LCU.csv | csv2trn -o mcsv -t Assets:Emergency -f LCU.xml | sed -f accounts.sed | \
 	mcsv2lent -f journalAccounts.xml >>LCU.journal
 ```
-The credit "To emergency fund" entry is now marked as a mirror entry,
-while the debit entry is as before:
+The debit entry is unchanged, but the credit entry is now marked as a mirror:
 ```
 NB.journal                    |  LCU.journal
 ------------------------------|------------------------------
@@ -126,17 +125,17 @@ NB.journal                    |  LCU.journal
 
 ## Merge Ledger journals into a general journal
 
-Program mrglent merges Ledger journals.
-Entries with dates, except those marked as mirrors, are copied from input to output.
-The program orders its output by date ascending.
+Program mrglent merges multiple Ledger journals into one general journal.
+Entries with dates are copied from input to output.
+But dated entries marked as mirrors, automatic transactions, comments and command directives are discarded.
+Program mrglent orders its output by date ascending.
 
 Build, install and verify mrglent from its directory.
-Then in the sed directory, merge the journals from the last example into a general journal with:
+Then in the examples directory, merge the journals from the last example into a general journal with:
 ```
 cat NB.journal LCU.journal | mrglent >general.journal
 ```
-For the "To emergency fund" transfer, the debit entry is in general.journal
-but the credit is not.
+Note that for the transfer above, the general journal contains the debit entry but not the credit.
 
 ## Package transaction
 
@@ -155,10 +154,11 @@ This package offers:
 Get more information with `go doc -all` in the transaction directory.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
-[filter]: https://en.wikipedia.org/wiki/Filter_(software)
+[filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Go]: https://go.dev
 [Go has been installed]: https://go.dev/doc/install
 [Go standard library]: https://pkg.go.dev/std
 [Ledger]: https://ledger-cli.org
+[sed]: https://en.wikipedia.org/wiki/Sed
 [The convert command]: https://ledger-cli.org/doc/ledger3.html#The-convert-command
 [XML]: https://en.wikipedia.org/wiki/XML
