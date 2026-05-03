@@ -2,8 +2,8 @@
 
 This [Go] module offers programs to:
 
- * translate a [comma-separated values (CSV)] financial transaction statement
-   in an arbitrary format to a [Ledger] journal
+ * translate a [comma-separated values (CSV)] financial transaction statement,
+   in an arbitrary format, to a [Ledger] journal
  * merge multiple Ledger journals into one general journal for reporting and analysis
 
 According to the Ledger 3 manual:
@@ -14,9 +14,9 @@ According to the Ledger 3 manual:
 
 This module aims to make it a little easier; its sole dependency is the [Go standard library].
 
-The programs are [filters] which run in pipelines with output redirected to files.
+The programs are [filters] which run in a pipeline with output redirected to a file.
 One of the examples below uses the stream editor [sed].
-A Unix-like environment would offer these features.
+These features are offered in Unix-like environments.
 
 ## Translate transactions from CSV records to Ledger journal entries
 
@@ -77,7 +77,7 @@ View the journals with `cat NB.journal` and `cat LCU.journal` .
 In the example, sed modifies transactions in this module's CSV record format ("mcsv").
 Program csv2trn orders its output by date ascending.
 
-## Mark mirror Ledger journal entries
+## Mark mirror entries in Ledger journals
 
 In the example above,
 Ledger accounts Assets:Current and Assets:Emergency each have their own journal.
@@ -96,11 +96,12 @@ To merge these journals into one general journal,
 one of those entries must be discarded so the transfer happens once not twice.
 
 Program mcsv2lent marks the credit entry of transfers between Ledger accounts with journals.
-The names of Ledger accounts with journals are listed in an XML file.
+The names of Ledger accounts with journals are listed in an XML file;
+they should be [asset or liability accounts].
 Marked entries are discarded during merging.
 
 Build, install and verify mcsv2lent from its directory. Then in the examples directory,
-repeat the last example with mcsv2lent instead of the second csv2trn:
+repeat the example above replacing the second csv2trn with mcsv2lent:
 ```
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
@@ -131,11 +132,12 @@ But dated entries marked as mirrors, automatic transactions, comments and comman
 Program mrglent orders its output by date ascending.
 
 Build, install and verify mrglent from its directory.
-Then in the examples directory, merge the journals from the last example into a general journal with:
+Then in the examples directory, merge the journals from the example above into a general journal with:
 ```
 cat NB.journal LCU.journal | mrglent >general.journal
 ```
-Note that for the transfer above, the general journal contains the debit entry but not the credit.
+Note that for the transfer between accounts with journals above,
+the general journal contains the debit entry but not the credit.
 
 ## Package transaction
 
@@ -145,7 +147,7 @@ It is described by a memo and code,
 also known as the transaction's description and type respectively.
 A transaction belongs to an account known as this account.
 
-This package offers:
+Package transaction offers:
 
  - parsing a transaction from a CSV record;
    an instance of type CSVRecordFormat configures the parser for the record format
@@ -153,6 +155,7 @@ This package offers:
 
 Get more information with `go doc -all` in the transaction directory.
 
+[asset or liability accounts]: https://ledger-cli.org/doc/ledger3.html#Assets-and-Liabilities
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filters]: https://en.wikipedia.org/wiki/Filter_(software)
 [Go]: https://go.dev

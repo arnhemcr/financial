@@ -99,22 +99,15 @@ The only flag is:
 }
 
 /*
-A ledgerEntry represents an entry, also known as a transaction, in a Ledger journal.
-See also "Transactions and Comments" in the [Ledger 3 manual].
-
-[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
+A ledgerEntry represents an entry with a date, also known as a transaction, in a Ledger journal.
+See "Transactions and Comments" in the Ledger 3 manual.
 */
 type ledgerEntry struct {
 	Lines []string        // The lines of this entry.
 	Trn   aft.Transaction // Copies of this entry's date, code and memo.
 }
 
-/*
-A ledgerJournal represents the entries in a Ledger journal.
-
-In future, fields may be added to represent other Ledger journal elements
-including automatic transactions, comments and command directives.
-*/
+// A ledgerJournal represents a Ledger journal containing dated entries.
 type ledgerJournal struct {
 	Entries []ledgerEntry
 }
@@ -247,7 +240,7 @@ func (j *ledgerJournal) parse(s *bufio.Scanner) error {
 	return nil
 }
 
-// Sort sorts the entries in this Ledger journal by date ascending.
+// Sort orders the entries in this Ledger journal by date ascending.
 func (j *ledgerJournal) sort() {
 	d2es := make(map[string][]ledgerEntry)
 

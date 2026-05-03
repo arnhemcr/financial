@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-MCSV2lent [filters] financial transactions 
+MCSV2lent [filters] financial transactions
 from this module's [comma-separated values (CSV)] records to [Ledger] journal entries.
 
 For further information, see [this package's README].

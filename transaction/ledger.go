@@ -44,9 +44,11 @@ const (
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
 
-	// The start and end Ledger global comment lines around mirror transactions.
-	StartMirror = "# mirror entry\n"
-	EndMirror   = "# end mirror entry\n"
+	// The start and end Ledger global comment lines around a mirror entry.
+	StartMirror      = "# mirror entry\n"
+	EndMirror        = "# end mirror entry\n"
+	StartMirrorEntry = StartMirror
+	EndMirrorEntry   = EndMirror
 )
 
 /*
