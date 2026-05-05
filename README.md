@@ -27,7 +27,7 @@ The format of the input CSV record can be configured in an [XML] file (or left a
 
 Assuming [Go has been installed], build csv2trn in its directory with `go build` .
 
-The Ledger manual contains an example of a CSV statement from ValuFirst Credit Union (VFCU) 
+The Ledger manual contains an example of a CSV statement from ValuFirst Credit Union (VFCU)
 (see "[The convert command]").
 Program csv2trn can translate that statement into a Ledger journal with:
 ```
@@ -127,8 +127,9 @@ NB.journal                    |  LCU.journal
 ## Merge Ledger journals into a general journal
 
 Program mrglent merges multiple Ledger journals into one general journal.
-Entries with dates are copied from input to output.
-But dated entries marked as mirrors, automatic transactions, comments and command directives are discarded.
+Entries with dates are copied from input to output (including any comments on the entry).
+But dated entries marked as mirrors, automatic transactions, global comments and
+command directives are discarded.
 Program mrglent orders its output by date ascending.
 
 Build, install and verify mrglent from its directory.

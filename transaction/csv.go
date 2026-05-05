@@ -47,48 +47,12 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 	*/
 	fs := slices.Insert(fields, 0, "")
 
-	// required fields
-	var err error
-
-	t.Amount, err = parseAmount(fs, crf)
+	err := t.parseRequired(fs, crf)
 	if err != nil {
 		return err
 	}
 
-	t.Date, err = parseDate(fs[crf.DateI], crf.DateLayout)
-	if err != nil {
-		return err
-	}
-
-	t.Memo, t.OtherAccount = fs[crf.MemoI], fs[crf.OtherAccountI]
-	if t.Memo == "" {
-		return errMemo
-	}
-
-	if t.OtherAccount == "" {
-		t.OtherAccount = DefaultOtherAccount
-	}
-
-	a := fs[crf.ThisAccountI]
-
-	switch {
-	case t.ThisAccount == DefaultOtherAccount || a == DefaultOtherAccount:
-		return errThisAccount
-	case t.ThisAccount != "":
-		// This account already has a value which takes precedence over its field.
-	case a != "":
-		t.ThisAccount = a
-	default:
-		return errThisAccount
-	}
-
-	// optional fields
-	t.Code = fs[crf.CodeI]
-
-	// Currency may already have a value which takes precedence over its field.
-	if t.Currency == "" {
-		t.Currency = fs[crf.CurrencyI]
-	}
+	t.parseOptional(fs, crf)
 
 	return nil
 }
@@ -107,3 +71,51 @@ var (
 	errThisAccount = errors.New(
 		"this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
 )
+
+func (t *Transaction) parseRequired(fields []string, crf CSVRecordFormat) error {
+	var err error
+
+	t.Amount, err = parseAmount(fields, crf)
+	if err != nil {
+		return err
+	}
+
+	t.Date, err = parseDate(fields[crf.DateI], crf.DateLayout)
+	if err != nil {
+		return err
+	}
+
+	t.Memo = fields[crf.MemoI]
+	if t.Memo == "" {
+		return errMemo
+	}
+
+	t.OtherAccount = fields[crf.OtherAccountI]
+	if t.OtherAccount == "" {
+		t.OtherAccount = DefaultOtherAccount
+	}
+
+	a := fields[crf.ThisAccountI]
+
+	switch {
+	case t.ThisAccount == DefaultOtherAccount || a == DefaultOtherAccount:
+		return errThisAccount
+	case t.ThisAccount != "":
+		// This account already has a value which takes precedence over its field.
+	case a != "":
+		t.ThisAccount = a
+	default:
+		return errThisAccount
+	}
+
+	return nil
+}
+
+func (t *Transaction) parseOptional(fields []string, crf CSVRecordFormat) {
+	t.Code = fields[crf.CodeI]
+
+	// Currency may already have a value which takes precedence over its field.
+	if t.Currency == "" {
+		t.Currency = fields[crf.CurrencyI]
+	}
+}

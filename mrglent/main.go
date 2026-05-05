@@ -60,19 +60,6 @@ func main() {
 	}
 }
 
-/*
-IsIndent reports whether the rune is white space used to indent a Ledger entry's postings.
-See "Transactions and Comments" in the [Ledger 3 manual].
-*/
-func isIndent(r rune) bool {
-	switch r {
-	case ' ', '\t':
-		return true
-	default:
-		return false
-	}
-}
-
 // An entry represents a dated Ledger journal entry.
 type entry struct {
 	Date string
@@ -140,8 +127,8 @@ func parseEntries(s *bufio.Scanner) ([]entry, error) {
 
 			// This line starts with a date and is the first line in the next entry.
 			e.Date, e.Text = d, ln
-		case aft.IsIndented(ln):
-			// This line is indented and is a posting belonging to the current entry.
+		case aft.IsLedgerIndented(ln):
+			// This line is indented and belongs to the current entry.
 			e.Text += ln
 		}
 	}

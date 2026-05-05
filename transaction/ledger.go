@@ -46,11 +46,12 @@ const (
 )
 
 /*
-IsIndented reports whether the line starts with a white space character used by Ledger to indent postings.
+IsLedgerIndented reports whether the line starts with a white space character
+used by Ledger to indent postings and comments belonging to an entry.
 
 See "Transactions and Comments" in the [Ledger 3 manual].
 */
-func IsIndented(line string) bool {
+func IsLedgerIndented(line string) bool {
 	if len(line) == 0 {
 		return false
 	}
