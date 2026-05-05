@@ -38,7 +38,6 @@ import (
 	"log"
 	"os"
 	"slices"
-	"time"
 	"unicode"
 )
 
@@ -128,21 +127,21 @@ func parseEntries(s *bufio.Scanner) ([]entry, error) {
 			continue
 		}
 
-		r0 := rune(ln[0])
-
 		switch {
-		case unicode.IsDigit(r0):
+		case unicode.IsDigit(rune(ln[0])):
 			if e.Date != "" {
 				es = append(es, e)
 			}
 
-			d, err := parseDate(ln)
+			d, err := aft.ParseModuleDate(ln)
 			if err != nil {
 				return es, fmt.Errorf("input line %v: %w", lnN, err)
 			}
 
+			// This line starts with a date and is the first line in the next entry.
 			e.Date, e.Text = d, ln
-		case isIndent(r0):
+		case aft.IsIndented(ln):
+			// This line is indented and is a posting belonging to the current entry.
 			e.Text += ln
 		}
 	}
@@ -152,32 +151,6 @@ func parseEntries(s *bufio.Scanner) ([]entry, error) {
 	}
 
 	return es, nil
-}
-
-/*
-ParseDate returns the date in "2006-01-02" layout from the start of a Ledger entry's text.
-If parseDate fails to parse a date, it returns the error.
-*/
-func parseDate(text string) (string, error) {
-	const dLen = len(time.DateOnly)
-
-	var (
-		tLen = len(text)
-		d    string
-	)
-
-	if dLen <= tLen {
-		d = text[0:dLen]
-	} else {
-		d = text[0:tLen]
-	}
-
-	date, err := time.Parse(time.DateOnly, d)
-	if err != nil {
-		return "", fmt.Errorf("parseDate: %w", err)
-	}
-
-	return date.Format(time.DateOnly), nil
 }
 
 /*

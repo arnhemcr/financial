@@ -27,15 +27,37 @@ import (
 )
 
 /*
-ParseDate returns the date parsed from the string according to the layout.
-It assumes the layout is valid e.g. "2006-01-02".
-If parseDate fails to parse a date, it returns the error.
+ParseModuleDate returns the date in this module's layout from the start of text.
+This module's date layout is "2006-01-02" or time.DateOnly.
+If it fails to parse a date, parseModuleDate returns the error.
 */
-func parseDate(date, layout string) (string, error) {
-	d, err := time.Parse(layout, date)
-	if err != nil {
-		return "", fmt.Errorf("cannot parse date: %w", err)
+func ParseModuleDate(text string) (string, error) {
+	const dLen = len(time.DateOnly)
+
+	var (
+		tLen = len(text)
+		d    string
+	)
+
+	if dLen <= tLen {
+		d = text[0:dLen]
+	} else {
+		d = text[0:tLen]
 	}
 
-	return d.Format(time.DateOnly), nil
+	return parseDate(d, time.DateOnly)
+}
+
+/*
+ParseDate returns the date parsed from text according to the layout.
+It assumes the layout is valid e.g. "2006-01-02".
+If it fails to parse a date, parseDate returns the error.
+*/
+func parseDate(text, layout string) (string, error) {
+	date, err := time.Parse(layout, text)
+	if err != nil {
+		return "", fmt.Errorf("parseDate: %w", err)
+	}
+
+	return date.Format(time.DateOnly), nil
 }

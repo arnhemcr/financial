@@ -28,8 +28,7 @@ import (
 )
 
 const (
-	ModuleCSV  = "mcsv"   // The name of this module's CSV record format.
-	ModuleCSV_ = "modcsv" // An alias for the name of this module's CSV record format.
+	ModuleCSV = "mcsv" // The name of this module's CSV record format.
 )
 
 /*

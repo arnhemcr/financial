@@ -55,7 +55,7 @@ func main() {
 	var err error
 
 	if jafn != "" {
-		jas, err = aft.LedgerAccounts(jafn)
+		jas, err = aft.LoadLedgerAccountNames(jafn)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -85,7 +85,7 @@ func main() {
 
 		if 0 < t.Amount && slices.Contains(jas, t.ThisAccount) &&
 			slices.Contains(jas, t.OtherAccount) {
-			ent = aft.StartMirror + ent + aft.EndMirror
+			ent = aft.StartMirrorEntry + ent + aft.EndMirrorEntry
 		}
 
 		fmt.Fprint(os.Stdout, ent)

@@ -23,21 +23,17 @@ package transaction
 
 import (
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
-	"time"
-	"unicode"
 )
 
 const (
-	Ledger  = "lent"   // The name of the Ledger journal entry format.
-	Ledger_ = "ledger" // An alias for the Ledger journal entry format.
+	Ledger = "lent" // The name of the Ledger journal entry format.
 
 	/*
 		The start and end lines for Ledger block comments
-		(see the "Commenting Your Journal" section of the [Ledger 3 Manual].
+		(see the "Commenting Your Journal" section of the [Ledger 3 manual].
 
 		[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 	*/
@@ -45,15 +41,31 @@ const (
 	EndBlockComment   = "end comment\n"
 
 	// The start and end Ledger global comment lines around a mirror entry.
-	StartMirror      = "# mirror entry\n"
-	EndMirror        = "# end mirror entry\n"
-	StartMirrorEntry = StartMirror
-	EndMirrorEntry   = EndMirror
+	StartMirrorEntry = "# mirror entry\n"
+	EndMirrorEntry   = "# end mirror entry\n"
 )
 
 /*
-LedgerAccounts returns a list of Ledger account names read from the named XML file.
-If it fails to read the list, LedgerAccounts returns the first error.
+IsIndented reports whether the line starts with a white space character used by Ledger to indent postings.
+
+See "Transactions and Comments" in the [Ledger 3 manual].
+*/
+func IsIndented(line string) bool {
+	if len(line) == 0 {
+		return false
+	}
+
+	switch rune(line[0]) {
+	case ' ', '\t':
+		return true
+	default:
+		return false
+	}
+}
+
+/*
+LoadLedgerAccountNames returns a list of Ledger account names loaded from the named XML file.
+If it fails to load the list, LedgerAccounts returns the first error.
 
 For example, file LedgerAccountsWithJournals.xml might contain three asset account names:
 
@@ -63,7 +75,7 @@ For example, file LedgerAccountsWithJournals.xml might contain three asset accou
 	  <Account>Assets:Savings</Account>
 	</Accounts>
 */
-func LedgerAccounts(fileName string) ([]string, error) {
+func LoadLedgerAccountNames(fileName string) ([]string, error) {
 	var as struct {
 		Accounts []string `xml:"Account"`
 	}
@@ -79,53 +91,6 @@ func LedgerAccounts(fileName string) ([]string, error) {
 	}
 
 	return as.Accounts, nil
-}
-
-/*
-ParseLedger parses this transaction's date, code and memo fields
-from the first line of a Ledger journal entry.
-If it fails to parse those fields, ParseLedger returns the first error.
-
-The format of a Ledger journal entry is described in the
-"Transactions and Comments" section of the [Ledger 3 manual].
-*/
-func (t *Transaction) ParseLedger(lines []string) error {
-	if len(lines) == 0 || !startsDigit(lines[0]) {
-		return errEntryStart
-	}
-
-	fs := strings.Fields(lines[0])
-	n := len(fs)
-
-	var (
-		err error
-		i   int
-	)
-
-	t.Date, err = getDate(fs[i])
-	if err == nil {
-		i++
-	} else {
-		return err
-	}
-
-	if i < n && isStatusMark(fs[i]) {
-		// skip status mark
-		i++
-	}
-
-	if i < n {
-		t.Code = getCode(fs[i])
-		if t.Code != "" {
-			i++
-		}
-	}
-
-	if i < n {
-		t.Memo = strings.Join(fs[i:n], " ")
-	}
-
-	return nil
 }
 
 // StringLedger returns this transaction as a Ledger journal entry.
@@ -168,55 +133,3 @@ const (
 	startCode = "("
 	endCode   = ")"
 )
-
-var errEntryStart = errors.New(
-	"first line of Ledger journal entry must start with decimal digit")
-
-/*
-GetCode returns a transaction code from the Ledger journal entry string.
-In an entry, a transaction code is in brackets e.g. code "MT" appears in the entry as "(MT)".
-If the string does not contain the code, getCode returns an empty string.
-*/
-func getCode(code string) string {
-	n := len(code)
-	if n < 3 ||
-		!strings.HasPrefix(code, startCode) || !strings.HasSuffix(code, endCode) {
-		return ""
-	}
-
-	return code[1 : n-1]
-}
-
-/*
-GetDate returns the actual date from a Ledger journal entry dates string.
-The dates string syntax is "actual[=effective]".
-If the actual string does not contain a date, getDate returns an error.
-*/
-func getDate(dates string) (string, error) {
-	const separator = "="
-
-	d, _, _ := strings.Cut(dates, separator)
-
-	return parseDate(d, time.DateOnly)
-}
-
-// IsStatusMark reports whether the string is a Ledger journal entry status mark.
-func isStatusMark(mark string) bool {
-	const cleared, pending = "*", "!"
-
-	switch mark {
-	case cleared, pending:
-		return true
-	default:
-		return false
-	}
-}
-
-// StartsDigit reports whether the string starts with a decimal digit.
-func startsDigit(line string) bool {
-	if 0 < len(line) && unicode.IsDigit(rune(line[0])) {
-		return true
-	}
-
-	return false
-}
