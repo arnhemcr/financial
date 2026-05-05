@@ -61,12 +61,12 @@ func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
 
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return crf, fmt.Errorf("cannot read CSV record format: %w", err)
+		return crf, fmt.Errorf("NewCSVRecordFormat: %w", err)
 	}
 
 	err = xml.Unmarshal(bs, &crf)
 	if err != nil {
-		return crf, fmt.Errorf("cannot parse CSV record format: %w", err)
+		return crf, fmt.Errorf("NewCSVRecordFormat: %w", err)
 	}
 
 	err = crf.Validate()

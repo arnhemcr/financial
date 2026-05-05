@@ -76,7 +76,7 @@ If it fails to parse a number, parseFloat returns the error.
 func parseFloat(s string) (float64, error) {
 	n, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, fmt.Errorf("cannot parse number: %w", err)
+		return 0, fmt.Errorf("parseFloat: %w", err)
 	}
 
 	return n, nil

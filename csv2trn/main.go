@@ -153,7 +153,7 @@ func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 		if errors.Is(err, io.EOF) {
 			break
 		} else if err != nil {
-			return ts, fmt.Errorf("cannot read CSV statement: %w", err)
+			return ts, fmt.Errorf("parseCSVStatement: %w", err)
 		}
 
 		var t aft.Transaction

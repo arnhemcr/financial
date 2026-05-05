@@ -135,7 +135,7 @@ func parseEntries(s *bufio.Scanner) ([]entry, error) {
 
 			d, err := aft.ParseModuleDate(ln)
 			if err != nil {
-				return es, fmt.Errorf("input line %v: %w", lnN, err)
+				return es, fmt.Errorf("line %v: %w", lnN, err)
 			}
 
 			// This line starts with a date and is the first line in the next entry.

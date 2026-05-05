@@ -82,12 +82,12 @@ func LoadLedgerAccountNames(fileName string) ([]string, error) {
 
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return as.Accounts, fmt.Errorf("cannot read list of Ledger account names: %w", err)
+		return as.Accounts, fmt.Errorf("LoadLedgerAccountNames: %w", err)
 	}
 
 	err = xml.Unmarshal(bs, &as)
 	if err != nil {
-		return as.Accounts, fmt.Errorf("cannot parse list of Ledger account names: %w", err)
+		return as.Accounts, fmt.Errorf("LoadLedgerAccountNames: %w", err)
 	}
 
 	return as.Accounts, nil
