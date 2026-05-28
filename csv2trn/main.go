@@ -63,10 +63,10 @@ The flags are:
 	-c string
 	  	currency: symbol "$" or code e.g. "GBP"; overrides currency field from input
 	-f string
-	  	name of file containing input CSV record format in XML
+	 	name of file containing input CSV record format in XML
 	-h	write this help text then exit
 	-o string
-	  	output format name: Ledger journal entry "lent" or "mcsv" (default "lent")
+	  	output format name: Ledger journal entry "lent" or "mcsv" (default "mcsv")
 	-t string
 	  	the Ledger name of this account e.g. "Assets:Current"; overrides this account field from input
 
@@ -157,7 +157,7 @@ func parseFlags() config {
 	flag.StringVar(&cfg.currency, "c", "", fmt.Sprintf("currency: symbol %q or code e.g. %q%s",
 		"$", "GBP", "; overrides currency field from input"))
 	flag.StringVar(&cfg.formatFileName, "f", "", "name of file containing input CSV record format in XML")
-	flag.StringVar(&cfg.outFormatName, "o", aft.Ledger,
+	flag.StringVar(&cfg.outFormatName, "o", aft.ModuleCSV,
 		fmt.Sprintf("output format name: Ledger journal entry %q or %q",
 			aft.Ledger, aft.ModuleCSV))
 	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
