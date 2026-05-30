@@ -50,10 +50,16 @@ Program csv2trn reads the statement line by line, parses transactions from CSV r
 and warns about lines that cannot be parsed.
 Records from LCU do not provide this account, so it is set to its Ledger name Assets:Emergency.
 If other account is not provided it defaults to Imbalance.
-Although csv2trn can be configured to read any date layout, it defaults to YYYY-MM-DD (the [ISO 8601] extended date layout), which is used by the rest of this module.
 The program writes transactions in this module's CSV record format (mcsv) ordered by date ascending.
 
 The stream editor sed substitutes Ledger account names for account numbers and for Imbalance by matching the transaction's memo.
+
+This module has specific layouts for some details of a transaction:
+
+* Amount: decimal integer or decimal expressions both with optional signs e.g. 1234, +1234 and -1234.56.
+  This module does not support decimal separators other than '.', thousands separators or currencies in amounts.
+* Date: YYYY-MM-DD or [ISO 8601] extended date. 
+  Program csv2trn can be configured to read other layouts through the CSV input record format.
 
 ## Mark mirror entries in Ledger journals
 
