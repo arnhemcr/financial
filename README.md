@@ -54,12 +54,13 @@ The program writes transactions in this module's CSV record format (mcsv) ordere
 
 The stream editor sed substitutes Ledger account names for account numbers and for Imbalance by matching the transaction's memo.
 
-This module has specific layouts for some details of a transaction:
+This module has specific layouts for some transaction details:
 
-* Amount: decimal integer or decimal expressions both with optional signs e.g. 1234, +1234 and -1234.56.
-  This module does not support decimal separators other than '.', thousands separators or currencies in amounts.
+* Amount: integer or decimal with optional sign e.g. "1234", "+1234" and "-1234.56".
+  This module does not support amounts with decimal separators other than '.', thousands separators or currencies in amounts
+  e.g. "123,45", "1,234.56", "1.234,56", "-$1234.56" or "1234.56 GBP".
 * Date: YYYY-MM-DD or [ISO 8601] extended date. 
-  Program csv2trn can be configured to read other layouts through the CSV input record format.
+  Program csv2trn can be configured to read other date layouts through the CSV input record format.
 
 ## Mark mirror entries in Ledger journals
 

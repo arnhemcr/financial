@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	errAmountSyntax   = errors.New("parseDecimal: string must represent a decimal integer or a decimal expression")
+	errAmountSyntax   = errors.New("parseDecimal: string must be integer or decimal")
 	errAmountZero     = errors.New("parseAmount: amount cannot be zero")
 	errCreditDebit    = errors.New("parseAmount: credit and debit cannot both be empty string or both non-empty string")
 	errPositiveNumber = errors.New("parsePositiveDecimal: number must be positive")
@@ -73,14 +73,11 @@ func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
 
 /*
 ParseDecimal returns the floating-point number parsed from the string.
-The string must represent a decimal integer or a decimal expression (see syntax below).
-If the string does not have that syntax or it fails to parse a number, parseDecimal returns the error.
+If the string does not have the following syntax or it fails to parse a number, parseDecimal returns the error.
 
-The string syntax is:
-
- amount = signed_integer_decimal | signed_decimal
- signed_integer_decimal = [ "+" | "-" ] decimal_digits [ "." [ decimal_digits ] ]
- signed_decimal = [ "+" | "-" ] "." decimal_digits
+ number = [ "-" | "+" ] ( integer_decimal | decimal )
+ integer_decimal = decimal_digits [ "." [ decimal_digits ] ]
+ decimal = "." decimal_digits
 
 */
 func parseDecimal(s string) (float64, error) {
