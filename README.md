@@ -56,7 +56,7 @@ The stream editor sed substitutes Ledger account names for account numbers and f
 
 This module has specific layouts for some transaction details:
 
-* Amount: integer or decimal with optional sign e.g. "1234", "+1234" and "-1234.56".
+* Amount: decimal or integer with optional sign e.g. "1234.56", "-98.765" "+1234".
   This module does not support amounts with decimal separators other than '.', thousands separators or currencies in amounts
   e.g. "123,45", "1,234.56", "1.234,56", "-$1234.56" or "1234.56 GBP".
 * Date: YYYY-MM-DD or [ISO 8601] extended date. 
