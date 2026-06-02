@@ -152,7 +152,7 @@ Required indexes must be non-zero.
 If not, validateIndexes returns the first error.
 */
 func (crf CSVRecordFormat) validateIndexes() error {
-	is := [...]uint8{crf.AmountI, crf.CodeI, crf.CreditI, crf.DateI, crf.DebitI,
+	is := [...]uint8{crf.AmountI, crf.CodeI, crf.CreditI, crf.CurrencyI, crf.DateI, crf.DebitI,
 		crf.MemoI, crf.OtherAccountI, crf.ThisAccountI}
 
 	var used [maxNFields + 1]bool
