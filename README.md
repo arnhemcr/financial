@@ -24,8 +24,8 @@ It then merges those journals into a general journal.
 ## Install programs
 
 Install this module's program csv2trn from its directory with `go install`.
-Verify by viewing its help text with `csv2trn -h`.
-Then install and verify programs mcsv2lent and mrglent.
+Validate by viewing its help text with `csv2trn -h`.
+Then install and validate programs mcsv2lent and mrglent.
 
 ## Translate CSV statements into Ledger journals
 
@@ -70,9 +70,9 @@ When merging journals into a general journal, one of these entries must be disca
 Returning to the example above, mcsv2lent reads transactions in mcsv format then writes them in Ledger entry format (lent).
 For transfers between accounts with journals, whose Ledger account names are on the list in XML, the credit entry is marked with "mirror entry" comments.
 
-Use Ledger to verify the LCU journal with `ledger -f LCU.journal register Assets:Emergency`.
+Use Ledger to validate the LCU journal with `ledger -f LCU.journal register Assets:Emergency`.
 There are three entries with a current balance of 42.42 GBP.
-Verify the "To emergency fund" entry in that journal is marked as a mirror with `cat LCU.journal`.
+Validate the "To emergency fund" entry in that journal is marked as a mirror with `cat LCU.journal`.
 
 ## Merge Ledger journals into a general journal
 
@@ -83,8 +83,8 @@ cat NB.journal LCU.journal | mrglent >general.journal
 Program mrglent reads the journals and writes entries ordered by date ascending.
 All other journal content is discarded including mirror entries, automatic transactions and command directives as well as block and global comments.
 
-Verify the general journal with `ledger -f general.journal register Assets:Emergency` which has the same entries and balance as above.
-Then verify the accounts and their balances with `ledger -f general.journal balance` are:
+Validate the general journal with `ledger -f general.journal register Assets:Emergency` which has the same entries and balance as above.
+Then validate the accounts and their balances with `ledger -f general.journal balance` are:
 ```
  96.28 GBP  Assets
  53.86 GBP    Current
