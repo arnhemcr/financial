@@ -121,13 +121,13 @@ func (t Transaction) StringLedger() string {
 	a := stringAmount(t.Amount)
 
 	cu := t.Currency
-	switch cu {
-	case "":
+	switch len(cu) {
+	case 0:
 		// There is no currency for the amount.
-	case "$":
-		a = "$" + a
+	case 1:
+		a = cu + a // This amount has a currency symbol.
 	default:
-		a = a + " " + cu
+		a = a + " " + cu // This amount has a currency code.
 	}
 
 	var co string
