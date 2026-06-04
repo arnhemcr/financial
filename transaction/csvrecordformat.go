@@ -136,7 +136,7 @@ var (
 	errAmountOption = errors.New("validateOptions: amount field index, " +
 		"or credit and debit indexes in CSV record format cannot both be zero")
 	errDateI      = errors.New("validateIndexes: date field index in CSV record format cannot be zero")
-	errDateLayout = errors.New("Validate: date layout in CSV record format must be Go-style e.g. \"" +
+	errDateLayout = errors.New("Validate: date layout in CSV record format must be Go style e.g. \"" +
 		time.DateOnly + "\"")
 	errIndexUnique  = errors.New("validateIndexes: field indexes in CSV record format cannot share a non-zero value")
 	errIndexRange   = errors.New("validateIndexes: field index in CSV record format is out of range")

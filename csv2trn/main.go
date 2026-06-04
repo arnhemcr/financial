@@ -61,7 +61,7 @@ Usage:
 The flags are:
 
 	-c string
-	  	currency: symbol "$" or code e.g. "GBP"; overrides currency field from input
+	  	Ledger currency e.g. "$" or "GBP"; overrides currency field from input
 	-f string
 	 	name of file containing input CSV record format in XML
 	-h	write this help text then exit
@@ -99,22 +99,21 @@ type config struct {
 	thisAccount    string
 }
 
-var (
-	errOutFormatName = errors.New("invalid output format name")
-	errThisAccount   = errors.New("cannot get this account: " +
-		"CSV records do not contain that field and its flag is not set")
-)
-
 func main() {
 	log.SetPrefix("csv2trn: ")
 	log.SetFlags(0)
 
 	cfg := parseFlags()
+
+	if !aft.IsLedgerCurrency(cfg.currency) {
+		log.Fatalf("%v: not a Ledger currency", cfg.currency)
+	}
+
 	switch cfg.outFormatName {
 	case aft.Ledger, aft.ModuleCSV:
 		// This output format name is valid.
 	default:
-		log.Fatalf("%q: %v", cfg.outFormatName, errOutFormatName)
+		log.Fatalf("%v: not an output format name", cfg.outFormatName)
 	}
 
 	var err error
@@ -128,7 +127,7 @@ func main() {
 	}
 
 	if cfg.thisAccount == "" && inFormat.ThisAccountI == 0 {
-		log.Fatal(errThisAccount)
+		log.Fatal("cannot get this account: CSV records do not contain that field and its flag is not set")
 	}
 
 	r := csv.NewReader(os.Stdin)
@@ -154,8 +153,8 @@ If the flags are invalid, this program exits with a non-zero status.
 func parseFlags() config {
 	var cfg config
 
-	flag.StringVar(&cfg.currency, "c", "", fmt.Sprintf("currency: symbol %q or code e.g. %q%s",
-		"$", "GBP", "; overrides currency field from input"))
+	flag.StringVar(&cfg.currency, "c", "", 
+		fmt.Sprintf("Ledger currency e.g. %q or %q; overrides currency field from input", "$", "GBP"))
 	flag.StringVar(&cfg.formatFileName, "f", "", "name of file containing input CSV record format in XML")
 	flag.StringVar(&cfg.outFormatName, "o", aft.ModuleCSV,
 		fmt.Sprintf("output format name: Ledger journal entry %q or %q",

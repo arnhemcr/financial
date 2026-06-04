@@ -23,9 +23,11 @@ package transaction
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
+	"unicode"
 )
 
 const (
@@ -44,6 +46,26 @@ const (
 	StartMirrorEntry = "# mirror entry\n"
 	EndMirrorEntry   = "# end mirror entry\n"
 )
+
+/*
+IsLedgerCurrency reports whether the string contains a Ledger currency or commodity.
+
+See "Commodities and Currencies" in the [Ledger 3 manual].
+*/
+func IsLedgerCurrency(s string) bool {
+	for _, r := range s {
+		switch r {
+		case '.', ',', '/', '@':
+			return false
+		}
+
+		if unicode.IsDigit(r) || unicode.IsSpace(r) {
+			return false
+		}
+	}
+
+	return true
+}
 
 /*
 IsLedgerIndented reports whether the line starts with a white space character
@@ -134,3 +156,5 @@ const (
 	startCode = "("
 	endCode   = ")"
 )
+
+var errCurrency = errors.New("currency must be Ledger style")

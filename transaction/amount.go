@@ -75,10 +75,9 @@ func parseAmount(fields []string, crf CSVRecordFormat) (float64, error) {
 ParseDecimal returns the floating-point number parsed from the string.
 If the string does not have the following syntax or it fails to parse a number, parseDecimal returns the error.
 
- number = [ "-" | "+" ] ( integer_decimal | decimal )
- integer_decimal = decimal_digits [ "." [ decimal_digits ] ]
- decimal = "." decimal_digits
-
+	number = [ "-" | "+" ] ( integer_decimal | decimal )
+	integer_decimal = decimal_digits [ "." [ decimal_digits ] ]
+	decimal = "." decimal_digits
 */
 func parseDecimal(s string) (float64, error) {
 	var postPoint bool

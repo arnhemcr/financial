@@ -23,6 +23,7 @@ package transaction
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 )
@@ -53,7 +54,10 @@ func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
 		return err
 	}
 
-	t.parseOptional(fs, crf)
+	err = t.parseOptional(fs, crf)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -112,11 +116,24 @@ func (t *Transaction) parseRequired(fields []string, crf CSVRecordFormat) error 
 	return nil
 }
 
-func (t *Transaction) parseOptional(fields []string, crf CSVRecordFormat) {
+func (t *Transaction) parseOptional(fields []string, crf CSVRecordFormat) error {
 	t.Code = fields[crf.CodeI]
 
-	// Currency may already have a value which takes precedence over its field.
-	if t.Currency == "" {
-		t.Currency = fields[crf.CurrencyI]
+	if t.Currency != "" {
+		// The existing currency value takes precedence over its field.
+		return nil
 	}
+
+	c := fields[crf.CurrencyI]
+	if c == "" {
+		return nil
+	}
+
+	if !IsLedgerCurrency(c) {
+		return fmt.Errorf("parseOptional: %w", errCurrency)
+	}
+
+	t.Currency = c
+
+	return nil
 }
