@@ -153,7 +153,7 @@ If the flags are invalid, this program exits with a non-zero status.
 func parseFlags() config {
 	var cfg config
 
-	flag.StringVar(&cfg.currency, "c", "", 
+	flag.StringVar(&cfg.currency, "c", "",
 		fmt.Sprintf("Ledger currency e.g. %q or %q; overrides currency field from input", "$", "GBP"))
 	flag.StringVar(&cfg.formatFileName, "f", "", "name of file containing input CSV record format in XML")
 	flag.StringVar(&cfg.outFormatName, "o", aft.ModuleCSV,
