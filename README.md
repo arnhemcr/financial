@@ -2,7 +2,7 @@
 
 This [Go] module offers [filter] programs to:
  * help translate financial transactions from a [comma-separated values (CSV)] statement
-   into a journal for the [Ledger] command-line accounting system
+   into journal entries for the [Ledger] command-line accounting system
  * merge Ledger journals into a general journal for reporting and analysis
 
 Its only dependency is the [Go standard library].
@@ -11,8 +11,7 @@ Its only dependency is the [Go standard library].
 
 An individual has two accounts: one with National Bank (NB) and the other with Local Credit Union (LCU).
 These institutions provide CSV statements with different sets of transactions details and record formats.
-This example translates those CSV statements into Ledger journals.
-It then merges those journals into a general journal.
+This example creates a general journal containing entries for the transactions in both statements.
 
 ## Dependencies
 
@@ -31,7 +30,7 @@ Then install and validate programs mcsv2lent and mrglent.
 
 In the example directory, translate the statements into journals with:
 ```
-# Initialise both journals.
+# Initialise both journals with opening balances.
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
 
@@ -41,34 +40,34 @@ cat LCU.csv | csv2trn -f LCU.xml -t Assets:Emergency -c GBP | sed -f accounts.se
 	mcsv2lent -f journalAccounts.xml >>LCU.journal
 ```
 
-The pipelines load a CSV statement with cat, process its transactions then append entries to the journals.
+Each pipeline loads a CSV statement with cat, processes its transactions then append entries to its journal.
 A transaction is the transfer of an amount of currency between accounts on a particular day.
 It is described by a memo and code, also called the description and transaction type.
 A statement and its records belong to an account, which in a transaction is called this account.
 
-Program csv2trn reads the statement line by line, parses transactions from CSV records following the input format in XML
-and warns about lines that cannot be parsed.
+Program csv2trn reads the statement line by line, parses transactions from CSV records,
+following the input format in XML, and warns about lines that cannot be parsed.
 Records from LCU do not provide this account, so it is set to its Ledger name Assets:Emergency.
 If other account is not provided it defaults to Imbalance.
 The program writes transactions in this module's CSV record format (mcsv) ordered by date ascending.
 
-The stream editor sed substitutes Ledger account names for account numbers and for Imbalance by matching the transaction's memo.
+The stream editor sed is configured to substitute Ledger account names 
+for account numbers and for Imbalance by matching the transaction's memo.
 
 This module has specific layouts for some transaction details:
 
 * Amount: decimal or integer with optional sign e.g. "1234.56", "-98.765" "+1234".
-  This module does not support amounts with decimal separators other than '.', thousands separators or currencies in amounts
-  e.g. "123,45", "1,234.56", "1.234,56", "-$1234.56" or "1234.56 GBP".
+  This module does not support amounts with decimal separators other than '.', thousands separators or currencies in amounts.
 * Date: YYYY-MM-DD or [ISO 8601] extended date. 
-  Program csv2trn can be configured to read other date layouts through the CSV input record format.
+  Program csv2trn can be configured to read other date layouts through its input record format in XML.
 
 ## Mark mirror entries in Ledger journals
 
 Transfers between accounts with journals have two entries: a debit in one mirrored by a credit in the other.
-When merging journals into a general journal, one of these entries must be discarded so the transfer happens once not twice.
+When those merging journals into a general journal, one of these entries must be discarded so the transfer happens once not twice.
 
-Returning to the example above, mcsv2lent reads transactions in mcsv format then writes them in Ledger entry format (lent).
-For transfers between accounts with journals, whose Ledger account names are on the list in XML, the credit entry is marked with "mirror entry" comments.
+Returning to the example above, program mcsv2lent reads transactions in mcsv format then writes them in Ledger entry format (lent).
+For transfers between accounts with journals, whose Ledger account names are listed in XML, the credit entry is marked with "mirror entry" comments.
 
 Use Ledger to validate the LCU journal with `ledger -f LCU.journal register Assets:Emergency`.
 There are three entries with a current balance of 42.42 GBP.
@@ -84,7 +83,7 @@ Program mrglent reads the journals and writes entries ordered by date ascending.
 All other journal content is discarded including mirror entries, automatic transactions and command directives as well as block and global comments.
 
 Validate the general journal with `ledger -f general.journal register Assets:Emergency` which has the same entries and balance as above.
-Then validate the accounts and their balances with `ledger -f general.journal balance` are:
+Then validate the accounts and their balances with `ledger -f general.journal balance`:
 ```
  96.28 GBP  Assets
  53.86 GBP    Current

@@ -124,16 +124,16 @@ func (t *Transaction) parseOptional(fields []string, crf CSVRecordFormat) error 
 		return nil
 	}
 
-	c := fields[crf.CurrencyI]
-	if c == "" {
+	cu := fields[crf.CurrencyI]
+	if cu == "" {
 		return nil
 	}
 
-	if !IsLedgerCurrency(c) {
+	if !IsLedgerCurrency(cu) {
 		return fmt.Errorf("parseOptional: %w", errCurrency)
 	}
 
-	t.Currency = c
+	t.Currency = cu
 
 	return nil
 }
