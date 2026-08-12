@@ -28,9 +28,7 @@ import (
 	"strings"
 )
 
-const (
-	ModuleCSV = "mcsv" // The name of this module's CSV record format.
-)
+const ModuleCSV = "mcsv" // The name of this module's CSV record format.
 
 /*
 ParseCSV parses this transaction from the CSV record fields according to the format.
@@ -77,9 +75,7 @@ var (
 		"parseRequired: this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
 )
 
-func (t *Transaction) parseRequired(fields []string, crf CSVRecordFormat) error {
-	var err error
-
+func (t *Transaction) parseRequired(fields []string, crf CSVRecordFormat) (err error) {
 	t.Amount, err = parseAmount(fields, crf)
 	if err != nil {
 		return err

@@ -63,16 +63,13 @@ func ParseModuleDate(text string) (string, error) {
 
 // TrimDate returns the start of the text trimmed to the length of layout or the text whichever is shorter.
 func trimDate(text, layout string) string {
-	var (
-		dlLen = len(layout)
-		tLen  = len(text)
-	)
+	tLen, lLen := len(text), len(layout)
 
 	switch {
-	case dlLen == 0 || tLen == 0:
+	case lLen == 0 || tLen == 0:
 		return ""
-	case dlLen < tLen:
-		return text[0:dlLen]
+	case lLen < tLen:
+		return text[0:lLen]
 	default:
 		return text
 	}

@@ -16,9 +16,9 @@ This example creates a general journal containing entries for the transactions i
 ## Dependencies
 
 * a [Go installation]
-* a program to match text strings and substitute one for another e.g. the stream editor [sed]
-* connecting programs together in a pipeline and redirecting output to a file
 * a [Ledger installation]
+* the stream editor [sed]; other programs that can match a text string and substitute one string for another could be used instead
+* the ability to connect programs together in a pipeline and redirect its output to a file
 
 ## Install programs
 
@@ -47,7 +47,8 @@ A statement and its records belong to an account, which in a transaction is call
 
 Program csv2trn reads the statement line by line, parses transactions from CSV records,
 following the input format in XML, and warns about lines that cannot be parsed.
-Records from LCU do not provide this account, so it is set to its Ledger name Assets:Emergency.
+LCU statements do not provide this account, so it is set to its Ledger name Assets:Emergency.
+Neither NB nor LCU provide the currency for transactions, so it is set to GBP.
 If other account is not provided it defaults to Imbalance.
 The program writes transactions in this module's CSV record format (mcsv) ordered by date ascending.
 
@@ -57,7 +58,7 @@ for account numbers and for Imbalance by matching the transaction's memo.
 This module has specific layouts for some transaction details:
 
 * Amount: decimal or integer with optional sign e.g. "1234.56", "-98.765" "+1234".
-  This module does not support amounts with decimal separators other than '.', thousands separators or currencies in amounts.
+  This module does not support amounts with decimal separators other than '.', thousands separators or those that contain a currency.
 * Date: YYYY-MM-DD or [ISO 8601] extended date. 
   Program csv2trn can be configured to read other date layouts through its input record format in XML.
 
