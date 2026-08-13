@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	errAmountSyntax   = errors.New("parseDecimal: string must be integer or decimal")
+	errAmountSyntax   = errors.New("parseDecimal: string must represent a decimal or integer")
 	errAmountZero     = errors.New("parseAmount: amount cannot be zero")
 	errCreditDebit    = errors.New("parseAmount: credit and debit cannot both be empty string or both non-empty string")
 	errPositiveNumber = errors.New("parsePositiveDecimal: number must be positive")
@@ -80,9 +80,9 @@ func parseDecimal(s string) (n float64, err error) {
 	for i, r := range s {
 		switch {
 		case i == 0 && (r == '-' || r == '+'):
+		case unicode.IsDigit(r):
 		case !postPoint && r == '.':
 			postPoint = true
-		case unicode.IsDigit(r):
 		default:
 			return n, errAmountSyntax
 		}

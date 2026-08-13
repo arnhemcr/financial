@@ -34,7 +34,7 @@ const (
 	Ledger = "lent" // The name of the Ledger journal entry format.
 
 	/*
-		The start and end lines for Ledger block comments
+		The start and end lines for a Ledger block comment
 		(see the "Commenting Your Journal" section of the [Ledger 3 manual].
 
 		[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
@@ -42,7 +42,7 @@ const (
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
 
-	// The start and end Ledger global comment lines around a mirror entry.
+	// The start and end Ledger global comment lines for a mirror entry in this module.
 	StartMirrorEntry = "# mirror entry\n"
 	EndMirrorEntry   = "# end mirror entry\n"
 )
@@ -90,7 +90,7 @@ func IsLedgerIndented(line string) bool {
 LoadLedgerAccountNames returns a list of Ledger account names loaded from the named XML file.
 If it fails to load the list, LedgerAccounts returns the first error.
 
-For example, file LedgerAccountsWithJournals.xml might contain three asset account names:
+For example, file LedgerAccountsWithJournals.xml contains three asset account names:
 
 	<Accounts>
 	  <Account>Assets:Current</Account>
@@ -139,7 +139,6 @@ func (t Transaction) StringLedger() string {
 		}
 
 		co += t.Code
-
 		if !strings.HasSuffix(t.Code, endCode) {
 			co += endCode
 		}

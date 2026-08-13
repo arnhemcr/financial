@@ -26,9 +26,9 @@ import (
 	"time"
 )
 
-// Reports whether dl is a Go-style date layout.
-func IsDateLayout(dl string) bool {
-	d, _ := time.Parse(dl, dl)
+// Reports whether the string is a Go-style date layout.
+func IsDateLayout(layout string) bool {
+	d, _ := time.Parse(layout, layout)
 
 	return d.Format(time.DateOnly) == time.DateOnly
 }
@@ -40,14 +40,14 @@ The layout can be verified by calling function IsDateLayout.
 If it fails to parse a date, parseDate returns the error.
 */
 func ParseDate(text, layout string) (string, error) {
-	d := trimDate(text, layout)
+	t := trimDate(text, layout)
 
-	date, err := time.Parse(layout, d)
+	d, err := time.Parse(layout, t)
 	if err != nil {
 		return "", fmt.Errorf("ParseDate: %w", err)
 	}
 
-	return date.Format(time.DateOnly), nil
+	return d.Format(time.DateOnly), nil
 }
 
 /*
@@ -61,7 +61,7 @@ func ParseModuleDate(text string) (string, error) {
 	return ParseDate(text, time.DateOnly)
 }
 
-// TrimDate returns the start of the text trimmed to the length of layout or the text whichever is shorter.
+// TrimDate returns the shorter of the text or the start of the text trimmed to the length of the layout.
 func trimDate(text, layout string) string {
 	tLen, lLen := len(text), len(layout)
 

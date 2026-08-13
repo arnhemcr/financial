@@ -93,10 +93,10 @@ import (
 
 // The configuration returned by parseFlags.
 type config struct {
-	currency       string
-	formatFileName string
-	outFormatName  string
-	thisAccount    string
+	currency         string
+	inFormatFileName string
+	outFormatName    string
+	thisAccount      string
 }
 
 func main() {
@@ -106,21 +106,24 @@ func main() {
 	cfg := parseFlags()
 
 	if !aft.IsLedgerCurrency(cfg.currency) {
-		log.Fatalf("%v: not a Ledger currency", cfg.currency)
+		log.Fatalf("not a Ledger currency %q", cfg.currency)
 	}
 
 	switch cfg.outFormatName {
 	case aft.Ledger, aft.ModuleCSV:
 		// This output format name is valid.
 	default:
-		log.Fatalf("%v: not an output format name", cfg.outFormatName)
+		log.Fatalf("not an output format name %q", cfg.outFormatName)
 	}
 
-	var err error
+	var inFormat aft.CSVRecordFormat
 
-	inFormat := aft.NewModuleCSVRecordFormat()
-	if cfg.formatFileName != "" {
-		inFormat, err = aft.NewCSVRecordFormat(cfg.formatFileName)
+	if cfg.inFormatFileName == "" {
+		inFormat = aft.NewModuleCSVRecordFormat()
+	} else {
+		var err error
+
+		inFormat, err = aft.NewCSVRecordFormat(cfg.inFormatFileName)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -131,10 +134,8 @@ func main() {
 	}
 
 	r := csv.NewReader(os.Stdin)
-	/*
-		The number of fields in a record is checked by aft.ParseCSV,
-		so disable the reader's check.
-	*/
+
+	// The number of fields in a record is checked by aft.ParseCSV; disable the reader's check.
 	r.FieldsPerRecord, r.ReuseRecord = -1, true
 
 	ts, err := parseCSVStatement(r, cfg, inFormat)
@@ -150,16 +151,14 @@ ParseFlags returns this program's configuration parsed from command line flags.
 If help was requested, parseFlags writes this program's help text then exits.
 If the flags are invalid, this program exits with a non-zero status.
 */
-func parseFlags() config {
-	var cfg config
-
-	flag.StringVar(&cfg.currency, "c", "",
+func parseFlags() (c config) {
+	flag.StringVar(&c.currency, "c", "",
 		fmt.Sprintf("Ledger currency e.g. %q or %q; overrides currency field from input", "$", "GBP"))
-	flag.StringVar(&cfg.formatFileName, "f", "", "name of file containing input CSV record format in XML")
-	flag.StringVar(&cfg.outFormatName, "o", aft.ModuleCSV,
+	flag.StringVar(&c.inFormatFileName, "f", "", "name of file containing input CSV record format in XML")
+	flag.StringVar(&c.outFormatName, "o", aft.ModuleCSV,
 		fmt.Sprintf("output format name: Ledger journal entry %q or %q",
 			aft.Ledger, aft.ModuleCSV))
-	flag.StringVar(&cfg.thisAccount, "t", "", fmt.Sprintf(
+	flag.StringVar(&c.thisAccount, "t", "", fmt.Sprintf(
 		"the Ledger name of this account e.g. %q%s",
 		"Assets:Current", "; overrides this account field from input"))
 
@@ -175,7 +174,7 @@ func parseFlags() config {
 		os.Exit(0)
 	}
 
-	return cfg
+	return c
 }
 
 /*
@@ -185,9 +184,7 @@ then returns the transactions.
 If it fails to read the statement, parseCSVStatement returns an error.
 If it fails to parse a transaction, parseCSVStatement logs a warning then continues.
 */
-func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]aft.Transaction, error) {
-	var ts []aft.Transaction
-
+func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) (ts []aft.Transaction, err error) {
 	for {
 		fs, err := r.Read()
 		if errors.Is(err, io.EOF) {
@@ -196,9 +193,7 @@ func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) ([]af
 			return ts, fmt.Errorf("parseCSVStatement: %w", err)
 		}
 
-		var t aft.Transaction
-
-		t.Currency, t.ThisAccount = cfg.currency, cfg.thisAccount
+		t := aft.Transaction{Currency: cfg.currency, ThisAccount: cfg.thisAccount}
 
 		err = t.ParseCSV(fs, crf)
 		if err != nil {
