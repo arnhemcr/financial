@@ -33,28 +33,24 @@ const ModuleCSV = "mcsv" // The name of this module's CSV record format.
 /*
 ParseCSV parses this transaction from the CSV record fields according to the format.
 It assumes the format is valid.
-The format can be verified by calling function crf.Validate.
 If ParseCSV fails to parse the transaction, it returns the first error.
 */
-func (t *Transaction) ParseCSV(fields []string, crf CSVRecordFormat) error {
-	if len(fields) != int(crf.NFields) {
-		return errNFields
+func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) error {
+	if len(fields) != int(f.NFields) {
+		return fmt.Errorf("ParseCSV: %w", errNFields)
 	}
 
-	/*
-		Prepend fields with an empty string,
-		so a field whose index is zero has value empty string.
-	*/
-	fs := slices.Insert(fields, 0, "")
+	// Prepend fields with an empty string, so a field whose index is zero has value empty string.
+	fields = slices.Insert(fields, 0, "")
 
-	err := t.parseRequired(fs, crf)
+	err := t.parseRequired(fields, f)
 	if err != nil {
-		return err
+		return fmt.Errorf("ParseCSV: %w", err)
 	}
 
-	err = t.parseOptional(fs, crf)
+	err = t.parseOptional(fields, f)
 	if err != nil {
-		return err
+		return fmt.Errorf("ParseCSV: %w", err)
 	}
 
 	return nil
@@ -69,34 +65,33 @@ func (t Transaction) StringModuleCSV() string {
 }
 
 var (
-	errMemo        = errors.New("parseRequired: memo cannot be empty string")
-	errNFields     = errors.New("ParseCSV: unexpected number of fields in CSV record")
-	errThisAccount = errors.New(
-		"parseRequired: this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
+	errMemo        = errors.New("memo cannot be empty string")
+	errNFields     = errors.New("unexpected number of fields in record")
+	errThisAccount = errors.New("this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
 )
 
-func (t *Transaction) parseRequired(fields []string, crf CSVRecordFormat) (err error) {
-	t.Amount, err = parseAmount(fields, crf)
+func (t *Transaction) parseRequired(fields []string, f CSVRecordFormat) (err error) {
+	t.Amount, err = parseAmount(fields, f)
 	if err != nil {
 		return err
 	}
 
-	t.Date, err = ParseDate(fields[crf.DateI], crf.DateLayout)
+	t.Date, err = ParseDate(fields[f.DateI], f.DateLayout)
 	if err != nil {
 		return err
 	}
 
-	t.Memo = fields[crf.MemoI]
+	t.Memo = fields[f.MemoI]
 	if t.Memo == "" {
 		return errMemo
 	}
 
-	t.OtherAccount = fields[crf.OtherAccountI]
+	t.OtherAccount = fields[f.OtherAccountI]
 	if t.OtherAccount == "" {
 		t.OtherAccount = DefaultOtherAccount
 	}
 
-	a := fields[crf.ThisAccountI]
+	a := fields[f.ThisAccountI]
 
 	switch {
 	case t.ThisAccount == DefaultOtherAccount || a == DefaultOtherAccount:
@@ -112,24 +107,24 @@ func (t *Transaction) parseRequired(fields []string, crf CSVRecordFormat) (err e
 	return nil
 }
 
-func (t *Transaction) parseOptional(fields []string, crf CSVRecordFormat) error {
-	t.Code = fields[crf.CodeI]
+func (t *Transaction) parseOptional(fields []string, f CSVRecordFormat) error {
+	t.Code = fields[f.CodeI]
 
 	if t.Currency != "" {
 		// The existing currency value takes precedence over its field.
 		return nil
 	}
 
-	cu := fields[crf.CurrencyI]
-	if cu == "" {
+	c := fields[f.CurrencyI]
+	if c == "" {
 		return nil
 	}
 
-	if !IsLedgerCurrency(cu) {
-		return fmt.Errorf("parseOptional: %w", errCurrency)
+	if !IsLedgerCurrency(c) {
+		return errCurrency
 	}
 
-	t.Currency = cu
+	t.Currency = c
 
 	return nil
 }

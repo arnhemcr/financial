@@ -23,16 +23,15 @@ package transaction
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"unicode"
 )
 
 var (
-	errAmountSyntax   = errors.New("parseDecimal: string must represent a decimal or integer")
-	errAmountZero     = errors.New("parseAmount: amount cannot be zero")
-	errCreditDebit    = errors.New("parseAmount: credit and debit cannot both be empty string or both non-empty string")
-	errPositiveNumber = errors.New("parsePositiveDecimal: number must be positive")
+	errAmountSyntax   = errors.New("string must represent a decimal or integer")
+	errAmountZero     = errors.New("amount cannot be zero")
+	errCreditDebit    = errors.New("credit and debit cannot both be empty string or both non-empty string")
+	errPositiveNumber = errors.New("number must be positive")
 )
 
 /*
@@ -40,8 +39,8 @@ ParseAmount parses the value of a transaction from either the amount, credit or 
 The value cannot be zero.
 If it fails to parse a non-zero value, parseAmount returns the first error.
 */
-func parseAmount(fields []string, crf CSVRecordFormat) (v float64, err error) {
-	a, c, d := fields[crf.AmountI], fields[crf.CreditI], fields[crf.DebitI]
+func parseAmount(fields []string, f CSVRecordFormat) (v float64, err error) {
+	a, c, d := fields[f.AmountI], fields[f.CreditI], fields[f.DebitI]
 
 	switch {
 	case a != "":
@@ -90,7 +89,7 @@ func parseDecimal(s string) (n float64, err error) {
 
 	n, err = strconv.ParseFloat(s, 64)
 	if err != nil {
-		return 0, fmt.Errorf("parseDecimal: %w", err)
+		return 0, err
 	}
 
 	return n, nil

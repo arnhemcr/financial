@@ -53,33 +53,31 @@ type CSVRecordFormat struct {
 }
 
 /*
-NewCSVRecordFormat returns a valid CSV record format read from the named XML file.
+NewCSVRecordFormat returns the CSV record format read from the named XML file.
 The format's date layout defaults to "2006-01-02", while all other fields default to zero.
 If it fails to read or validate the format, NewCSVRecordFormat returns the first error.
 */
-func NewCSVRecordFormat(fileName string) (CSVRecordFormat, error) {
-	var crf CSVRecordFormat
-
+func NewCSVRecordFormat(fileName string) (f CSVRecordFormat, err error) {
 	bs, err := os.ReadFile(fileName)
 	if err != nil {
-		return crf, fmt.Errorf("NewCSVRecordFormat: %w", err)
+		return f, fmt.Errorf("NewCSVRecordFormat: %w", err)
 	}
 
-	err = xml.Unmarshal(bs, &crf)
+	err = xml.Unmarshal(bs, &f)
 	if err != nil {
-		return crf, fmt.Errorf("NewCSVRecordFormat: %w", err)
+		return f, fmt.Errorf("NewCSVRecordFormat: %w", err)
 	}
 
-	if crf.DateLayout == "" {
-		crf.DateLayout = time.DateOnly
+	if f.DateLayout == "" {
+		f.DateLayout = time.DateOnly
 	}
 
-	err = crf.Validate()
+	err = f.Validate()
 	if err != nil {
-		return crf, err
+		return f, fmt.Errorf("NewCSVRecordFormat: %w", err)
 	}
 
-	return crf, nil
+	return f, nil
 }
 
 // NewModuleCSVRecordFormat returns this module's CSV record format.
@@ -103,24 +101,24 @@ func NewModuleCSVRecordFormat() CSVRecordFormat {
 Validate returns nil if this CSV record format is valid.
 If not, Validate returns the first error.
 */
-func (crf CSVRecordFormat) Validate() error {
-	n := crf.NFields
+func (f CSVRecordFormat) Validate() error {
+	n := f.NFields
 	if n < minNFields || maxNFields < n {
-		return errNFieldsRange
+		return fmt.Errorf("Validate: %w", errNFieldsRange)
 	}
 
-	err := crf.validateIndexes()
+	err := f.validateIndexes()
 	if err != nil {
-		return err
+		return fmt.Errorf("Validate: %w", err)
 	}
 
-	err = crf.validateOptions()
+	err = f.validateOptions()
 	if err != nil {
-		return err
+		return fmt.Errorf("Validate: %w", err)
 	}
 
-	if !IsDateLayout(crf.DateLayout) {
-		return errDateLayout
+	if !IsDateLayout(f.DateLayout) {
+		return fmt.Errorf("Validate: %w", errDateLayout)
 	}
 
 	return nil
@@ -133,15 +131,15 @@ const (
 )
 
 var (
-	errAmountOption = errors.New("validateOptions: amount field index, " +
-		"or credit and debit indexes in CSV record format cannot both be zero")
-	errDateI      = errors.New("validateIndexes: date field index in CSV record format cannot be zero")
-	errDateLayout = errors.New("Validate: date layout in CSV record format must be Go style e.g. \"" +
+	errAmountOption = errors.New(
+		"amount field index, or credit and debit indexes in CSV record format cannot both be zero")
+	errDateI      = errors.New("date field index in CSV record format cannot be zero")
+	errDateLayout = errors.New("date layout in CSV record format must be Go style e.g. \"" +
 		time.DateOnly + "\"")
-	errIndexUnique  = errors.New("validateIndexes: field indexes in CSV record format cannot share a non-zero value")
-	errIndexRange   = errors.New("validateIndexes: field index in CSV record format is out of range")
-	errMemoI        = errors.New("validateIndexes: memo field index in CSV record format cannot be zero")
-	errNFieldsRange = errors.New("Validate: number of fields in CSV record format is out of range")
+	errIndexUnique  = errors.New("field indexes in CSV record format cannot share a non-zero value")
+	errIndexRange   = errors.New("field index in CSV record format is out of range")
+	errMemoI        = errors.New("memo field index in CSV record format cannot be zero")
+	errNFieldsRange = errors.New("number of fields in CSV record format is out of range")
 )
 
 /*
@@ -151,15 +149,15 @@ Each non-zero index must be unique.
 Required indexes must be non-zero.
 If not, validateIndexes returns the first error.
 */
-func (crf CSVRecordFormat) validateIndexes() error {
-	is := [...]uint8{crf.AmountI, crf.CodeI, crf.CreditI, crf.CurrencyI, crf.DateI, crf.DebitI,
-		crf.MemoI, crf.OtherAccountI, crf.ThisAccountI}
+func (f CSVRecordFormat) validateIndexes() error {
+	is := [...]uint8{f.AmountI, f.CodeI, f.CreditI, f.CurrencyI,
+		f.DateI, f.DebitI, f.MemoI, f.OtherAccountI, f.ThisAccountI}
 
 	var used [maxNFields + 1]bool
 
 	for _, i := range is {
 		switch {
-		case crf.NFields < i:
+		case f.NFields < i:
 			return errIndexRange
 		case i == 0:
 			// These CSV records do not contain this field.
@@ -171,9 +169,9 @@ func (crf CSVRecordFormat) validateIndexes() error {
 	}
 
 	switch {
-	case crf.DateI == 0:
+	case f.DateI == 0:
 		return errDateI
-	case crf.MemoI == 0:
+	case f.MemoI == 0:
 		return errMemoI
 	default:
 		return nil
@@ -181,15 +179,14 @@ func (crf CSVRecordFormat) validateIndexes() error {
 }
 
 /*
-ValidateOptions returns nil if the combination of optional field indexes
-in this CSV record format is valid.
+ValidateOptions returns nil if the combination of optional field indexes in this CSV record format is valid.
 If not, validateOptions returns the error.
 */
-func (crf CSVRecordFormat) validateOptions() error {
+func (f CSVRecordFormat) validateOptions() error {
 	switch {
-	case crf.AmountI != 0:
+	case f.AmountI != 0:
 		return nil
-	case crf.CreditI != 0 && crf.DebitI != 0:
+	case f.CreditI != 0 && f.DebitI != 0:
 		return nil
 	default:
 		return errAmountOption
