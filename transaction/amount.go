@@ -23,15 +23,14 @@ package transaction
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"unicode"
 )
 
 var (
-	errAmountSyntax   = errors.New("string must represent a decimal or integer")
 	errAmountZero     = errors.New("amount cannot be zero")
-	errCreditDebit    = errors.New("credit and debit cannot both be empty string or both non-empty string")
-	errPositiveNumber = errors.New("number must be positive")
+	errPositiveNumber = errors.New("credit and debit cannot be negative or zero")
 )
 
 /*
@@ -52,7 +51,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (v float64, err error) {
 
 		v *= -1
 	default:
-		return 0, errCreditDebit
+		return 0, fmt.Errorf("credit and debit, %q and %q, cannot both be empty or non-empty strings", c, d)
 	}
 
 	switch {
@@ -83,7 +82,7 @@ func parseDecimal(s string) (n float64, err error) {
 		case !postPoint && r == '.':
 			postPoint = true
 		default:
-			return n, errAmountSyntax
+			return n, fmt.Errorf("cannot parse %q as amount", s)
 		}
 	}
 

@@ -198,7 +198,7 @@ func parseCSVStatement(r *csv.Reader, cfg config, crf aft.CSVRecordFormat) (ts [
 		err = t.ParseCSV(fs, crf)
 		if err != nil {
 			n, _ := r.FieldPos(0)
-			log.Printf("%v on line %v", err, n)
+			log.Printf("line %v: %v", n, err)
 
 			continue
 		}

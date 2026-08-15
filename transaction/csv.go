@@ -67,7 +67,7 @@ func (t Transaction) StringModuleCSV() string {
 var (
 	errMemo        = errors.New("memo cannot be empty string")
 	errNFields     = errors.New("unexpected number of fields in record")
-	errThisAccount = errors.New("this account cannot be empty string or \"" + DefaultOtherAccount + "\"")
+	errThisAccount = errors.New("this account cannot be empty string (or \"" + DefaultOtherAccount + "\")")
 )
 
 func (t *Transaction) parseRequired(fields []string, f CSVRecordFormat) (err error) {
@@ -121,7 +121,7 @@ func (t *Transaction) parseOptional(fields []string, f CSVRecordFormat) error {
 	}
 
 	if !IsLedgerCurrency(c) {
-		return errCurrency
+		return fmt.Errorf("%q %w", c, errCurrency)
 	}
 
 	t.Currency = c

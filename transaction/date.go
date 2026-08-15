@@ -22,7 +22,6 @@ If not, see <https://www.gnu.org/licenses/>.
 package transaction
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -44,7 +43,7 @@ func ParseDate(text, layout string) (string, error) {
 
 	d, err := time.Parse(layout, t)
 	if err != nil {
-		return "", fmt.Errorf("ParseDate: %w", err)
+		return "", err // This error will be wrapped by ParseCSV.
 	}
 
 	return d.Format(time.DateOnly), nil
