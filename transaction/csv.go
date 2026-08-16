@@ -56,7 +56,7 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) error {
 	return nil
 }
 
-// StringModuleCSV returns this transaction as this module's CSV record.
+// StringModuleCSV returns this transaction as a CSV record in this module's format (mcsv).
 func (t Transaction) StringModuleCSV() string {
 	a := stringAmount(t.Amount)
 	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, a, t.Currency}
@@ -67,7 +67,7 @@ func (t Transaction) StringModuleCSV() string {
 var (
 	errMemo        = errors.New("memo cannot be empty string")
 	errNFields     = errors.New("unexpected number of fields in record")
-	errThisAccount = errors.New("this account cannot be empty string (or \"" + DefaultOtherAccount + "\")")
+	errThisAccount = fmt.Errorf("this account cannot be empty string (or %q)", DefaultOtherAccount)
 )
 
 func (t *Transaction) parseRequired(fields []string, f CSVRecordFormat) (err error) {

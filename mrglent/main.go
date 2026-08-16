@@ -39,7 +39,7 @@ Usage:
 The flags are:
 
 	-d string
-	  	Go date layout of Ledger journal entries (default "2006-01-02")
+	  	Go-style date layout of Ledger journal entries (default "2006-01-02")
 	-h	write this help text then exit
 
 See also [this package's README].
@@ -68,7 +68,7 @@ func main() {
 
 	dateLayout := parseFlags()
 	if !aft.IsDateLayout(dateLayout) {
-		log.Fatalf("date layout must be Go-style e.g. %q", time.DateOnly)
+		log.Fatalf("%q %v", dateLayout, aft.ErrDateLayout)
 	}
 
 	s := bufio.NewScanner(os.Stdin)
@@ -78,9 +78,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	oes := sortEntries(es)
-	for _, oe := range oes {
-		fmt.Fprint(os.Stdout, oe)
+	etexts := sortEntries(es)
+	for _, etext := range etexts {
+		fmt.Fprint(os.Stdout, etext)
 	}
 }
 
@@ -100,42 +100,38 @@ see "Transactions and Comments" and "Commenting on your journal" in the [Ledger 
 
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
-func parseEntries(s *bufio.Scanner, dateLayout string) ([]entry, error) {
+func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
 	var (
-		es                            []entry
-		e                             entry
 		inBlockComment, inMirrorEntry bool
-		lnN                           int
+		e                             entry
+		n                             int // The number of the line being parsed.
 	)
 
 	for s.Scan() {
-		ln := s.Text() + "\n"
-		lnN++
+		line := s.Text() + "\n"
+		n++
 
-		if inBlock(&inBlockComment, ln, aft.StartBlockComment, aft.EndBlockComment) {
-			continue
-		}
-
-		if inBlock(&inMirrorEntry, ln, aft.StartMirrorEntry, aft.EndMirrorEntry) {
+		if inBlock(line, aft.StartBlockComment, aft.EndBlockComment, &inBlockComment) ||
+			inBlock(line, aft.StartMirrorEntry, aft.EndMirrorEntry, &inMirrorEntry) {
 			continue
 		}
 
 		switch {
-		case unicode.IsDigit(rune(ln[0])):
+		case unicode.IsDigit(rune(line[0])):
 			if e.Date != "" {
 				es = append(es, e)
 			}
 
-			d, err := aft.ParseDate(ln, dateLayout)
+			d, err := aft.ParseDate(line, dateLayout)
 			if err != nil {
-				return es, fmt.Errorf("line %v: %w", lnN, err)
+				return es, fmt.Errorf("line %v: %w", n, err)
 			}
 
 			// This line starts with a date and is the first line in the next entry.
-			e.Date, e.Text = d, ln
-		case aft.IsLedgerIndented(ln):
-			// This line is indented and belongs to the current entry.
-			e.Text += ln
+			e.Date, e.Text = d, line
+		case aft.IsLedgerIndented(line):
+			// This indented line is a continuation of the current entry.
+			e.Text += line
 		}
 	}
 
@@ -148,21 +144,48 @@ func parseEntries(s *bufio.Scanner, dateLayout string) ([]entry, error) {
 
 /*
 InBlock reports whether the line from a Ledger journal is in a block delimited by start and end lines.
-It also updates the in block state.
+It may also update the in block state.
 */
-func inBlock(state *bool, line, startLine, endLine string) bool {
+func inBlock(line, start, end string, state *bool) bool {
 	switch {
-	case line == startLine:
+	case line == start:
 		*state = true
-	case line == endLine:
+	case line == end:
 		*state = false
 	case *state:
-		// The line is in-between start and end lines.
+		// This line is in a block between start and end lines.
 	default:
 		return false
 	}
 
 	return true
+}
+
+// Sort orders the texts of the list of Ledger journal entries by date ascending.
+func sortEntries(es []entry) (etexts []string) {
+	d2ets := make(map[string][]string) // The map of entry dates to entry texts.
+	ds := []string{}                   // The list of entry dates.
+
+	for _, e := range es {
+		d := e.Date
+
+		_, found := d2ets[d]
+		if !found {
+			d2ets[d] = []string{}
+
+			ds = append(ds, d)
+		}
+
+		d2ets[d] = append(d2ets[d], e.Text)
+	}
+
+	slices.Sort(ds)
+
+	for _, d := range ds {
+		etexts = append(etexts, d2ets[d]...)
+	}
+
+	return etexts
 }
 
 /*
@@ -173,7 +196,7 @@ If the flags are invalid, this program exits with a non-zero status.
 func parseFlags() string {
 	var dateLayout string
 
-	flag.StringVar(&dateLayout, "d", time.DateOnly, "Go date layout of Ledger journal entries")
+	flag.StringVar(&dateLayout, "d", time.DateOnly, "Go-style date layout of Ledger journal entries")
 
 	var help bool
 
@@ -188,36 +211,6 @@ func parseFlags() string {
 	}
 
 	return dateLayout
-}
-
-// Sort orders the texts of a list of Ledger journal entries by date ascending.
-func sortEntries(es []entry) []string {
-	d2txts := make(map[string][]string)
-
-	var ds []string
-
-	for _, e := range es {
-		d := e.Date
-
-		_, found := d2txts[d]
-		if !found {
-			d2txts[d] = []string{}
-
-			ds = append(ds, d)
-		}
-
-		d2txts[d] = append(d2txts[d], e.Text)
-	}
-
-	var oes []string
-
-	slices.Sort(ds)
-
-	for _, d := range ds {
-		oes = append(oes, d2txts[d]...)
-	}
-
-	return oes
 }
 
 // Usage writes the help text for this program.

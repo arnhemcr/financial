@@ -39,7 +39,7 @@ type CSVRecordFormat struct {
 		The index for a required field is between one and NFields inclusive.
 		If an optional field is not contained in a record, its index is zero.
 	*/
-	// Either amount, or both credit and debit fields are required.
+	// Required fields are either amount, or credit and debit.
 	AmountI         uint8
 	CreditI, DebitI uint8
 	CurrencyI       uint8
@@ -81,7 +81,7 @@ func NewCSVRecordFormat(fileName string) (f CSVRecordFormat, err error) {
 	return f, nil
 }
 
-// NewModuleCSVRecordFormat returns this module's CSV record format.
+// NewModuleCSVRecordFormat returns this module's CSV record format (mcsv).
 func NewModuleCSVRecordFormat() CSVRecordFormat {
 	return CSVRecordFormat{
 		NFields: 7,
@@ -119,7 +119,7 @@ func (f CSVRecordFormat) Validate() error {
 	}
 
 	if !IsDateLayout(f.DateLayout) {
-		return fmt.Errorf("Validate: %q %w", f.DateLayout, errDateLayout)
+		return fmt.Errorf("Validate: %q %w", f.DateLayout, ErrDateLayout)
 	}
 
 	return nil
@@ -134,7 +134,6 @@ const (
 var (
 	errAmountOption = errors.New("amount field index, or credit and debit indexes cannot be zero")
 	errDateI        = errors.New("date field index cannot be zero")
-	errDateLayout   = errors.New("not Go-style date layout")
 	errIndexUnique  = errors.New("field indexes cannot share a non-zero value")
 	errIndexRange   = errors.New("field index is out of range")
 	errMemoI        = errors.New("memo field index cannot be zero")

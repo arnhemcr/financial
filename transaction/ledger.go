@@ -42,7 +42,7 @@ const (
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
 
-	// The start and end Ledger global comment lines for a mirror entry in this module.
+	// The start and end Ledger global comment lines for a mirror entry used by this module.
 	StartMirrorEntry = "# mirror entry\n"
 	EndMirrorEntry   = "# end mirror entry\n"
 )

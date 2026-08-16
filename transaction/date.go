@@ -22,8 +22,11 @@ If not, see <https://www.gnu.org/licenses/>.
 package transaction
 
 import (
+	"errors"
 	"time"
 )
+
+var ErrDateLayout = errors.New("not Go-style date layout")
 
 // Reports whether the string is a Go-style date layout.
 func IsDateLayout(layout string) bool {

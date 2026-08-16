@@ -25,8 +25,7 @@ It offers:
   - parsing a transaction from a [comma-separated values (CSV)] record;
     an instance of type CSVRecordFormat configures the parser for the record format
   - parsing some of a transaction's fields from a [Ledger] journal entry
-  - stringing a transaction to either a Ledger journal entry or
-    this module's CSV record
+  - stringing a transaction to either a Ledger journal entry or this module's CSV record (mcsv)
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
@@ -38,7 +37,7 @@ A Transaction represents a financial transaction:
 the transfer of an amount of currency from one account to another on a date.
 It is described by a memo and code, also called the description and transaction type.
 A transaction belongs to an account called this account.
-Optional fields may have the value empty string, while the rest must have non-zero values.
+Optional fields may have the value empty string, while required fields must have non-zero values.
 */
 type Transaction struct {
 	Amount       float64
@@ -46,7 +45,7 @@ type Transaction struct {
 	Currency     string // This field is optional.
 	Date         string
 	Memo         string
-	OtherAccount string // The default value of this field is DefaultOtherAccount.
+	OtherAccount string
 	ThisAccount  string
 }
 
