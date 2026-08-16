@@ -79,12 +79,12 @@ func main() {
 	log.SetPrefix("mcsv2lent: ")
 	log.SetFlags(0)
 
+	var (
+		jas []string // The list of Ledger accounts with journals.
+		err error
+	)
+
 	jafn := parseFlags() // The name of the file listing Ledger accounts with journals.
-
-	var jas []string // The list of Ledger accounts with journals.
-
-	var err error
-
 	if jafn != "" {
 		jas, err = aft.LoadLedgerAccountNames(jafn)
 		if err != nil {
@@ -110,12 +110,13 @@ func main() {
 		err = t.ParseCSV(fs, mcsv)
 		if err != nil {
 			n, _ := r.FieldPos(0)
-			log.Fatalf("%v on line %v", err, n)
+			log.Fatalf("line %v: %v", n, err)
 		}
 
 		ent := t.StringLedger()
 
-		if 0 < t.Amount && slices.Contains(jas, t.ThisAccount) &&
+		if 0 < t.Amount &&
+			slices.Contains(jas, t.ThisAccount) &&
 			slices.Contains(jas, t.OtherAccount) {
 			ent = aft.StartMirrorEntry + ent + aft.EndMirrorEntry
 		}
@@ -125,20 +126,18 @@ func main() {
 }
 
 /*
-ParseFlags returns this program's configuration parsed from command line flags.
-If help was requested, parseFlags writes help text then exits.
+ParseFlags parses this program's configuration parsed from command line flags.
 If the flags are invalid, this program exits with a non-zero status.
+If help was requested, parseFlags writes help text then exits.
+ParseFlags returns the name of a file or empty string if that flag was not set.
 */
-func parseFlags() string {
-	var fileName string
-
+func parseFlags() (fileName string) {
 	flag.StringVar(&fileName, "f", "",
 		"name of file containing list of Ledger accounts with journals in XML")
 
 	var help bool
 
 	flag.BoolVar(&help, "h", false, "write this help text then exit")
-
 	flag.Usage = usage
 	flag.Parse()
 

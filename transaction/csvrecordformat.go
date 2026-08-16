@@ -33,14 +33,15 @@ import (
 type CSVRecordFormat struct {
 	NFields uint8 // The number of fields in a record.
 
-	// The indexes of fields in the record.
-	// Some fields are required, while the rest are optional.
-	// The index for a required field is between 1 and NFields inclusive.
-	// If a field is not contained in a record, its index is zero.
-	//
-	// Either amount, or both credit and debit are required.
-	AmountI         uint8 // Either this field is required or
-	CreditI, DebitI uint8 // these two.
+	/*
+		The indexes of fields in the record.
+		Some fields are required, while the rest are optional.
+		The index for a required field is between one and NFields inclusive.
+		If an optional field is not contained in a record, its index is zero.
+	*/
+	// Either amount, or both credit and debit fields are required.
+	AmountI         uint8
+	CreditI, DebitI uint8
 	CurrencyI       uint8
 	CodeI           uint8
 	DateI           uint8 // This field is required.
@@ -48,13 +49,13 @@ type CSVRecordFormat struct {
 	OtherAccountI   uint8
 	ThisAccountI    uint8
 
-	// The Go-style date layout in the records e.g. "01/02/2006".
+	// The Go-style date layout in the record e.g. "01/02/2006".
 	DateLayout string
 }
 
 /*
 NewCSVRecordFormat returns the CSV record format read from the named XML file.
-The format's date layout defaults to "2006-01-02", while all other fields default to zero.
+Fields in the format default to zero except DateLayout which defaults to "2006-02-01".
 If it fails to read or validate the format, NewCSVRecordFormat returns the first error.
 */
 func NewCSVRecordFormat(fileName string) (f CSVRecordFormat, err error) {
@@ -118,7 +119,7 @@ func (f CSVRecordFormat) Validate() error {
 	}
 
 	if !IsDateLayout(f.DateLayout) {
-		return fmt.Errorf("Validate: %w", errDateLayout)
+		return fmt.Errorf("Validate: %q %w", f.DateLayout, errDateLayout)
 	}
 
 	return nil
@@ -131,23 +132,20 @@ const (
 )
 
 var (
-	errAmountOption = errors.New(
-		"amount field index, or credit and debit indexes in CSV record format cannot both be zero")
-	errDateI      = errors.New("date field index in CSV record format cannot be zero")
-	errDateLayout = errors.New("date layout in CSV record format must be Go style e.g. \"" +
-		time.DateOnly + "\"")
-	errIndexUnique  = errors.New("field indexes in CSV record format cannot share a non-zero value")
-	errIndexRange   = errors.New("field index in CSV record format is out of range")
-	errMemoI        = errors.New("memo field index in CSV record format cannot be zero")
-	errNFieldsRange = errors.New("number of fields in CSV record format is out of range")
+	errAmountOption = errors.New("amount field index, or credit and debit indexes cannot be zero")
+	errDateI        = errors.New("date field index cannot be zero")
+	errDateLayout   = errors.New("not Go-style date layout")
+	errIndexUnique  = errors.New("field indexes cannot share a non-zero value")
+	errIndexRange   = errors.New("field index is out of range")
+	errMemoI        = errors.New("memo field index cannot be zero")
+	errNFieldsRange = errors.New("number of fields is out of range")
 )
 
 /*
 ValidateIndexes returns nil if the field indexes in this CSV record format are valid.
-Indexes must be <= nFields.
-Each non-zero index must be unique.
-Required indexes must be non-zero.
-If not, validateIndexes returns the first error.
+Indexes must be between zero and NFields inclusive.
+Required indexes must be non-zero and unique.
+If the indexes are not valid, validateIndexes returns the first error.
 */
 func (f CSVRecordFormat) validateIndexes() error {
 	is := [...]uint8{f.AmountI, f.CodeI, f.CreditI, f.CurrencyI,
@@ -157,10 +155,10 @@ func (f CSVRecordFormat) validateIndexes() error {
 
 	for _, i := range is {
 		switch {
+		case i == 0:
+			// This field is not contained in CSV records of this format.
 		case f.NFields < i:
 			return errIndexRange
-		case i == 0:
-			// These CSV records do not contain this field.
 		case used[i]:
 			return errIndexUnique
 		default:

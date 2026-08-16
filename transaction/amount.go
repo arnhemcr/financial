@@ -34,9 +34,9 @@ var (
 )
 
 /*
-ParseAmount parses the value of a transaction from either the amount, credit or debit fields.
+ParseAmount returns the value of a transaction parsed from the amount, credit or debit fields.
 The value cannot be zero.
-If it fails to parse a non-zero value, parseAmount returns the first error.
+If it fails to parse a valid value, parseAmount returns the first error.
 */
 func parseAmount(fields []string, f CSVRecordFormat) (v float64, err error) {
 	a, c, d := fields[f.AmountI], fields[f.CreditI], fields[f.DebitI]
@@ -56,7 +56,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (v float64, err error) {
 
 	switch {
 	case err != nil:
-		return 0, err
+		return 0, err // This error will be wrapped by ParseCSV.
 	case v == 0:
 		return 0, errAmountZero
 	default:
@@ -66,7 +66,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (v float64, err error) {
 
 /*
 ParseDecimal returns the floating-point number parsed from the string.
-If the string does not have the following syntax or it fails to parse a number, parseDecimal returns the error.
+If the string does not have the following syntax or it fails to parse a number, parseDecimal returns the first error.
 
 	number = [ "-" | "+" ] ( integer_decimal | decimal )
 	integer_decimal = decimal_digits [ "." [ decimal_digits ] ]
