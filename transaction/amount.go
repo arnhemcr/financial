@@ -37,27 +37,30 @@ var (
 /*
 IsDecimal reports whether the string represents a decimal number with the following syntax:
 
-	decimal = [ "-" | "+" ] ( decimal_integer | decimal_fraction )
-	integer = decimal_digits
-	fraction = [ decimal_digits ] "." decimal_digits
+	decimal = sign ( integer | fraction ) .
+	sign = [ "-" | "+" ] .
+	integer = digits .
+	fraction = ( [ digits ] "." digits | digits "." ) .
+	digits = digit { digit } .
+	digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
 */
 func isDecimal(s string) bool {
-	var hasDot bool
+	var hasDigit, hasDot bool
 
 	for i, r := range []rune(s) {
 		switch {
 		case unicode.IsDigit(r):
+			hasDigit = true
 		case i == 0 && (r == '-' || r == '+'):
 			// The decimal is signed.
 		case !hasDot && r == '.':
-			// The decimal contains a dot separating the integer and fractional parts.
 			hasDot = true
 		default:
 			return false
 		}
 	}
 
-	return true
+	return hasDigit
 }
 
 /*

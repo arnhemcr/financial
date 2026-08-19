@@ -39,7 +39,7 @@ type CSVRecordFormat struct {
 		The index for a required field is between one and NFields inclusive.
 		If an optional field is not contained in a record, its index is zero.
 	*/
-	// Required fields are either amount, or credit and debit.
+	// Either amount, or credit and debit are required.
 	AmountI         uint8
 	CreditI, DebitI uint8
 	CurrencyI       uint8

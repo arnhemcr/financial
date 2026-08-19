@@ -31,8 +31,8 @@ import (
 const ModuleCSV = "mcsv" // The name of this module's CSV record format.
 
 /*
-ParseCSV parses this transaction from the CSV record fields according to the format.
-It assumes the format is valid.
+ParseCSV parses this transaction from the fields of a CSV record according to the format.
+It assumes the format is valid, which can be checked with [CSVRecordFormat.Validate].
 If ParseCSV fails to parse the transaction, it returns the first error.
 */
 func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) error {
@@ -58,9 +58,9 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) error {
 
 // StringModuleCSV returns this transaction as a CSV record in this module's format (mcsv).
 func (t Transaction) StringModuleCSV() string {
-	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
+	fields := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
 
-	return strings.Join(fs, ",") + "\n"
+	return strings.Join(fields, ",") + "\n"
 }
 
 var (

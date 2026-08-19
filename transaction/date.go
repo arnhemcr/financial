@@ -36,10 +36,12 @@ func IsDateLayout(layout string) bool {
 }
 
 /*
-ParseDate returns the date parsed according to the layout from the start of text.
-It assumes the layout is valid e.g. "2006-01-02".
-The layout can be verified by calling function IsDateLayout.
+ParseDate parses a date from the string, according to the layout, and returns the date in this module's layout.
+It assumes the layout is valid e.g. "2006-01-02", which can be verified by calling [IsDateLayout].
+This module's date layout is YYYY-MM-DD also known as Go [time.DateOnly] and [ISO 8601 extended date].
 If it fails to parse a date, parseDate returns the error.
+
+[ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
 */
 func ParseDate(text, layout string) (string, error) {
 	t := trimDate(text, layout)
@@ -53,25 +55,25 @@ func ParseDate(text, layout string) (string, error) {
 }
 
 /*
-ParseModuleDate returns the date in this module's default layout from the start of text.
-The layout is YYYY-MM-DD also known as [time.DateOnly] and [ISO 8601 extended date].
+ParseDate parses a date from the string, according to this module's layout, and returns the date in this module's layout.
 If it fails to parse a date, parseModuleDate returns the error.
-
-[ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
 */
 func ParseModuleDate(text string) (string, error) {
 	return ParseDate(text, time.DateOnly)
 }
 
-// TrimDate returns the shorter of the text or the start of the text trimmed to the length of the layout.
+/*
+TrimDate assumes the text starts with a date and returns it trimmed to the length of the date layout.
+If either text or layout is empty string, trimDate returns empty string.
+*/
 func trimDate(text, layout string) string {
-	tLen, lLen := len(text), len(layout)
+	tl, ll := len(text), len(layout)
 
 	switch {
-	case lLen == 0 || tLen == 0:
+	case tl == 0 || ll == 0:
 		return ""
-	case lLen < tLen:
-		return text[0:lLen]
+	case ll < tl:
+		return text[0:ll]
 	default:
 		return text
 	}

@@ -11,13 +11,13 @@ Its only dependency is the [Go standard library].
 
 An individual has two accounts: one with National Bank (NB) and the other with Local Credit Union (LCU).
 These institutions provide CSV statements with different sets of transactions details and record formats.
-This example creates a general journal containing entries for the transactions in both statements.
+This example creates a general journal from the statements of both accounts.
 
 ## Dependencies
 
 * a [Go installation]
 * a [Ledger installation]
-* the stream editor [sed]; other programs that can match a text string and substitute one string for another could be used instead
+* the stream editor [sed]; other programs that match text strings and substitute one string for another could be used instead
 * the ability to connect programs together in a pipeline and redirect its output to a file
 
 ## Install programs
@@ -34,6 +34,7 @@ In the example directory, translate the statements into journals with:
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
 
+# Translate transactions from records in CSV statements to entries in Ledger journals.
 cat NB.csv | csv2trn -f NB.xml -c GBP | sed -f accounts.sed | \
 	mcsv2lent -f journalAccounts.xml >>NB.journal
 cat LCU.csv | csv2trn -f LCU.xml -t Assets:Emergency -c GBP | sed -f accounts.sed | \
