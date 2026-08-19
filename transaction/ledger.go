@@ -118,7 +118,7 @@ func LoadLedgerAccountNames(fileName string) ([]string, error) {
 
 // StringLedger returns this transaction as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
-	a := stringAmount(t.Amount)
+	a := t.AmountText
 
 	cu := t.Currency
 	switch len(cu) {

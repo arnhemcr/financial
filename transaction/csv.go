@@ -58,8 +58,7 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) error {
 
 // StringModuleCSV returns this transaction as a CSV record in this module's format (mcsv).
 func (t Transaction) StringModuleCSV() string {
-	a := stringAmount(t.Amount)
-	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, a, t.Currency}
+	fs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
 
 	return strings.Join(fs, ",") + "\n"
 }
@@ -71,7 +70,7 @@ var (
 )
 
 func (t *Transaction) parseRequired(fields []string, f CSVRecordFormat) (err error) {
-	t.Amount, err = parseAmount(fields, f)
+	t.AmountText, t.Amount, err = parseAmount(fields, f)
 	if err != nil {
 		return err
 	}

@@ -40,6 +40,8 @@ A transaction belongs to an account called this account.
 Optional fields may have the value empty string, while required fields must have non-zero values.
 */
 type Transaction struct {
+	// The amount is represented as a string and a floating-point number.
+	AmountText   string
 	Amount       float64
 	Code         string // This field is optional.
 	Currency     string // This field is optional.
