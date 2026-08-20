@@ -55,7 +55,7 @@ func ParseDate(text, layout string) (string, error) {
 }
 
 /*
-ParseDate parses a date from the string, according to this module's layout, and returns the date in this module's layout.
+ParseDate parses a date from the string, according to this module's layout, and returns the date in that layout.
 If it fails to parse a date, parseModuleDate returns the error.
 */
 func ParseModuleDate(text string) (string, error) {
@@ -64,7 +64,7 @@ func ParseModuleDate(text string) (string, error) {
 
 /*
 TrimDate assumes the text starts with a date and returns it trimmed to the length of the date layout.
-If either text or layout is empty string, trimDate returns empty string.
+If text or layout are empty string, trimDate returns empty string.
 */
 func trimDate(text, layout string) string {
 	tl, ll := len(text), len(layout)

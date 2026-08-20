@@ -49,7 +49,6 @@ const (
 
 /*
 IsLedgerCurrency reports whether the string contains a Ledger currency or commodity.
-
 See "Commodities and Currencies" in the [Ledger 3 manual].
 */
 func IsLedgerCurrency(s string) bool {
@@ -70,7 +69,6 @@ func IsLedgerCurrency(s string) bool {
 /*
 IsLedgerIndented reports whether the line starts with a white space character
 used by Ledger to indent postings and comments belonging to an entry.
-
 See "Transactions and Comments" in the [Ledger 3 manual].
 */
 func IsLedgerIndented(line string) bool {
@@ -78,7 +76,7 @@ func IsLedgerIndented(line string) bool {
 		return false
 	}
 
-	switch rune(line[0]) {
+	switch line[0] {
 	case ' ', '\t':
 		return true
 	default:

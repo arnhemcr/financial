@@ -47,7 +47,7 @@ IsDecimal reports whether the string represents a decimal number with the follow
 func isDecimal(s string) bool {
 	var hasDigit, hasDot bool
 
-	for i, r := range []rune(s) {
+	for i, r := range s {
 		switch {
 		case unicode.IsDigit(r):
 			hasDigit = true
