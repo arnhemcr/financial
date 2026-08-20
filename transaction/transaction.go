@@ -32,6 +32,11 @@ It offers:
 */
 package transaction
 
+import (
+	"errors"
+	"fmt"
+)
+
 /*
 A Transaction represents a financial transaction:
 the transfer of an amount of currency from one account to another on a date.
@@ -67,3 +72,46 @@ func (t Transaction) StringFormat(name string) string {
 		return ""
 	}
 }
+
+/*
+Validate returns nil if this transaction is valid.
+If not, Validate returns the first error.
+*/
+func (t Transaction) Validate() error {
+	_, a, err := parseDecimal(t.AmountText)
+	if err != nil || t.Amount != a {
+		return fmt.Errorf("Validate: %w", err)
+	}
+
+	// The code field is not validated because it is optional and free form.
+
+	if t.Currency != "" && !IsLedgerCurrency(t.Currency) {
+		return fmt.Errorf("Validate: %w", errCurrency)
+	}
+
+	_, err = ParseModuleDate(t.Date)
+	if err != nil {
+		return fmt.Errorf("Validate: %w", err)
+	}
+
+	if t.Memo == "" {
+		return fmt.Errorf("Validate: %w", errMemo)
+	}
+
+	if t.OtherAccount == "" {
+		return fmt.Errorf("Validate: %w", errOtherAccount)
+	}
+
+	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
+		return fmt.Errorf("Validate: %w", errThisAccount)
+	}
+
+	return nil
+}
+
+var (
+	errMemo         = errors.New("memo cannot be empty string")
+	errNFields      = errors.New("unexpected number of fields in record")
+	errOtherAccount = errors.New("other account cannot be empty string")
+	errThisAccount  = fmt.Errorf("this account cannot be empty string (or %q)", DefaultOtherAccount)
+)

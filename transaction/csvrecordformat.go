@@ -56,7 +56,7 @@ type CSVRecordFormat struct {
 /*
 NewCSVRecordFormat returns the CSV record format read from the named XML file.
 Fields in the format default to zero except DateLayout which defaults to "2006-02-01".
-If it fails to read or validate the format, NewCSVRecordFormat returns the first error.
+If it fails to read a valid format, NewCSVRecordFormat returns the first error.
 */
 func NewCSVRecordFormat(fileName string) (f CSVRecordFormat, err error) {
 	bs, err := os.ReadFile(fileName)
