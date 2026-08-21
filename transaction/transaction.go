@@ -83,10 +83,14 @@ func (t Transaction) Validate() error {
 		return fmt.Errorf("Validate: %w", err)
 	}
 
+	if t.Amount == 0 {
+		return fmt.Errorf("Validate: %w", errAmountZero)
+	}
+
 	// The code field is not validated because it is optional and free form.
 
 	if t.Currency != "" && !IsLedgerCurrency(t.Currency) {
-		return fmt.Errorf("Validate: %w", errCurrency)
+		return fmt.Errorf("Validate: %w not %q", errCurrency, t.Currency)
 	}
 
 	_, err = ParseModuleDate(t.Date)
@@ -95,23 +99,22 @@ func (t Transaction) Validate() error {
 	}
 
 	if t.Memo == "" {
-		return fmt.Errorf("Validate: %w", errMemo)
+		return fmt.Errorf("Validate: %w not %q", errMemo, t.Memo)
 	}
 
 	if t.OtherAccount == "" {
-		return fmt.Errorf("Validate: %w", errOtherAccount)
+		return fmt.Errorf("Validate: %w not %q", errOtherAccount, t.OtherAccount)
 	}
 
 	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
-		return fmt.Errorf("Validate: %w", errThisAccount)
+		return fmt.Errorf("Validate: %w not %q", errThisAccount, t.ThisAccount)
 	}
 
 	return nil
 }
 
 var (
-	errMemo         = errors.New("memo cannot be empty string")
-	errNFields      = errors.New("unexpected number of fields in record")
-	errOtherAccount = errors.New("other account cannot be empty string")
-	errThisAccount  = fmt.Errorf("this account cannot be empty string (or %q)", DefaultOtherAccount)
+	errMemo         = errors.New("expect memo string")
+	errOtherAccount = errors.New("expect other account string")
+	errThisAccount  = fmt.Errorf("expect this account string")
 )

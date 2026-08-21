@@ -154,4 +154,4 @@ const (
 	endCode   = ")"
 )
 
-var errCurrency = errors.New("not Ledger-style currency")
+var errCurrency = errors.New("expect Ledger-style currency")

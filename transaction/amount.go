@@ -29,9 +29,10 @@ import (
 )
 
 var (
-	errAmountZero     = errors.New("amount cannot be zero")
-	errDecimal        = errors.New("not decimal number")
-	errPositiveNumber = errors.New("credit and debit cannot be negative or zero")
+	errAmountZero      = errors.New("expect non-zero amount")
+	errCreditDebit     = errors.New("expect a string and an empty string in credit and debit")
+	errDecimal         = errors.New("expect decimal number string")
+	errPositiveDecimal = errors.New("expect positive decimal number as credit or debit")
 )
 
 /*
@@ -82,7 +83,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 		vText, v, err = parsePositiveDecimal(d)
 		negative = true
 	default:
-		return "", 0, fmt.Errorf("credit and debit, %q and %q, cannot both be empty or non-empty strings", c, d)
+		return "", 0, fmt.Errorf("%w not %q and %q", errCreditDebit, c, d)
 	}
 
 	if err != nil {
@@ -107,7 +108,7 @@ If it fails to parse a number, parseDecimal returns the first error.
 */
 func parseDecimal(s string) (nText string, n float64, err error) {
 	if !isDecimal(s) {
-		return "", 0, fmt.Errorf("%q %w", s, errDecimal)
+		return "", 0, fmt.Errorf("%w not %q", errDecimal, s)
 	}
 
 	n, err = strconv.ParseFloat(s, 64)
@@ -129,7 +130,7 @@ func parsePositiveDecimal(s string) (nText string, n float64, err error) {
 	case err != nil:
 		return "", 0, err
 	case n <= 0:
-		return "", 0, errPositiveNumber
+		return "", 0, fmt.Errorf("%w not %v", errPositiveDecimal, n)
 	default:
 		return nText, n, nil
 	}

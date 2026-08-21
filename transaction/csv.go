@@ -34,40 +34,52 @@ ParseCSV parses this transaction from the fields of a CSV record according to th
 It assumes the format is valid, which can be checked with [CSVRecordFormat.Validate].
 If ParseCSV fails to parse a valid transaction, it returns the first error.
 */
-func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) error {
+func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 	if len(fields) != int(f.NFields) {
-		return fmt.Errorf("ParseCSV: %w", errNFields)
+		return fmt.Errorf("ParseCSV: expect %v fields not %v", f.NFields, len(fields))
 	}
 
 	// Prepend fields with an empty string, so a field whose index is zero has value empty string.
 	fields = slices.Insert(fields, 0, "")
 
-	t.AmountText, t.Amount, _ = parseAmount(fields, f)
+	t.AmountText, t.Amount, err = parseAmount(fields, f)
+	if err != nil {
+		return fmt.Errorf("ParseCSV: %w", err)
+	}
 
 	t.Code = fields[f.CodeI]
 
-	// If currency has a value, it takes precedence over its field.
+	// If currency already has a value, it takes precedence over its field.
 	if t.Currency == "" {
 		t.Currency = fields[f.CurrencyI]
 	}
 
-	t.Date, _ = ParseDate(fields[f.DateI], f.DateLayout)
+	if t.Currency != "" && !IsLedgerCurrency(t.Currency) {
+		return fmt.Errorf("ParseCSV: %w not %q", errCurrency, t.Currency)
+	}
+
+	t.Date, err = ParseDate(fields[f.DateI], f.DateLayout)
+	if err != nil {
+		return fmt.Errorf("ParseCSV: %w", err)
+	}
 
 	t.Memo = fields[f.MemoI]
+	if t.Memo == "" {
+		return fmt.Errorf("ParseCSV: %w not %q", errMemo, t.Memo)
+	}
 
 	t.OtherAccount = fields[f.OtherAccountI]
 	if t.OtherAccount == "" {
 		t.OtherAccount = DefaultOtherAccount
 	}
 
-	// If this account has a value, it takes precedence over its field.
+	// If this account already has a value, it takes precedence over its field.
 	if t.ThisAccount == "" {
 		t.ThisAccount = fields[f.ThisAccountI]
 	}
 
-	err := t.Validate()
-	if err != nil {
-		return fmt.Errorf("Validate: %w", err)
+	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
+		return fmt.Errorf("ParseCSV: %w not %q", errThisAccount, t.ThisAccount)
 	}
 
 	return nil
