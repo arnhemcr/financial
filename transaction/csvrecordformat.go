@@ -105,7 +105,7 @@ If not, Validate returns the first error.
 func (f CSVRecordFormat) Validate() error {
 	n := f.NFields
 	if n < minNFields || maxNFields < n {
-		return fmt.Errorf("Validate: %w", errNFieldsRange)
+		return fmt.Errorf("Validate: %w %v to %v inclusive not %v", errNFieldsRange, minNFields, maxNFields, n)
 	}
 
 	err := f.validateIndexes()
@@ -119,7 +119,7 @@ func (f CSVRecordFormat) Validate() error {
 	}
 
 	if !IsDateLayout(f.DateLayout) {
-		return fmt.Errorf("Validate: %q %w", f.DateLayout, ErrDateLayout)
+		return fmt.Errorf("Validate: %w not %q", ErrDateLayout, f.DateLayout)
 	}
 
 	return nil
@@ -132,12 +132,12 @@ const (
 )
 
 var (
-	errAmountOption = errors.New("amount field index, or credit and debit indexes cannot be zero")
-	errDateI        = errors.New("date field index cannot be zero")
-	errIndexUnique  = errors.New("field indexes cannot share a non-zero value")
-	errIndexRange   = errors.New("field index is out of range")
-	errMemoI        = errors.New("memo field index cannot be zero")
-	errNFieldsRange = errors.New("number of fields is out of range")
+	errAmountOption = errors.New("expect either amount field index, or credit and debit indexes to be non-zero")
+	errDateI        = errors.New("expect date field index to be non-zero")
+	errIndexUnique  = errors.New("expect non-zero field index to be unique")
+	errIndexRange   = errors.New("expect field index in range")
+	errMemoI        = errors.New("expect memo field index to be non-zero")
+	errNFieldsRange = errors.New("expect number of fields in range")
 )
 
 /*
@@ -157,7 +157,7 @@ func (f CSVRecordFormat) validateIndexes() error {
 		case i == 0:
 			// This field is not contained in CSV records of this format.
 		case f.NFields < i:
-			return errIndexRange
+			return fmt.Errorf("%w %v to %v inclusive not %v", errIndexRange, 1, f.NFields, i)
 		case used[i]:
 			return errIndexUnique
 		default:
@@ -186,6 +186,6 @@ func (f CSVRecordFormat) validateOptions() error {
 	case f.CreditI != 0 && f.DebitI != 0:
 		return nil
 	default:
-		return errAmountOption
+		return fmt.Errorf("%w not %v, or %v and %v", errAmountOption, f.AmountI, f.CreditI, f.DebitI)
 	}
 }

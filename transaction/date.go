@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-var ErrDateLayout = errors.New("not Go-style date layout")
+var ErrDateLayout = errors.New("expect Go-style date layout")
 
 // Reports whether the string is a Go-style date layout.
 func IsDateLayout(layout string) bool {

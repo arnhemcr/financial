@@ -60,7 +60,7 @@ This module has specific layouts for some transaction details:
 
 * Amount: decimal or integer with optional sign e.g. "1234.56", "-98.765" "+1234".
   This module does not support amounts with decimal separators other than '.', thousands separators or those that contain a currency.
-* Date: YYYY-MM-DD or [ISO 8601] extended date. 
+* Date: YYYY-MM-DD also known as Go time.DateOnly and [ISO 8601 extended date].
   Program csv2trn can be configured to read other date layouts through its input record format in XML.
 
 ## Mark mirror entries in Ledger journals

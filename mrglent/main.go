@@ -68,7 +68,7 @@ func main() {
 
 	dateLayout := parseFlags()
 	if !aft.IsDateLayout(dateLayout) {
-		log.Fatalf("%q %v", dateLayout, aft.ErrDateLayout)
+		log.Fatalf("%v not %q", ErrDateLayout, dateLayout)
 	}
 
 	s := bufio.NewScanner(os.Stdin)
