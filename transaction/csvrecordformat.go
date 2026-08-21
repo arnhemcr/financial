@@ -134,7 +134,7 @@ const (
 var (
 	errAmountOption = errors.New("expect either amount field index, or credit and debit indexes to be non-zero")
 	errDateI        = errors.New("expect date field index to be non-zero")
-	errIndexUnique  = errors.New("expect non-zero field index to be unique")
+	errIndexUnique  = errors.New("expect non-zero field indexes to be unique")
 	errIndexRange   = errors.New("expect field index in range")
 	errMemoI        = errors.New("expect memo field index to be non-zero")
 	errNFieldsRange = errors.New("expect number of fields in range")

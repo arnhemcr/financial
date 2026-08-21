@@ -30,7 +30,7 @@ import (
 
 var (
 	errAmountZero      = errors.New("expect non-zero amount")
-	errCreditDebit     = errors.New("expect a string and an empty string in credit and debit")
+	errCreditDebit     = errors.New("expect string in credit and empty string in debit or visa versa")
 	errDecimal         = errors.New("expect decimal number string")
 	errPositiveDecimal = errors.New("expect positive decimal number as credit or debit")
 )
