@@ -33,20 +33,20 @@ const (
 	Ledger = "lent" // The name of the Ledger journal entry format.
 
 	/*
-		The lines Ledger uses to mark block comments (see [Commenting on your Journal] in the Ledger 3 manual).
+		The lines used to mark Ledger block comments (see [Commenting on your Journal] in the Ledger 3 manual).
 
 		[Commenting on your Journal]: https://ledger-cli.org/doc/ledger3.html#Commenting-on-your-Journal
 	*/
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
 
-	// The Ledger global comment lines that this module uses to mark mirror entries.
+	// The Ledger global comments used to mark mirror entries by this module.
 	StartMirrorEntry = "# mirror entry\n"
 	EndMirrorEntry   = "# end mirror entry\n"
 )
 
 /*
-IsLedgerCurrency reports whether the string is a currency symbol or word valid in Ledger
+IsLedgerCurrency reports whether the string is a currency symbol or word in Ledger
 (see [Commodities and Currencies] in the Ledger 3 manual).
 
 [Commodities and Currencies]: https://ledger-cli.org/doc/ledger3.html#Commodities-and-Currencies
@@ -67,8 +67,7 @@ func IsLedgerCurrency(currency string) bool {
 }
 
 /*
-IsLedgerIndented reports whether the string starts with a space or horizontal tab.
-Ledger uses these runes to indent positing and comment lines belonging to an entry
+IsLedgerIndented reports whether the line is indented with a Ledger space rune
 (see [Transactions and Comments] in the Ledger 3 manual).
 
 [Transactions and Comments]: https://ledger-cli.org/doc/ledger3.html#Transactions-and-Comments
@@ -145,7 +144,7 @@ var errCurrency = errors.New("expect currency symbol or word valid in Ledger")
 // IsLedgerSpace reports whether the rune is a space in Ledger.
 func isLedgerSpace(r rune) bool {
 	switch r {
-	case ' ', '\t':
+	case ' ', '\t': // The subset of Go space runes (see [unicode.IsSpace] that are space runes in Ledger 3.
 		return true
 	default:
 		return false
