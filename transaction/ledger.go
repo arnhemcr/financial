@@ -26,7 +26,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"unicode"
 )
 
@@ -34,22 +33,23 @@ const (
 	Ledger = "lent" // The name of the Ledger journal entry format.
 
 	/*
-		The start and end lines for a Ledger block comment
-		(see the "Commenting Your Journal" section of the [Ledger 3 manual].
+		Lines around a Ledger block comment (see [Commenting on your Journal] in the Ledger 3 manual.
 
-		[Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
+		[Commenting on your Journal]: https://ledger-cli.org/doc/ledger3.html#Commenting-on-your-Journal
 	*/
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
 
-	// The start and end Ledger global comment lines for a mirror entry used by this module.
+	// Ledger global comment lines that this module uses around mirror entries.
 	StartMirrorEntry = "# mirror entry\n"
 	EndMirrorEntry   = "# end mirror entry\n"
 )
 
 /*
-IsLedgerCurrency reports whether the string contains a Ledger currency or commodity.
-See "Commodities and Currencies" in the [Ledger 3 manual].
+IsLedgerCurrency reports whether the string contains a currency symbol or word valid in Ledger
+(see [Commodities and Currencies] in the Ledger 3 manual).
+
+[Commodities and Currencies]: https://ledger-cli.org/doc/ledger3.html#Commodities-and-Currencies
 */
 func IsLedgerCurrency(s string) bool {
 	for _, r := range s {
@@ -67,9 +67,11 @@ func IsLedgerCurrency(s string) bool {
 }
 
 /*
-IsLedgerIndented reports whether the line starts with a white space character
-used by Ledger to indent postings and comments belonging to an entry.
-See "Transactions and Comments" in the [Ledger 3 manual].
+IsLedgerIndented reports whether the line starts with a space or horizontal tab.
+Ledger uses these runes to indent positings and comments belonging to an entry
+(see [Transactions and Comments] in the Ledger 3 manual).
+
+[Transactions and Comments]: https://ledger-cli.org/doc/ledger3.html#Transactions-and-Comments
 */
 func IsLedgerIndented(line string) bool {
 	if len(line) == 0 {
@@ -114,32 +116,22 @@ func LoadLedgerAccountNames(fileName string) ([]string, error) {
 	return as.Accounts, nil
 }
 
-// StringLedger returns this transaction as a Ledger journal entry.
+// StringLedger returns this transaction formated as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
-	a := t.AmountText
-
-	cu := t.Currency
+	a, cu := t.AmountText, t.Currency
 	switch len(cu) {
 	case 0:
-		// There is no currency for the amount.
+		// There is no currency for this amount.
 	case 1:
 		a = cu + a // This amount has a currency symbol.
 	default:
-		a = a + " " + cu // This amount has a currency code.
+		a = a + " " + cu // This amount has a currency word.
 	}
 
 	var co string
 
 	if t.Code != "" {
-		co = " "
-		if !strings.HasPrefix(t.Code, startCode) {
-			co += startCode
-		}
-
-		co += t.Code
-		if !strings.HasSuffix(t.Code, endCode) {
-			co += endCode
-		}
+		co = fmt.Sprintf(" %v%v%v", startCode, t.Code, endCode)
 	}
 
 	return fmt.Sprintf("%v%v %v\n %v  %v\n %v\n",
@@ -154,4 +146,4 @@ const (
 	endCode   = ")"
 )
 
-var errCurrency = errors.New("expect Ledger-style currency symbol or code")
+var errCurrency = errors.New("expect currency symbol or word valid in Ledger")
