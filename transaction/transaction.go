@@ -116,5 +116,5 @@ func (t Transaction) Validate() error {
 var (
 	errMemo         = errors.New("expect memo string")
 	errOtherAccount = errors.New("expect other account string")
-	errThisAccount  = fmt.Errorf("expect this account string")
+	errThisAccount  = errors.New("expect this account string")
 )

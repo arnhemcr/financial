@@ -144,7 +144,7 @@ var errCurrency = errors.New("expect currency symbol or word valid in Ledger")
 // IsLedgerSpace reports whether the rune is a space in Ledger.
 func isLedgerSpace(r rune) bool {
 	switch r {
-	case ' ', '\t': // The subset of Go space runes (see [unicode.IsSpace] that are space runes in Ledger 3.
+	case ' ', '\t': // The space runes in Ledger 3, which are a subset of those in Go (see [unicode.IsSpace]).
 		return true
 	default:
 		return false

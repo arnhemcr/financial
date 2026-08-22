@@ -35,8 +35,9 @@ It assumes the format is valid, which can be checked with [CSVRecordFormat.Valid
 If ParseCSV fails to parse a valid transaction, it returns the first error.
 */
 func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
-	if len(fields) != int(f.NFields) {
-		return fmt.Errorf("ParseCSV: expect %v fields not %v", f.NFields, len(fields))
+	n, m := int(f.NFields), len(fields)
+	if n != m {
+		return fmt.Errorf("ParseCSV: expect %v fields not %v", n, m)
 	}
 
 	// Prepend fields with an empty string, so a field whose index is zero has value empty string.
@@ -85,7 +86,7 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 	return nil
 }
 
-// StringModuleCSV returns this transaction as a CSV record in this module's format (mcsv).
+// StringModuleCSV returns this transaction formated as this module's CSV record (mcsv).
 func (t Transaction) StringModuleCSV() string {
 	fields := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
 
