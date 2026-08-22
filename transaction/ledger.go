@@ -33,32 +33,32 @@ const (
 	Ledger = "lent" // The name of the Ledger journal entry format.
 
 	/*
-		Lines around a Ledger block comment (see [Commenting on your Journal] in the Ledger 3 manual.
+		The lines Ledger uses to mark block comments (see [Commenting on your Journal] in the Ledger 3 manual).
 
 		[Commenting on your Journal]: https://ledger-cli.org/doc/ledger3.html#Commenting-on-your-Journal
 	*/
 	StartBlockComment = "comment\n"
 	EndBlockComment   = "end comment\n"
 
-	// Ledger global comment lines that this module uses around mirror entries.
+	// The Ledger global comment lines that this module uses to mark mirror entries.
 	StartMirrorEntry = "# mirror entry\n"
 	EndMirrorEntry   = "# end mirror entry\n"
 )
 
 /*
-IsLedgerCurrency reports whether the string contains a currency symbol or word valid in Ledger
+IsLedgerCurrency reports whether the string is a currency symbol or word valid in Ledger
 (see [Commodities and Currencies] in the Ledger 3 manual).
 
 [Commodities and Currencies]: https://ledger-cli.org/doc/ledger3.html#Commodities-and-Currencies
 */
-func IsLedgerCurrency(s string) bool {
-	for _, r := range s {
+func IsLedgerCurrency(currency string) bool {
+	for _, r := range currency {
 		switch r {
 		case '.', ',', '/', '@':
 			return false
 		}
 
-		if unicode.IsDigit(r) || unicode.IsSpace(r) {
+		if unicode.IsDigit(r) || isLedgerSpace(r) {
 			return false
 		}
 	}
@@ -67,23 +67,18 @@ func IsLedgerCurrency(s string) bool {
 }
 
 /*
-IsLedgerIndented reports whether the line starts with a space or horizontal tab.
-Ledger uses these runes to indent positings and comments belonging to an entry
+IsLedgerIndented reports whether the string starts with a space or horizontal tab.
+Ledger uses these runes to indent positing and comment lines belonging to an entry
 (see [Transactions and Comments] in the Ledger 3 manual).
 
 [Transactions and Comments]: https://ledger-cli.org/doc/ledger3.html#Transactions-and-Comments
 */
 func IsLedgerIndented(line string) bool {
-	if len(line) == 0 {
+	if line == "" {
 		return false
 	}
 
-	switch line[0] {
-	case ' ', '\t':
-		return true
-	default:
-		return false
-	}
+	return isLedgerSpace(rune(line[0]))
 }
 
 /*
@@ -118,20 +113,19 @@ func LoadLedgerAccountNames(fileName string) ([]string, error) {
 
 // StringLedger returns this transaction formated as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
+	co := t.Code
+	if co != "" {
+		co = " " + startCode + co + endCode
+	}
+
 	a, cu := t.AmountText, t.Currency
 	switch len(cu) {
 	case 0:
 		// There is no currency for this amount.
 	case 1:
-		a = cu + a // This amount has a currency symbol.
+		a = cu + a
 	default:
-		a = a + " " + cu // This amount has a currency word.
-	}
-
-	var co string
-
-	if t.Code != "" {
-		co = fmt.Sprintf(" %v%v%v", startCode, t.Code, endCode)
+		a = a + " " + cu
 	}
 
 	return fmt.Sprintf("%v%v %v\n %v  %v\n %v\n",
@@ -147,3 +141,13 @@ const (
 )
 
 var errCurrency = errors.New("expect currency symbol or word valid in Ledger")
+
+// IsLedgerSpace reports whether the rune is a space in Ledger.
+func isLedgerSpace(r rune) bool {
+	switch r {
+	case ' ', '\t':
+		return true
+	default:
+		return false
+	}
+}
