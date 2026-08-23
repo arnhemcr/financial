@@ -79,11 +79,12 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 		t.ThisAccount = fields[f.ThisAccountI]
 	}
 
-	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
+	switch t.ThisAccount {
+	case "", DefaultOtherAccount:
 		return fmt.Errorf("ParseCSV: %w not %q", errThisAccount, t.ThisAccount)
+	default:
+		return nil
 	}
-
-	return nil
 }
 
 // StringModuleCSV returns this transaction formated as this module's CSV record (mcsv).

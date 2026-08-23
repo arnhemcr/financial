@@ -24,8 +24,8 @@ Package transaction represents financial transactions as instances of type Trans
 It offers:
   - parsing a transaction from a [comma-separated values (CSV)] record;
     an instance of type CSVRecordFormat configures the parser for the record format
-  - parsing some of a transaction's fields from a [Ledger] journal entry
-  - stringing a transaction to either a Ledger journal entry or this module's CSV record (mcsv)
+  - parsing the lines of a [Ledger] journal entry and its date
+  - formating a transaction to either this module's CSV record (mcsv) or a Ledger journal entry
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
@@ -40,9 +40,9 @@ import (
 /*
 A Transaction represents a financial transaction:
 the transfer of an amount of currency from one account to another on a date.
-It is described by a memo and code, also called the description and transaction type.
+It is described by a memo and code also called the description and transaction type.
 A transaction belongs to an account called this account.
-Optional fields may have the value empty string, while required fields must have non-zero values.
+Optional fields may have the value empty string, while the other required fields must have non-zero values.
 */
 type Transaction struct {
 	// The amount is represented as a string and a floating-point number.
@@ -79,16 +79,21 @@ If not, Validate returns the first error.
 */
 func (t Transaction) Validate() error {
 	_, a, err := parseDecimal(t.AmountText)
-	if err != nil || t.Amount != a {
+	if err != nil {
 		return fmt.Errorf("Validate: %w", err)
+	}
+
+	if t.Amount != a {
+		return fmt.Errorf("Validate: %w but %q and %v do not", errAmountMismatch, t.AmountText, t.Amount)
 	}
 
 	if t.Amount == 0 {
 		return fmt.Errorf("Validate: %w", errAmountZero)
 	}
 
-	// The code field is not validated because it is optional and free form.
+	// The code is not validated because it is optional and free form.
 
+	// The currency is optional.
 	if t.Currency != "" && !IsLedgerCurrency(t.Currency) {
 		return fmt.Errorf("Validate: %w not %q", errCurrency, t.Currency)
 	}
@@ -106,11 +111,12 @@ func (t Transaction) Validate() error {
 		return fmt.Errorf("Validate: %w not %q", errOtherAccount, t.OtherAccount)
 	}
 
-	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
+	switch t.ThisAccount {
+	case "", DefaultOtherAccount:
 		return fmt.Errorf("Validate: %w not %q", errThisAccount, t.ThisAccount)
+	default:
+		return nil
 	}
-
-	return nil
 }
 
 var (

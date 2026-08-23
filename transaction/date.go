@@ -37,8 +37,8 @@ func IsDateLayout(layout string) bool {
 
 /*
 ParseDate parses a date from the string, according to the layout, and returns the date in this module's layout.
-It assumes the layout is valid e.g. "2006-01-02", which can be verified by calling [IsDateLayout].
-This module's date layout is YYYY-MM-DD also known as Go [time.DateOnly] and [ISO 8601 extended date].
+It assumes the layout is valid e.g. "2006-01-02", which can be checked with [IsDateLayout].
+This module's date layout is YYYY-MM-DD also called Go [time.DateOnly] and [ISO 8601 extended date].
 If it fails to parse a date, parseDate returns the error.
 
 [ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
@@ -70,7 +70,7 @@ func trimDate(text, layout string) string {
 	tl, ll := len(text), len(layout)
 
 	switch {
-	case tl == 0 || ll == 0:
+	case tl == 0, ll == 0:
 		return ""
 	case ll < tl:
 		return text[0:ll]

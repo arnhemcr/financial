@@ -29,6 +29,7 @@ import (
 )
 
 var (
+	errAmountMismatch  = errors.New("expect amount text and number to match")
 	errAmountZero      = errors.New("expect non-zero amount")
 	errCreditDebit     = errors.New("expect string in credit and empty string in debit or visa versa")
 	errDecimal         = errors.New("expect decimal number string")
@@ -45,15 +46,15 @@ IsDecimal reports whether the string represents a decimal number with the follow
 	digits = digit { digit } .
 	digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
 */
-func isDecimal(s string) bool {
+func isDecimal(d string) bool {
 	var hasDigit, hasDot bool
 
-	for i, r := range s {
+	for i, r := range d {
 		switch {
 		case unicode.IsDigit(r):
 			hasDigit = true
 		case i == 0 && (r == '-' || r == '+'):
-			// The decimal is signed.
+			// This decimal is signed.
 		case !hasDot && r == '.':
 			hasDot = true
 		default:
@@ -106,25 +107,25 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 ParseDecimal returns the decimal number parsed from the string in string and floating-point representations.
 If it fails to parse a number, parseDecimal returns the first error.
 */
-func parseDecimal(s string) (nText string, n float64, err error) {
-	if !isDecimal(s) {
-		return "", 0, fmt.Errorf("%w not %q", errDecimal, s)
+func parseDecimal(d string) (nText string, n float64, err error) {
+	if !isDecimal(d) {
+		return "", 0, fmt.Errorf("%w not %q", errDecimal, d)
 	}
 
-	n, err = strconv.ParseFloat(s, 64)
+	n, err = strconv.ParseFloat(d, 64)
 	if err != nil {
 		return "", 0, err // This error will be wrapped by ParseCSV.
 	}
 
-	return s, n, nil
+	return d, n, nil
 }
 
 /*
 ParsePositiveDecimal returns the positive number parsed from the string as string and floating-point values.
 If it fails to parse a positive number, parsePositiveDecimal returns the first error.
 */
-func parsePositiveDecimal(s string) (nText string, n float64, err error) {
-	nText, n, err = parseDecimal(s)
+func parsePositiveDecimal(d string) (nText string, n float64, err error) {
+	nText, n, err = parseDecimal(d)
 
 	switch {
 	case err != nil:
