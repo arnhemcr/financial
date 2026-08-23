@@ -110,7 +110,7 @@ func LoadLedgerAccountNames(fileName string) ([]string, error) {
 	return as.Accounts, nil
 }
 
-// StringLedger returns this transaction formated as a Ledger journal entry.
+// StringLedger returns this transaction formatted as a Ledger journal entry.
 func (t Transaction) StringLedger() string {
 	co := t.Code
 	if co != "" {
