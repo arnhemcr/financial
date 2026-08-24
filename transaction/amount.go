@@ -30,9 +30,9 @@ import (
 
 var (
 	errAmountMismatch  = errors.New("expect amount text and number to match")
-	errAmountZero      = errors.New("expect non-zero amount")
 	errCreditDebit     = errors.New("expect string in credit and empty string in debit or visa versa")
 	errDecimal         = errors.New("expect decimal number string")
+	errDecimalZero     = errors.New("expect non-zero decimal number")
 	errPositiveDecimal = errors.New("expect positive decimal number as credit or debit")
 )
 
@@ -77,7 +77,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 
 	switch {
 	case a != "":
-		vText, v, err = parseDecimal(a)
+		vText, v, err = parseNonZeroDecimal(a)
 	case c != "" && d == "":
 		vText, v, err = parsePositiveDecimal(c)
 	case d != "" && c == "":
@@ -91,10 +91,6 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 		return "", 0, err // This error will be wrapped by ParseCSV.
 	}
 
-	if v == 0 {
-		return "", 0, errAmountZero
-	}
-
 	if negative {
 		vText = "-" + vText
 		v *= -1
@@ -104,20 +100,24 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 }
 
 /*
-ParseDecimal returns the decimal number parsed from the string in string and floating-point representations.
-If it fails to parse a number, parseDecimal returns the first error.
+ParseDecimal returns the non-zero decimal number parsed from the string as both string and floating-point values.
+If it fails to parse a non-zero number, parseDecimal returns the first error.
 */
-func parseDecimal(d string) (nText string, n float64, err error) {
+func parseNonZeroDecimal(d string) (nText string, n float64, err error) {
 	if !isDecimal(d) {
 		return "", 0, fmt.Errorf("%w not %q", errDecimal, d)
 	}
 
 	n, err = strconv.ParseFloat(d, 64)
-	if err != nil {
-		return "", 0, err // This error will be wrapped by ParseCSV.
-	}
 
-	return d, n, nil
+	switch {
+	case err != nil:
+		return "", 0, err // This error will be wrapped by ParseCSV.
+	case n == 0:
+		return "", 0, fmt.Errorf("%w not %v", errDecimalZero, d)
+	default:
+		return d, n, nil
+	}
 }
 
 /*
@@ -125,12 +125,12 @@ ParsePositiveDecimal returns the positive number parsed from the string as strin
 If it fails to parse a positive number, parsePositiveDecimal returns the first error.
 */
 func parsePositiveDecimal(d string) (nText string, n float64, err error) {
-	nText, n, err = parseDecimal(d)
+	nText, n, err = parseNonZeroDecimal(d)
 
 	switch {
 	case err != nil:
 		return "", 0, err
-	case n <= 0:
+	case n < 0:
 		return "", 0, fmt.Errorf("%w not %v", errPositiveDecimal, n)
 	default:
 		return nText, n, nil

@@ -140,7 +140,7 @@ const (
 	endCode   = ")"
 )
 
-var errCurrency = errors.New("expect currency symbol or word valid in Ledger")
+var errCurrency = errors.New("expect currency symbol or word")
 
 // IsLedgerSpace reports whether the rune is a space in Ledger.
 func isLedgerSpace(r rune) bool {

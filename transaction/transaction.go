@@ -78,17 +78,13 @@ Validate returns nil if this transaction is valid.
 If not, Validate returns the first error.
 */
 func (t Transaction) Validate() error {
-	_, a, err := parseDecimal(t.AmountText)
+	_, a, err := parseNonZeroDecimal(t.AmountText)
 	if err != nil {
 		return fmt.Errorf("Validate: %w", err)
 	}
 
 	if t.Amount != a {
 		return fmt.Errorf("Validate: %w but %q and %v do not", errAmountMismatch, t.AmountText, t.Amount)
-	}
-
-	if t.Amount == 0 {
-		return fmt.Errorf("Validate: %w", errAmountZero)
 	}
 
 	// The code is not validated because it is optional and free form.
