@@ -39,8 +39,8 @@ var (
 /*
 IsDecimal reports whether the string represents a decimal number with the following syntax:
 
-	decimal = sign ( integer | fraction ) .
-	sign = [ "-" | "+" ] .
+	decimal = [ sign ] ( integer | fraction ) .
+	sign = "-" | "+" .
 	integer = digits .
 	fraction = ( [ digits ] "." digits | digits "." ) .
 	digits = digit { digit } .

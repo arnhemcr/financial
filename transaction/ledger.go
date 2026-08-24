@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"os"
 	"unicode"
+	"unicode/utf8"
 )
 
 const (
@@ -118,7 +119,7 @@ func (t Transaction) StringLedger() string {
 	}
 
 	a, cu := t.AmountText, t.Currency
-	switch len(cu) {
+	switch utf8.RuneCountInString(cu) {
 	case 0:
 		// There is no currency for this amount.
 	case 1:
