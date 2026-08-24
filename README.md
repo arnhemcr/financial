@@ -58,8 +58,8 @@ for account numbers and for Imbalance by matching the transaction's memo.
 
 This module has specific layouts for some transaction details:
 
-* Amount: decimal or integer with optional sign e.g. "1234.56", "-98.765" "+1234".
-  This module does not support amounts with decimal separators other than '.', thousands separators or those that contain a currency.
+* Amount: decimal number with optional sign e.g. "1234.56", "-98.765" "+1234".
+  This module does not support amounts containing decimal separators other than '.', thousands separators or currencies.
 * Date: YYYY-MM-DD also known as Go time.DateOnly and [ISO 8601 extended date].
   Program csv2trn can be configured to read other date layouts through its input record format in XML.
 
@@ -107,7 +107,7 @@ Then validate the accounts and their balances with `ledger -f general.journal ba
 [Go]: https://go.dev
 [Go installation]: https://go.dev/doc/install
 [Go standard library]: https://pkg.go.dev/std
-[ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
+[ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
 [Ledger]: https://ledger-cli.org
 [Ledger installation]: https://ledger-cli.org/download.html
 [sed]: https://www.gnu.org/software/sed/manual/sed.html
