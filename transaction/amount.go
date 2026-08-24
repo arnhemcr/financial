@@ -100,7 +100,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 }
 
 /*
-ParseDecimal returns the non-zero decimal number parsed from the string as both string and floating-point values.
+ParseNonZeroDecimal returns the non-zero decimal number parsed from the string as both string and floating-point values.
 If it fails to parse a non-zero number, parseDecimal returns the first error.
 */
 func parseNonZeroDecimal(d string) (nText string, n float64, err error) {
