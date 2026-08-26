@@ -40,7 +40,7 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 		return fmt.Errorf("ParseCSV: expect %v fields not %v", n, m)
 	}
 
-	// Prepend fields with an empty string so a field whose index is zero has value empty string.
+	// Prepend fields with an empty string so fields with index zero have value empty string.
 	fields = slices.Insert(fields, 0, "")
 
 	t.AmountText, t.Amount, err = parseAmount(fields, f)
@@ -79,12 +79,11 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 		t.ThisAccount = fields[f.ThisAccountI]
 	}
 
-	switch t.ThisAccount {
-	case "", DefaultOtherAccount:
+	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
 		return fmt.Errorf("ParseCSV: %w not %q", errThisAccount, t.ThisAccount)
-	default:
-		return nil
 	}
+
+	return nil
 }
 
 // StringModuleCSV returns this transaction formatted as this module's CSV record (mcsv).
