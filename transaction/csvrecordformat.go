@@ -49,17 +49,18 @@ type CSVRecordFormat struct {
 	OtherAccountI   uint8
 	ThisAccountI    uint8
 
-	// The Go-style date layout in the record e.g. "01/02/2006".
+	// The Go-style date layout in the record which defaults to [time.DateOnly] or "2006-01-02" for YYYY-MM-DD.
 	DateLayout string
 }
 
 /*
 NewCSVRecordFormat returns the CSV record format read from the named XML file.
-Fields in the format default to zero except DateLayout which defaults to "2006-02-01".
+Fields in the format default to zero except DateLayout which defaults to
+Go-style layout time.DateOnly or "2006-01-02" for YYYY-MM-DD.
 If it fails to read a valid format, NewCSVRecordFormat returns the first error.
 */
-func NewCSVRecordFormat(fileName string) (f CSVRecordFormat, err error) {
-	bs, err := os.ReadFile(fileName)
+func NewCSVRecordFormat(name string) (f CSVRecordFormat, err error) {
+	bs, err := os.ReadFile(name)
 	if err != nil {
 		return f, fmt.Errorf("NewCSVRecordFormat: %w", err)
 	}
@@ -127,7 +128,7 @@ func (f CSVRecordFormat) Validate() error {
 
 const (
 	// The inclusive limits for the number of fields in a CSV record.
-	minNFields = 3 // date, memo and amount
+	minNFields = 3 // The minimal set of fields in a CSV record is amount, date and memo.
 	maxNFields = 20
 )
 
@@ -165,14 +166,15 @@ func (f CSVRecordFormat) validateIndexes() error {
 		}
 	}
 
-	switch {
-	case f.DateI == 0:
+	if f.DateI == 0 {
 		return errDateI
-	case f.MemoI == 0:
-		return errMemoI
-	default:
-		return nil
 	}
+
+	if f.MemoI == 0 {
+		return errMemoI
+	}
+
+	return nil
 }
 
 /*
@@ -180,12 +182,9 @@ ValidateOptions returns nil if the combination of optional field indexes in this
 If not, validateOptions returns the error.
 */
 func (f CSVRecordFormat) validateOptions() error {
-	switch {
-	case f.AmountI != 0:
-		return nil
-	case f.CreditI != 0 && f.DebitI != 0:
-		return nil
-	default:
+	if f.AmountI == 0 && (f.CreditI == 0 || f.DebitI == 0) {
 		return fmt.Errorf("%w not %v, or %v and %v", errAmountOption, f.AmountI, f.CreditI, f.DebitI)
 	}
+
+	return nil
 }
