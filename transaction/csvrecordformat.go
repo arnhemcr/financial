@@ -118,8 +118,9 @@ func (f CSVRecordFormat) Validate() error {
 		return fmt.Errorf("Validate: %w", err)
 	}
 
-	if !IsDateLayout(f.DateLayout) {
-		return fmt.Errorf("Validate: %w not %q", ErrDateLayout, f.DateLayout)
+	err = ValidateDateLayout(f.DateLayout)
+	if err != nil {
+		return fmt.Errorf("Validate: %w", err)
 	}
 
 	return nil
