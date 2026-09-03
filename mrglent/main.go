@@ -58,6 +58,7 @@ import (
 	"log"
 	"os"
 	"slices"
+	"strings"
 	"time"
 	"unicode"
 )
@@ -67,8 +68,10 @@ func main() {
 	log.SetFlags(0)
 
 	dateLayout := parseFlags()
-	if !aft.IsDateLayout(dateLayout) {
-		log.Fatalf("%v not %q", aft.ErrDateLayout, dateLayout)
+
+	err := aft.ValidateDateLayout(dateLayout)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	s := bufio.NewScanner(os.Stdin)
@@ -122,7 +125,13 @@ func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
 				es = append(es, e)
 			}
 
-			d, err := aft.ParseDate(line, dateLayout)
+			i := strings.IndexAny(line, " \t\n")
+			/*
+				Line starts with a decimal digit and ends with newline
+				so the index of the rune following the date cannot be less than one.
+			*/
+
+			d, err := aft.ParseDate2(line[0:i], dateLayout)
 			if err != nil {
 				return es, fmt.Errorf("line %v: %w", n, err)
 			}
