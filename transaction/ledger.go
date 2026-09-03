@@ -33,6 +33,8 @@ import (
 const (
 	Ledger = "lent" // The name of the Ledger journal entry format.
 
+	LedgerSpaces = " \t" // A string of the space runes used by Ledger.
+
 	/*
 		The lines used to mark Ledger block comments (see [Commenting on your Journal] in the Ledger 3 manual).
 
@@ -93,12 +95,12 @@ For example, file LedgerAccountsWithJournals.xml contains three asset account na
 	  <Account>Assets:Savings</Account>
 	</Accounts>
 */
-func LoadLedgerAccountNames(fileName string) ([]string, error) {
+func LoadLedgerAccountNames(name string) ([]string, error) {
 	var as struct {
 		Accounts []string `xml:"Account"`
 	}
 
-	bs, err := os.ReadFile(fileName)
+	bs, err := os.ReadFile(name)
 	if err != nil {
 		return as.Accounts, fmt.Errorf("LoadLedgerAccountNames: %w", err)
 	}
@@ -144,10 +146,11 @@ var errCurrency = errors.New("expect currency symbol or word")
 
 // IsLedgerSpace reports whether the rune is a space in Ledger.
 func isLedgerSpace(r rune) bool {
-	switch r {
-	case ' ', '\t': // The space runes in Ledger 3, which are a subset of those in Go (see [unicode.IsSpace]).
-		return true
-	default:
-		return false
+	for _, s := range LedgerSpaces {
+		if s == r {
+			return true
+		}
 	}
+
+	return false
 }

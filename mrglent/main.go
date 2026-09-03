@@ -104,6 +104,8 @@ see "Transactions and Comments" and "Commenting on your journal" in the [Ledger 
 [Ledger 3 manual]: https://ledger-cli.org/doc/ledger3.html
 */
 func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
+	const dateSeps = aft.LedgerSpaces + "\n"
+
 	var (
 		inBlockComment, inMirrorEntry bool
 		e                             entry
@@ -125,10 +127,10 @@ func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
 				es = append(es, e)
 			}
 
-			i := strings.IndexAny(line, " \t\n")
+			i := strings.IndexAny(line, dateSeps)
 			/*
 				Line starts with a decimal digit and ends with newline
-				so the index of the rune following the date cannot be less than one.
+				so the index of the rune after the date cannot be less than one.
 			*/
 
 			d, err := aft.ParseDate2(line[0:i], dateLayout)
