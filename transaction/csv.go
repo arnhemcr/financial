@@ -59,7 +59,7 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 		return fmt.Errorf("ParseCSV: %w not %q", errCurrency, t.Currency)
 	}
 
-	t.Date, err = ParseDate(fields[f.DateI], f.DateLayout)
+	t.Date, err = ParseDate2(fields[f.DateI], f.DateLayout)
 	if err != nil {
 		return fmt.Errorf("ParseCSV: %w", err)
 	}
