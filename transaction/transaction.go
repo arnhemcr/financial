@@ -107,15 +107,19 @@ func (t Transaction) Validate() error {
 		return fmt.Errorf("Validate: %w not %q", errOtherAccount, t.OtherAccount)
 	}
 
-	switch t.ThisAccount {
-	case "", DefaultOtherAccount:
+	if t.ThisAccount == "" || t.ThisAccount == DefaultOtherAccount {
 		return fmt.Errorf("Validate: %w not %q", errThisAccount, t.ThisAccount)
-	default:
-		return nil
 	}
+
+	if t.ThisAccount == t.OtherAccount {
+		return fmt.Errorf("Validate: %w not %q", errAccounts, t.ThisAccount)
+	}
+
+	return nil
 }
 
 var (
+	errAccounts     = errors.New("expect this and other account to be different")
 	errMemo         = errors.New("expect memo string")
 	errOtherAccount = errors.New("expect other account string")
 	errThisAccount  = errors.New("expect this account string")

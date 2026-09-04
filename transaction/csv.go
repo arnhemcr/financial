@@ -83,6 +83,10 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 		return fmt.Errorf("ParseCSV: %w not %q", errThisAccount, t.ThisAccount)
 	}
 
+	if t.ThisAccount == t.OtherAccount {
+		return fmt.Errorf("ParseCSV: %w not both %q", errAccounts, t.ThisAccount)
+	}
+
 	return nil
 }
 
