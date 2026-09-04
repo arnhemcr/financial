@@ -33,7 +33,7 @@ import (
 const (
 	Ledger = "lent" // The name of the Ledger journal entry format.
 
-	LedgerSpaces = " \t" // A string of the space runes used by Ledger.
+	LedgerSpaces = " \t" // A string of space runes in Ledger.
 
 	/*
 		The lines used to mark Ledger block comments (see [Commenting on your Journal] in the Ledger 3 manual).

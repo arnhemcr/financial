@@ -20,12 +20,11 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Package transaction represents financial transactions as instances of type Transaction.
+Package transaction represents financial transactions.
 It offers:
-  - parsing a transaction from a [comma-separated values (CSV)] record;
-    an instance of type CSVRecordFormat configures the parser for the record format
-  - parsing the lines of a [Ledger] journal entry and its date
-  - formating a transaction to either this module's CSV record (mcsv) or a Ledger journal entry
+  - parsing an instance of type Transaction from a [comma-separated values (CSV)] record;
+    the parser is configured by an instance of type CSVRecordFormat
+  - formatting a Transaction to either this module's CSV record (mcsv) or a [Ledger] journal entry
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
@@ -42,7 +41,7 @@ A Transaction represents a financial transaction:
 the transfer of an amount of currency from one account to another on a date.
 It is described by a memo and code also called the description and transaction type.
 A transaction belongs to an account called this account.
-Optional fields may have the value empty string, while the other required fields must have non-zero values.
+Required fields must have non-zero values; optional fields may be empty string.
 */
 type Transaction struct {
 	// The amount is represented as a string and a floating-point number.
@@ -112,7 +111,7 @@ func (t Transaction) Validate() error {
 	}
 
 	if t.ThisAccount == t.OtherAccount {
-		return fmt.Errorf("Validate: %w not %q", errAccounts, t.ThisAccount)
+		return fmt.Errorf("Validate: %w not both %q", errAccounts, t.ThisAccount)
 	}
 
 	return nil
