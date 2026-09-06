@@ -23,10 +23,10 @@ If not, see <https://www.gnu.org/licenses/>.
 Mrglent merges financial transactions in [Ledger] entry (lent) format from multiple journals.
 
 It:
- - reads a concatenation of Ledger journals from standard input
- - extracts dated entries and skips other content
- - skips entries between "# mirror entry" and "# end mirror entry" comments
- - writes the remaining entries to standard output ordered by date ascending
+  - reads a concatenation of Ledger journals from standard input
+  - extracts dated entries and discards other content
+  - discards entries between "# mirror entry" and "# end mirror entry" comments
+  - writes the remaining entries to standard output ordered by date ascending
 
 Usage:
 
@@ -39,7 +39,7 @@ The flag is:
 
 See also [this module's README].
 
-[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software) 
+[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
 [this module's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
@@ -216,8 +216,8 @@ Mrglent merges financial transactions in Ledger entry (lent) format from multipl
 
 It:
  - reads a concatenation of Ledger journals from standard input
- - extracts dated entries and skips other content
- - skips entries between "# mirror entry" and "# end mirror entry" comments
+ - extracts dated entries and discards other content
+ - discards entries between "# mirror entry" and "# end mirror entry" comments
  - writes the remaining entries to standard output ordered by date ascending
 
 Usage:

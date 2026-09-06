@@ -20,8 +20,8 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-CSV2trn reformats financial transactions from [CSV] records in an account statement
-to other formats including [Ledger] journal entries (lent).
+CSV2trn translates financial transactions from [CSV] records in an account statement
+to formats including [Ledger] journal entries (lent).
 
 It:
   - reads the statement from standard input
@@ -194,7 +194,7 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-CSV2trn reformats financial transactions from CSV records in an account statement 
+CSV2trn translates financial transactions from CSV records in an account statement
 to other formats including Ledger journal entries (lent).
 
 It:

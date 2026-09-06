@@ -1,113 +1,114 @@
 # Arnhemcr/financial
 
-This [Go] module offers [filter] programs to:
- * help translate financial transactions from a [comma-separated values (CSV)] statement
-   into journal entries for the [Ledger] command-line accounting system
- * merge Ledger journals into a general journal for reporting and analysis
+This [Go] module offers three [filter] programs to:
+* help translate financial transactions from [comma-separated values (CSV)] records in an account statement
+  to journal entries for the [Ledger] command-line accounting system
+* merge multiple Ledger journals into one general journal for reporting and analysis
 
-Its only dependency is the [Go standard library].
+A financial transaction is the transfer of an amount of currency from one account to another on a date.
+It is described by a memo and code, also called the description and transaction type.
+A statement lists transactions on an account made over a period of time.
+Each transaction has two accounts: this account, the one which the transaction and its statement belong to, and the other account.
 
-# Example
+This module supports the following layouts for the details of transactions: 
+* Amount: decimal number with optional sign e.g. "1234.56", "-98.765" "+1234".
+  Decimal separators other than '.', thousands separators and amounts including currencies are not supported.
+* Date: YYYY-MM-DD also known as Go time.DateOnly and [ISO 8601 extended date].
+  Program `csv2trn` supports input CSV records with other date layouts.
 
-An individual has two accounts: one with National Bank (NB) and the other with Local Credit Union (LCU).
-These institutions provide CSV statements with different sets of transactions details and record formats.
-This example creates a general journal from the statements of both accounts.
+This module's only dependency is the standard library in the [Go installation].
+The examples depend a [Ledger installation], [pipelines], [redirection] of output to a file. 
+They also use the stream editor `sed` but other programs that can match text strings and substitute one string for another could be used instead.
 
-## Dependencies
+## Program `csv2trn`
 
-* a [Go installation]
-* a [Ledger installation]
-* the stream editor [sed]; other programs that match text strings and substitute one string for another could be used instead
-* the ability to connect programs together in a pipeline and redirect its output to a file
+This program translates financial transactions from CSV records in an account statement to formats including Ledger journal entries.
+Transactions are output in date order ascending.  
 
-## Install programs
+In the `csv2trn` directory, build and install the program with `go install`. 
+Then verify the program by getting its help text with `csv2trn -?`.
 
-Install this module's program csv2trn from its directory with `go install`.
-Validate by viewing its help text with `csv2trn -h`.
-Then install and validate programs mcsv2lent and mrglent.
-
-## Translate CSV statements into Ledger journals
-
-In the example directory, translate the statements into journals with:
+In the `example` directory, translate a National Bank statement with:
 ```
-# Initialise both journals with opening balances.
+cat NB.csv | csv2trn -f NB.xml -o lent
+```
+The input CSV record format is configured in the XML file, while the output format is set to Ledger journal entries (`lent`).
+
+Now translate a Local Credit Union statement:
+```
+cat LCU.csv | csv2trn -f LCU.xml -o lent -t Assets:Emergency 
+```
+In contrast to the bank's CSV records, those from the credit union do not have this or other account, and they are in reverse order.
+The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`, and the entries are output in date order ascending.
+
+This module's two remaining programs merge multiple Ledger journals into one general journal.
+Those who have just one account and one Ledger journal can stop reading here.
+
+## Accounts, journals and mirror entries
+
+The bank and credit union accounts above belong to the same person.
+To get a complete picture of their finances,
+the journals for those accounts are merged into one general journal.
+
+Transactions between accounts with journals have two entries: a debit in one journal mirrored by a credit in the other.
+One of those entries must be discarded during merging so, in the general journal, the transaction appears once not twice.
+
+## Program `mcsv2lent`
+
+This program translates financial transactions from this module's CSV records (`mcsv`) to Ledger journal entries (`lent`).
+It also encloses credit mirror entries with comments.
+
+In the `mcsv2lent` directory, build, install and verify the program.
+
+In the `example` directory, create Ledger journals from the bank and credit union statements with:
+```
+# Initialise the journals with opening balances.
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
 
-# Translate transactions from records in CSV statements to entries in Ledger journals.
-cat NB.csv | csv2trn -f NB.xml -c GBP | sed -f accounts.sed | \
+# Add transactions from the bank and credit union statements to the journals.
+cat NB.csv | csv2trn -f NB.xml -t Assets:Current -c GBP | sed -f accounts.sed | \
 	mcsv2lent -f journalAccounts.xml >>NB.journal
 cat LCU.csv | csv2trn -f LCU.xml -t Assets:Emergency -c GBP | sed -f accounts.sed | \
 	mcsv2lent -f journalAccounts.xml >>LCU.journal
 ```
+This time, `csv2trn` outputs transactions in its default format: this module's CSV records (`mcsv`).
+The stream editor `sed` substitutes Ledger account names for account numbers and for `Imbalance` by matching the memo.
+Then `mcsv2lent` translates this module's CSV records to Ledger journal entries (`lent`).
+It also encloses the credit entry of each transaction between accounts with journals using mirror entry comments (see the mirror entry in `LCU.journal`).
+The names of journalled accounts are listed in the XML file.
 
-Each pipeline loads a CSV statement with cat, processes its transactions then append entries to its journal.
-A transaction is the transfer of an amount of currency between accounts on a particular day.
-It is described by a memo and code, also called the description and transaction type.
-A statement and its records belong to an account, which in a transaction is called this account.
+Check the balance on each account according to its journal with:
+```
+ledger -f NB.journal register Current
+ledger -f LCU.journal register Emergency
+```
+The bank and credit union account balances should be 53.86 and 42.42 GBP respectively.
 
-Program csv2trn reads the statement line by line, parses transactions from CSV records,
-following the input format in XML, and warns about lines that cannot be parsed.
-LCU statements do not provide this account, so it is set to its Ledger name Assets:Emergency.
-Neither NB nor LCU provide the currency for transactions, so it is set to GBP.
-If other account is not provided it defaults to Imbalance.
-The program writes transactions in this module's CSV record format (mcsv) ordered by date ascending.
+## Program `mrglent`
 
-The stream editor sed is configured to substitute Ledger account names 
-for account numbers and for Imbalance by matching the transaction's memo.
+This program merges financial transactions in Ledger entry (`lent`) format from multiple journals.
+It also discards entries enclosed with mirror comments.
+Entries are output in date order ascending.
 
-This module has specific layouts for some transaction details:
+In the `mrglent` directory, build, install and verify the program.
 
-* Amount: decimal number with optional sign e.g. "1234.56", "-98.765" "+1234".
-  This module does not support amounts containing decimal separators other than '.', thousands separators or currencies.
-* Date: YYYY-MM-DD also known as Go time.DateOnly and [ISO 8601 extended date].
-  Program csv2trn can be configured to read other date layouts through its input record format in XML.
-
-## Mark mirror entries in Ledger journals
-
-Transfers between accounts with journals have two entries: a debit in one mirrored by a credit in the other.
-When those merging journals into a general journal, one of these entries must be discarded so the transfer happens once not twice.
-
-Returning to the example above, program mcsv2lent reads transactions in mcsv format then writes them in Ledger entry format (lent).
-For transfers between accounts with journals, whose Ledger account names are listed in XML, the credit entry is marked with "mirror entry" comments.
-
-Use Ledger to validate the LCU journal with `ledger -f LCU.journal register Assets:Emergency`.
-There are three entries with a current balance of 42.42 GBP.
-Validate the "To emergency fund" entry in that journal is marked as a mirror with `cat LCU.journal`.
-
-## Merge Ledger journals into a general journal
-
-Merge the journals into a general journal with:
+In the `example` directory, merge the bank and credit union journals into a general journal with:
 ```
 cat NB.journal LCU.journal | mrglent >general.journal
 ```
-Program mrglent reads the journals and writes entries ordered by date ascending.
-All other journal content is discarded including mirror entries, automatic transactions and command directives as well as block and global comments.
 
-Validate the general journal with `ledger -f general.journal register Assets:Emergency` which has the same entries and balance as above.
-Then validate the accounts and their balances with `ledger -f general.journal balance`:
+Check the balances on both accounts according to the general journal with:
 ```
- 96.28 GBP  Assets
- 53.86 GBP    Current
- 42.42 GBP    Emergency
--37.79 GBP  Equity:OpeningBalances
- 32.63 GBP  Expenses
- 20.00 GBP    Cash
- 12.63 GBP    Rates
-  4.38 GBP  Imbalance
--95.50 GBP  Income
- -0.13 GBP    NetInterest
--95.37 GBP    Salary
-----------
-         0
+ledger -f general.journal balance
 ```
+The bank and credit account balances should again be 53.86 and 42.42 GBP respectively.
 
 [comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
 [filter]: https://en.wikipedia.org/wiki/Filter_(software)
 [Go]: https://go.dev
 [Go installation]: https://go.dev/doc/install
-[Go standard library]: https://pkg.go.dev/std
 [ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
-[Ledger]: https://ledger-cli.org
 [Ledger installation]: https://ledger-cli.org/download.html
-[sed]: https://www.gnu.org/software/sed/manual/sed.html
+[pipelines]: https://en.wikipedia.org/wiki/Pipeline_(software)
+[redirection]: https://en.wikipedia.org/wiki/Redirection_(computing)

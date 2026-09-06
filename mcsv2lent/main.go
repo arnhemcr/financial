@@ -20,14 +20,14 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-MCSV2lent reformats financial transactions from this module's [CSV] records (mcsv) to [Ledger] journal entries (lent).
+MCSV2lent translates financial transactions from this module's [CSV] records (mcsv) to [Ledger] journal entries (lent).
 
 It:
- - reads transactions in this module's CSV record format from standard input
- - reformats transactions as Ledger journal entries
- - encloses the entry for a credit transaction between accounts with journals 
-   in "# mirror entry" and "# end mirror entry" comments
- - writes entries to standard output
+  - reads transactions in this module's CSV record format from standard input
+  - reformats transactions as Ledger journal entries
+  - encloses the entry for a credit transaction between accounts with journals
+    in "# mirror entry" and "# end mirror entry" comments
+  - writes entries to standard output
 
 Usage:
 
@@ -127,7 +127,7 @@ func parseFlags() (fileName string) {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-MCSV2lent reformats financial transactions from this module's CSV records (mcsv) to Ledger journal entries (lent).
+MCSV2lent translates financial transactions from this module's CSV records (mcsv) to Ledger journal entries (lent).
 
 It:
  - reads transactions in this module's CSV record format from standard input
