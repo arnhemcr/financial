@@ -20,39 +20,14 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-CSV2trn [filters] financial transactions from [comma-separated values (CSV)] records
-in an account statement to a selected format.
+CSV2trn reformats financial transactions from [CSV] records in an account statement
+to other formats including [Ledger] journal entries (lent).
 
-A transaction is the transfer of an amount of currency between accounts on a particular day.
-It is described by a memo and code, also called the description and transaction type.
-A statement and its records belong to an account, which is called this account in transactions from those records.
-
-CSV2trn reads a statement from standard input.
-It parses each line as a transaction CSV record following an input format
-and warns about lines that cannot be parsed to standard error.
-The input format defaults to this module's CSV record (mcsv), but it is usually loaded from an XML file.
-In XML, the mcsv format is:
-
-	<CSVRecordFormat>
-	    <NFields>7</NFields><!-- The number of fields in the record. -->
-
-	    <!-- The index of each field: 1..NFields or zero if it is not provided. -->
-	    <DateI>1</DateI>
-	        <DateLayout>2006-01-02</DateLayout><!-- The default Go date layout time.DateOnly. -->
-	    <ThisAccountI>2</ThisAccountI>
-	    <OtherAccountI>3</OtherAccountI>
-	    <CodeI>4</CodeI>
-	    <MemoI>5</MemoI>
-	    <AmountI>6</AmountI>
-	        <CreditI>0</CreditI>
-	        <DebitI>0</DebitI>
-	    <CurrencyI>7</CurrencyI>
-	</CSVRecordFormat>
-
-If the other account field is not provided then its default value is "Imbalance".
-
-CSV2trn orders transactions by date ascending and writes them to standard output in the selected format:
-[Ledger] journal entries (lent) or mcsv.
+It:
+  - reads the statement from standard input
+  - parses each CSV record as transaction following the input CSV record format
+    (default this module's CSV records (mcsv))
+  - writes transactions to standard output in the other format ordered by date ascending
 
 Usage:
 
@@ -64,18 +39,16 @@ The flags are:
 		currency symbol or word e.g. "$" or "GBP"; overrides currency field from input
 	-f string
 	 	name of file containing input CSV record format in XML
-	-h	write this help text then exit
 	-o string
-	  	output format name: Ledger journal entry "lent" or "mcsv" (default "mcsv")
+	  	output format name: "lent" or "mcsv" (default "mcsv")
 	-t string
 	  	the Ledger name of this account e.g. "Assets:Current"; overrides this account field from input
 
-See also [this package's README].
+See also [this module's README].
 
-[comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
-[filters]: https://en.wikipedia.org/wiki/Filter_(software)
-[Ledger]: https://ledger-cli.org
-[this package's README]: https://github.com/arnhemcr/financial/tree/main
+[CSV]: https://en.wikipedia.org/wiki/Comma-separated_values
+[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
+[this module's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
 
@@ -156,23 +129,13 @@ func parseFlags() (c config) {
 		fmt.Sprintf("currency symbol or word e.g. %q or %q; overrides currency field from input", "$", "GBP"))
 	flag.StringVar(&c.inFormatFileName, "f", "", "name of file containing input CSV record format in XML")
 	flag.StringVar(&c.outFormatName, "o", aft.ModuleCSV,
-		fmt.Sprintf("output format name: Ledger journal entry %q or %q",
-			aft.Ledger, aft.ModuleCSV))
+		fmt.Sprintf("output format name: %q or %q", aft.Ledger, aft.ModuleCSV))
 	flag.StringVar(&c.thisAccount, "t", "", fmt.Sprintf(
 		"the Ledger name of this account e.g. %q%s",
 		"Assets:Current", "; overrides this account field from input"))
 
-	var help bool
-
-	flag.BoolVar(&help, "h", false, "write this help text then exit")
-
 	flag.Usage = usage
 	flag.Parse()
-
-	if help {
-		usage()
-		os.Exit(0)
-	}
 
 	return c
 }
@@ -231,40 +194,14 @@ func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-CSV2trn filters financial transactions from comma-separated values (CSV) records in an account statement
-to a selected format.
+CSV2trn reformats financial transactions from CSV records in an account statement 
+to other formats including Ledger journal entries (lent).
 
-A transaction is the transfer of an amount of currency between accounts on a particular day.
-It is described by a memo and code, also called the description and transaction type.
-A statement and its records belong to an account, which is called this account in transactions from those records.
-
-CSV2trn reads a statement from standard input.
-It parses each line as a transaction CSV record following an input format
-and warns about lines that cannot be parsed to standard error.
-The input format defaults to this module's CSV record (mcsv), but it is usually loaded from an XML file.
-In XML, the mcsv format is:
-
-    <CSVRecordFormat>
-        <NFields>7</NFields><!-- The number of fields in the record. -->
-
-        <!-- The index of each field: 1..NFields or zero if it is not provided. -->
-        <DateI>1</DateI>
-	    <DateLayout>2006-01-02</DateLayout><!-- The default Go date layout time.DateOnly. -->
-        <ThisAccountI>2</ThisAccountI>
-        <OtherAccountI>3</OtherAccountI>
-        <CodeI>4</CodeI>
-        <MemoI>5</MemoI>
-        <AmountI>6</AmountI>
-            <CreditI>0</CreditI>
-            <DebitI>0</DebitI>
-        <CurrencyI>7</CurrencyI>
-    </CSVRecordFormat>
-
-If the other account field is not provided then its default value is
-"Imbalance".
-
-CSV2trn orders transactions by date ascending and writes them to standard output
-in the selected format: Ledger journal entries (lent) or mcsv.
+It:
+ - reads the statement from standard input
+ - parses each CSV record as transaction following the input CSV record format
+   (default this module's CSV records (mcsv))
+ - writes transactions to standard output in the other format ordered by date ascending
 
 Usage:
 

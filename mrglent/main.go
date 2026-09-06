@@ -20,33 +20,27 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-Mrglent [filters] financial transactions in [Ledger] entry format from multiple journals into a general journal.
+Mrglent merges financial transactions in [Ledger] entry (lent) format from multiple journals.
 
-Mrglent reads Ledger journals from standard input.
-It extracts dated journal entries.
-If an entry's date cannot be parsed according to the layout,
-mrglent writes a message to standard error and exits with a non-zero status.
-Dated entries marked as mirrors (between "# mirror entry" and "# end mirror entry" comment lines) are discarded.
-See this module's program mcsv2lent for more on marked entries.
-All other journal content is also discarded including automatic transactions, global comments and command directives.
-
-Mrglent orders the entries by date ascending and writes them to standard output.
+It:
+ - reads a concatenation of Ledger journals from standard input
+ - extracts dated entries and skips other content
+ - skips entries between "# mirror entry" and "# end mirror entry" comments
+ - writes the remaining entries to standard output ordered by date ascending
 
 Usage:
 
-	mrglent [flags]
+	mrglent [flag]
 
-The flags are:
+The flag is:
 
 	-d string
-	  	Go-style date layout of Ledger journal entries (default "2006-01-02")
-	-h	write this help text then exit
+	  	Go-style date layout of input entries (default "2006-01-02")
 
-See also [this package's README].
+See also [this module's README].
 
-[filters]: https://en.wikipedia.org/wiki/Filter_(software)
-[Ledger]: https://ledger-cli.org
-[this package's README]: https://github.com/arnhemcr/financial/tree/main
+[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software) 
+[this module's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
 
@@ -207,19 +201,10 @@ If the flags are invalid, this program exits with a non-zero status.
 func parseFlags() string {
 	var dateLayout string
 
-	flag.StringVar(&dateLayout, "d", time.DateOnly, "Go-style date layout of Ledger journal entries")
-
-	var help bool
-
-	flag.BoolVar(&help, "h", false, "write this help text then exit")
+	flag.StringVar(&dateLayout, "d", time.DateOnly, "Go-style date layout of input entries")
 
 	flag.Usage = usage
 	flag.Parse()
-
-	if help {
-		usage()
-		os.Exit(0)
-	}
 
 	return dateLayout
 }
@@ -227,23 +212,19 @@ func parseFlags() string {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-Mrglent filters financial transactions in Ledger entry format from multiple journals into a general journal.
+Mrglent merges financial transactions in Ledger entry (lent) format from multiple journals.
 
-Mrglent reads Ledger journals from standard input.
-It extracts dated journal entries.
-If an entry's date cannot be parsed according to the layout, 
-mrglent writes a message to standard error and exits with a non-zero status.
-Dated entries marked as mirrors (between "# mirror entry" and "# end mirror entry" comment lines) are discarded.
-See this module's program mcsv2lent for more on marked entries.
-All other journal content is also discarded including automatic transactions, global comments and command directives.
-
-Mrglent orders the entries by date ascending and writes them to standard output.
+It:
+ - reads a concatenation of Ledger journals from standard input
+ - extracts dated entries and skips other content
+ - skips entries between "# mirror entry" and "# end mirror entry" comments
+ - writes the remaining entries to standard output ordered by date ascending
 
 Usage:
 
-	mrglent [flags]
+	mrglent [flag]
 
-The flags are:
+The flag is:
 
 `)
 	flag.PrintDefaults()

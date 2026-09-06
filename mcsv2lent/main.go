@@ -20,46 +20,29 @@ If not, see <https://www.gnu.org/licenses/>.
 */
 
 /*
-MCSV2lent [filters] financial transactions
-from this module's [comma-separated values (CSV)] records to [Ledger] journal entries.
-If given a list of Ledger account names with journals,
-it also marks the credit entry of transfers between those accounts.
-Marked entries are discarded when those journals are merged by this module's program mrglent.
+MCSV2lent reformats financial transactions from this module's [CSV] records (mcsv) to [Ledger] journal entries (lent).
 
-MCSV2lent reads lines from standard input.
-It parses each line as a transaction CSV record in this module's format (mcsv).
-If a line cannot be parsed, mcsv2lent writes a message to standard error and exits with a non-zero status.
-
-The list of Ledger account names with journals is empty by default, but it can be loaded from an XML file.
-For example:
-
-	<LedgerAccountsWithJournals>
-	    <Account>Assets:Current</Account>    <!-- NB.journal -->
-	    <Account>Assets:Emergency</Account>  <!-- LCU.journal -->
-	</LedgerAccountsWithJournals>
-
-A transaction whose amount is positive and whose this and other accounts are both on the list is marked.
-
-MCSV2lent writes transactions to standard output in Ledger journal entry format.
-The entry for a marked transaction
-is preceded by Ledger global comment line "# mirror entry" and followed by "# end mirror entry".
+It:
+ - reads transactions in this module's CSV record format from standard input
+ - reformats transactions as Ledger journal entries
+ - encloses the entry for a credit transaction between accounts with journals 
+   in "# mirror entry" and "# end mirror entry" comments
+ - writes entries to standard output
 
 Usage:
 
-	mcsv2lent [flags]
+	mcsv2lent [flag]
 
-The flags are:
+The flag is:
 
 	-f string
-	      name of file containing list of Ledger accounts with journals in XML
-	-h    write this help text then exit
+	      name of file containing list of Ledger account names with journals in XML
 
-See also [this package's README].
+See also [this module's README].
 
-[comma-separated values (CSV)]: https://en.wikipedia.org/wiki/Comma-separated_values
-[filters]: https://en.wikipedia.org/wiki/Filter_(software)
+[CSV]: https://en.wikipedia.org/wiki/Comma-separated_values
 [Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
-[this package's README]: https://github.com/arnhemcr/financial/tree/main
+[this module's README]: https://github.com/arnhemcr/financial/tree/main
 */
 package main
 
@@ -133,18 +116,10 @@ ParseFlags returns the name of a file or empty string if that flag was not set.
 */
 func parseFlags() (fileName string) {
 	flag.StringVar(&fileName, "f", "",
-		"name of file containing list of Ledger accounts with journals in XML")
+		"name of file containing list of Ledger account names with journals in XML")
 
-	var help bool
-
-	flag.BoolVar(&help, "h", false, "write this help text then exit")
 	flag.Usage = usage
 	flag.Parse()
-
-	if help {
-		usage()
-		os.Exit(0)
-	}
 
 	return fileName
 }
@@ -152,35 +127,20 @@ func parseFlags() (fileName string) {
 // Usage writes the help text for this program.
 func usage() {
 	fmt.Fprint(os.Stderr, `
-MCSV2lent filters financial transactions
-from this module's comma-separated values (CSV) records to Ledger journal entries.
-If given a list of Ledger account names with journals,
-it also marks the credit entry of transfers between those accounts.
-Marked entries are discarded when those journals are merged by this module's program mrglent.
+MCSV2lent reformats financial transactions from this module's CSV records (mcsv) to Ledger journal entries (lent).
 
-MCSV2lent reads lines from standard input.
-It parses each line as a transaction CSV record in this module's format (mcsv).
-If a line cannot be parsed, mcsv2lent writes a message to standard error and exits with a non-zero status.
-
-The list of Ledger account names with journals is empty by default, but it can be loaded from an XML file.
-For example:
-
-    <LedgerAccountsWithJournals>
-        <Account>Assets:Current</Account>    <!-- NB.journal -->
-        <Account>Assets:Emergency</Account>  <!-- LCU.journal -->
-    </LedgerAccountsWithJournals>
-
-A transaction whose amount is positive and whose this and other accounts are both on the list is marked.
-
-MCSV2lent writes transactions to standard output in Ledger journal entry format.
-The entry for a marked transaction
-is preceded by Ledger global comment line "# mirror entry" and followed by "# end mirror entry".
+It:
+ - reads transactions in this module's CSV record format from standard input
+ - reformats transactions as Ledger journal entries
+ - encloses the entry for a credit transaction between accounts with journals 
+   in "# mirror entry" and "# end mirror entry" comments
+ - writes entries to standard output
 
 Usage:
 
-	mcsv2lent [flags]
+	mcsv2lent [flag]
 
-The flags are:
+The flag is:
 
 `)
 	flag.PrintDefaults()
