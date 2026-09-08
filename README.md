@@ -17,13 +17,13 @@ This module supports the following layouts for the details of transactions:
   Program `csv2trn` supports input CSV records with other date layouts.
 
 This module's only dependency is the standard library in the [Go installation].
-The examples depend a [Ledger installation], [pipelines], [redirection] of output to a file. 
+The examples depend on a [Ledger installation], [pipelines] and [redirection] of output to a file.
 They also use the stream editor `sed` but other programs that can match text strings and substitute one string for another could be used instead.
 
 ## Program `csv2trn`
 
 This program translates financial transactions from CSV records in an account statement to formats including Ledger journal entries.
-Transactions are output in date order ascending.  
+The output is ordered by date ascending.
 
 In the `csv2trn` directory, build and install the program with `go install`. 
 Then verify the program by getting its help text with `csv2trn -?`.
@@ -39,9 +39,9 @@ Now translate a Local Credit Union statement:
 cat LCU.csv | csv2trn -f LCU.xml -o lent -t Assets:Emergency 
 ```
 In contrast to the bank's CSV records, those from the credit union do not have this or other account, and they are in reverse order.
-The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`, and the entries are output in date order ascending.
+The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`, and outputs the entries ordered by date ascending.
 
-This module's two remaining programs merge multiple Ledger journals into one general journal.
+This module's two remaining programs are used when merging multiple Ledger journals into one general journal.
 Those who have just one account and one Ledger journal can stop reading here.
 
 ## Accounts, journals and mirror entries
@@ -51,7 +51,7 @@ To get a complete picture of their finances,
 the journals for those accounts are merged into one general journal.
 
 Transactions between accounts with journals have two entries: a debit in one journal mirrored by a credit in the other.
-One of those entries must be discarded during merging so, in the general journal, the transaction appears once not twice.
+One of those entries must be discarded during merging so the transaction appears in the general journal once not twice.
 
 ## Program `mcsv2lent`
 
@@ -89,7 +89,7 @@ The bank and credit union account balances should be 53.86 and 42.42 GBP respect
 
 This program merges financial transactions in Ledger entry (`lent`) format from multiple journals.
 It also discards entries enclosed with mirror comments.
-Entries are output in date order ascending.
+The output is ordered by date ascending.
 
 In the `mrglent` directory, build, install and verify the program.
 
@@ -109,6 +109,7 @@ The bank and credit account balances should again be 53.86 and 42.42 GBP respect
 [Go]: https://go.dev
 [Go installation]: https://go.dev/doc/install
 [ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
+[Ledger]: https://en.wikipedia.org/wiki/Ledger_(software)
 [Ledger installation]: https://ledger-cli.org/download.html
 [pipelines]: https://en.wikipedia.org/wiki/Pipeline_(software)
 [redirection]: https://en.wikipedia.org/wiki/Redirection_(computing)
