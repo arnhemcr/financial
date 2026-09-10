@@ -23,7 +23,7 @@ If not, see <https://www.gnu.org/licenses/>.
 MCSV2lent translates financial transactions from this module's [CSV] records (mcsv) to [Ledger] journal entries (lent).
 
 It:
-  - read CSV records from standard input
+  - reads CSV records from standard input
   - parses a transaction from each record following this module's format
   - writes transactions to standard output as Ledger journal entries
   - encloses the credit entry for a transaction between journalled accounts with comments
@@ -128,7 +128,7 @@ func usage() {
 MCSV2lent translates financial transactions from this module's CSV records (mcsv) to Ledger journal entries (lent).
 
 It:
-  - read CSV records from standard input
+  - reads CSV records from standard input
   - parses a transaction from each record following this module's format
   - writes transactions to standard output as Ledger journal entries
   - encloses the credit entry for a transaction between journalled accounts with comments
