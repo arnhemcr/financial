@@ -23,11 +23,10 @@ If not, see <https://www.gnu.org/licenses/>.
 MCSV2lent translates financial transactions from this module's [CSV] records (mcsv) to [Ledger] journal entries (lent).
 
 It:
-  - reads transactions in this module's CSV record format from standard input
-  - reformats transactions as Ledger journal entries
-  - encloses the entry for a credit transaction between accounts with journals
-    in "# mirror entry" and "# end mirror entry" comments
-  - writes entries to standard output
+  - read CSV records from standard input
+  - parses a transaction from each record following this module's format
+  - writes transactions to standard output as Ledger journal entries
+  - encloses the credit entry for a transaction between journalled accounts with comments
 
 Usage:
 
@@ -36,7 +35,7 @@ Usage:
 The flag is:
 
 	-f string
-	      name of file containing list of Ledger account names with journals in XML
+	      name of XML file listing Ledger account names with journals
 
 See also [this module's README].
 
@@ -63,28 +62,29 @@ func main() {
 	log.SetFlags(0)
 
 	var (
-		jas []string // The list of Ledger accounts with journals.
+		jas []string // The list of Ledger journalled account names.
 		err error
 	)
 
-	jafn := parseFlags() // The name of the file listing Ledger accounts with journals.
-	if jafn != "" {
-		jas, err = aft.LoadLedgerAccountNames(jafn)
+	fileName := parseFlags()
+	if fileName != "" {
+		jas, err = aft.LoadLedgerAccountNames(fileName)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	mcsv := aft.NewModuleCSVRecordFormat()
 	r := csv.NewReader(os.Stdin)
 	r.FieldsPerRecord, r.ReuseRecord = -1, true
 
-	mcsv := aft.NewModuleCSVRecordFormat()
-
 	for {
 		fs, err := r.Read()
-		if errors.Is(err, io.EOF) {
-			break
-		} else if err != nil {
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return
+			}
+
 			log.Fatal(err)
 		}
 
@@ -111,12 +111,10 @@ func main() {
 /*
 ParseFlags parses this program's configuration parsed from command line flags.
 If the flags are invalid, this program exits with a non-zero status.
-If help was requested, parseFlags writes help text then exits.
 ParseFlags returns the name of a file or empty string if that flag was not set.
 */
 func parseFlags() (fileName string) {
-	flag.StringVar(&fileName, "f", "",
-		"name of file containing list of Ledger account names with journals in XML")
+	flag.StringVar(&fileName, "f", "", "name of XML file listing Ledger account names with journals")
 
 	flag.Usage = usage
 	flag.Parse()
@@ -130,11 +128,10 @@ func usage() {
 MCSV2lent translates financial transactions from this module's CSV records (mcsv) to Ledger journal entries (lent).
 
 It:
- - reads transactions in this module's CSV record format from standard input
- - reformats transactions as Ledger journal entries
- - encloses the entry for a credit transaction between accounts with journals 
-   in "# mirror entry" and "# end mirror entry" comments
- - writes entries to standard output
+  - read CSV records from standard input
+  - parses a transaction from each record following this module's format
+  - writes transactions to standard output as Ledger journal entries
+  - encloses the credit entry for a transaction between journalled accounts with comments
 
 Usage:
 
