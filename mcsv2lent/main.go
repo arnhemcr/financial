@@ -26,7 +26,7 @@ It:
   - reads CSV records from standard input
   - parses a transaction from each record following this module's format
   - writes transactions to standard output as Ledger journal entries
-  - encloses the credit entry for a transaction between journalled accounts with comments
+  - encloses the credit entry for a transaction between journalled accounts with mirror entry comments
 
 Usage:
 
@@ -131,7 +131,7 @@ It:
   - reads CSV records from standard input
   - parses a transaction from each record following this module's format
   - writes transactions to standard output as Ledger journal entries
-  - encloses the credit entry for a transaction between journalled accounts with comments
+  - encloses the credit entry for a transaction between journalled accounts with mirror entry comments
 
 Usage:
 

@@ -10,7 +10,7 @@ It is described by a memo and code, also called the description and transaction 
 A statement lists transactions on an account made over a period of time.
 Each transaction has two accounts: this account, the one which the transaction and its statement belong to, and the other account.
 
-This module supports the following layouts for the details of transactions: 
+This module supports the following layouts for transaction details:
 * Amount: decimal number with optional sign e.g. "1234.56", "-98.765" "+1234".
   Decimal separators other than '.', thousands separators and amounts including currencies are not supported.
 * Date: YYYY-MM-DD also known as Go time.DateOnly and [ISO 8601 extended date].

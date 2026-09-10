@@ -25,7 +25,7 @@ Mrglent merges financial transactions in [Ledger] entry (lent) format from multi
 It:
   - reads a concatenation of Ledger journals from standard input
   - extracts dated entries and discards other content
-  - discards entries between "# mirror entry" and "# end mirror entry" comments
+  - discards entries enclosed with mirror entry comments
   - writes the remaining entries to standard output ordered by date ascending
 
 Usage:
@@ -61,23 +61,23 @@ func main() {
 	log.SetPrefix("mrglent: ")
 	log.SetFlags(0)
 
-	dateLayout := parseFlags()
+	dl := parseFlags()
 
-	err := aft.ValidateDateLayout(dateLayout)
+	err := aft.ValidateDateLayout(dl)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	s := bufio.NewScanner(os.Stdin)
 
-	es, err := parseEntries(s, dateLayout)
+	es, err := parseEntries(s, dl)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	etexts := sortEntries(es)
-	for _, etext := range etexts {
-		fmt.Fprint(os.Stdout, etext)
+	ets := sortEntries(es)
+	for _, e := range ets {
+		fmt.Fprint(os.Stdout, e)
 	}
 }
 
@@ -88,8 +88,8 @@ type entry struct {
 }
 
 /*
-ParseEntries reads a stream of Ledger journals and returns entries with dates.
-Other content is discarded, including dated entries marked as mirrors and Ledger block comments.
+ParseEntries reads a concatenation of Ledger journals and returns entries with dates.
+Other content is discarded including entries enclosed with mirror entry comments.
 If it fails to parse the date of an entry, parseEntries returns the error.
 
 For further information on dated entries (or transactions) and block comments,
@@ -118,6 +118,7 @@ func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
 		switch {
 		case unicode.IsDigit(rune(line[0])):
 			if e.Date != "" {
+				// Add the current entry to the list.
 				es = append(es, e)
 			}
 
@@ -132,15 +133,16 @@ func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
 				return es, fmt.Errorf("line %v: %w", n, err)
 			}
 
-			// This line starts with a date and is the first line in the next entry.
+			// This dated line starts a new entry.
 			e.Date, e.Text = d, line
 		case aft.IsLedgerIndented(line):
-			// This indented line is a continuation of the current entry.
+			// This indented line continues the current entry.
 			e.Text += line
 		}
 	}
 
 	if e.Date != "" {
+		// Add the last entry to the list.
 		es = append(es, e)
 	}
 
@@ -148,7 +150,7 @@ func parseEntries(s *bufio.Scanner, dateLayout string) (es []entry, err error) {
 }
 
 /*
-InBlock reports whether the line from a Ledger journal is in a block delimited by start and end lines.
+InBlock reports whether the line from a Ledger journal is in a block enclosed by start and end lines.
 It may also update the in block state.
 */
 func inBlock(line, start, end string, state *bool) bool {
@@ -158,7 +160,7 @@ func inBlock(line, start, end string, state *bool) bool {
 	case line == end:
 		*state = false
 	case *state:
-		// This line is in a block between start and end lines.
+		// This line is in a block enclosed by start and end lines.
 	default:
 		return false
 	}
@@ -166,8 +168,8 @@ func inBlock(line, start, end string, state *bool) bool {
 	return true
 }
 
-// Sort orders the texts of the list of Ledger journal entries by date ascending.
-func sortEntries(es []entry) (etexts []string) {
+// SortEntries returns the texts of the list of Ledger journal entries ordered by date ascending.
+func sortEntries(es []entry) (ets []string) {
 	d2ets := make(map[string][]string) // The map of entry dates to entry texts.
 	ds := []string{}                   // The list of entry dates.
 
@@ -187,20 +189,17 @@ func sortEntries(es []entry) (etexts []string) {
 	slices.Sort(ds)
 
 	for _, d := range ds {
-		etexts = append(etexts, d2ets[d]...)
+		ets = append(ets, d2ets[d]...)
 	}
 
-	return etexts
+	return ets
 }
 
 /*
 ParseFlags returns the date layout of Ledger journal entries parsed from command line flags.
-If help was requested, parseFlags writes this program's help text then exits.
 If the flags are invalid, this program exits with a non-zero status.
 */
-func parseFlags() string {
-	var dateLayout string
-
+func parseFlags() (dateLayout string) {
 	flag.StringVar(&dateLayout, "d", time.DateOnly, "Go-style date layout of input entries")
 
 	flag.Usage = usage
@@ -217,7 +216,7 @@ Mrglent merges financial transactions in Ledger entry (lent) format from multipl
 It:
  - reads a concatenation of Ledger journals from standard input
  - extracts dated entries and discards other content
- - discards entries between "# mirror entry" and "# end mirror entry" comments
+ - discards entries enclosed with mirror entry comments
  - writes the remaining entries to standard output ordered by date ascending
 
 Usage:
