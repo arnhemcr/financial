@@ -161,7 +161,7 @@ func (f CSVRecordFormat) validateIndexes() error {
 		case f.NFields < i:
 			return fmt.Errorf("%w %v to %v inclusive not %v", errIndexRange, 1, f.NFields, i)
 		case used[i]:
-			return errIndexUnique
+			return fmt.Errorf("%w not sharing %v", errIndexUnique, i)
 		default:
 			used[i] = true
 		}

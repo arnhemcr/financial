@@ -33,13 +33,15 @@ In the `example` directory, translate a National Bank statement with:
 cat NB.csv | csv2trn -f NB.xml -o lent
 ```
 The input CSV record format is configured in the XML file, while the output format is set to Ledger journal entries (`lent`).
+Note the warning about the header line that cannot be translated.
 
 Now translate a Local Credit Union statement:
 ```
 cat LCU.csv | csv2trn -f LCU.xml -o lent -t Assets:Emergency 
 ```
 In contrast to the bank's CSV records, those from the credit union do not have this or other account, and they are in reverse order.
-The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`, and outputs the entries ordered by date ascending.
+The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`.
+It outputs the entries ordered by date ascending.
 
 This module's two remaining programs are used when merging multiple Ledger journals into one general journal.
 Those who have just one account and one Ledger journal can stop reading here.
@@ -62,11 +64,11 @@ In the `mcsv2lent` directory, build, install and verify the program.
 
 In the `example` directory, create Ledger journals from the bank and credit union statements with:
 ```
-# Initialise the journals with opening balances.
+# Initialise the bank and credit union journals with opening balances.
 cp NB_0.journal NB.journal
 cp LCU_0.journal LCU.journal
 
-# Add transactions from the bank and credit union statements to the journals.
+# Add entries for transactions from the bank and credit union statements to their journals.
 cat NB.csv | csv2trn -f NB.xml -t Assets:Current -c GBP | sed -f accounts.sed | \
 	mcsv2lent -f journalAccounts.xml >>NB.journal
 cat LCU.csv | csv2trn -f LCU.xml -t Assets:Emergency -c GBP | sed -f accounts.sed | \
