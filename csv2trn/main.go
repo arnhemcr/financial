@@ -26,7 +26,7 @@ to formats including [Ledger] journal entries (lent).
 It:
   - reads the statement from standard input
   - parses a transaction from each CSV record following the input format (default this module's CSV records (mcsv))
-  - warns if a record cannot be parsed into a transaction
+  - warns if a record cannot be parsed into a transaction to standard error
   - writes transactions to standard output in the other format ordered by date ascending
 
 Usage:
@@ -198,7 +198,7 @@ to other formats including Ledger journal entries (lent).
 It:
  - reads the statement from standard input
  - parses a transaction from each CSV record following the input format (default this module's CSV records (mcsv))
- - warns if a record cannot be parsed into a transaction
+ - warns if a record cannot be parsed into a transaction to standard error
  - writes transactions to standard output in the other format ordered by date ascending
 
 Usage:

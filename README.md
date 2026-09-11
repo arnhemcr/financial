@@ -14,7 +14,7 @@ This module supports the following layouts for transaction details:
 * Amount: decimal number with optional sign e.g. "1234.56", "-98.765" "+1234".
   Decimal separators other than '.', thousands separators and amounts including currencies are not supported.
 * Date: YYYY-MM-DD also known as Go time.DateOnly and [ISO 8601 extended date].
-  Program `csv2trn` supports input CSV records with other date layouts.
+  Programs `csv2trn` and `mrglent` support other date layouts in their inputs.
 
 This module's only dependency is the standard library in the [Go installation].
 The examples depend on a [Ledger installation], [pipelines] and [redirection] of output to a file.
@@ -41,7 +41,6 @@ cat LCU.csv | csv2trn -f LCU.xml -o lent -t Assets:Emergency
 ```
 In contrast to the bank's CSV records, those from the credit union do not have this or other account, and they are in reverse order.
 The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`.
-It outputs the entries ordered by date ascending.
 
 This module's two remaining programs are used when merging multiple Ledger journals into one general journal.
 Those who have just one account and one Ledger journal can stop reading here.
