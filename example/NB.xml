@@ -12,13 +12,11 @@
   <MemoI>3</MemoI>
   <CodeI>4</CodeI>
   <OtherAccountI>12</OtherAccountI>
-  <CreditI>13</CreditI>
-  <DebitI>14</DebitI>
   <AmountI>15</AmountI>
   <!--
     The last field is currency, which is optional and not usually contained in a record.
     Its index CurrencyI defaults to zero.
     -->
 
-  <DateLayout>02-01-2006</DateLayout>
+  <DateLayout>02-01-2006</DateLayout><!-- DD/MM/YYYY -->
 </CSVRecordFormat>
