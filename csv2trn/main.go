@@ -80,7 +80,7 @@ func main() {
 
 	cfg := parseFlags()
 
-	if !aft.IsLedgerCurrency(cfg.currency) {
+	if cfg.currency != "" && !aft.IsLedgerCurrency(cfg.currency) {
 		log.Fatalf("expect currency symbol or word not %q", cfg.currency)
 	}
 
