@@ -37,15 +37,14 @@ var (
 )
 
 /*
-IsDecimal reports whether the string represents a decimal number with the following syntax:
+IsDecimal reports whether the string represents a decimal floating-point number
+without an exponent but optionally with a sign.
+Adapted from [Go's floating-point literals], the syntax is:
 
-	decimal = [ sign ] ( integer | fraction ) .
-	sign = "-" | "+" .
-	integer = digits .
-	fraction = ( [ digits ] point digits | digits point ) .
-	digits = digit { digit } .
-	digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
-	point = "."
+	signed_decimal_float_lit = [ sign ] ( decimal_digits "." [ decimal_digits ] | "." decimal_digits ) .
+	sign = ( "+" | "-" ) .
+
+[Go's floating-point literals]: https://go.dev/ref/spec#Floating-point_literals
 */
 func isDecimal(d string) bool {
 	var hasDigit, hasPoint bool
@@ -69,9 +68,10 @@ func isDecimal(d string) bool {
 /*
 ParseAmount returns the value of a transaction as both string and floating-point values.
 The value is parsed from the amount, credit or debit fields of a CSV record according to the format.
-It assumes the format is valid, which can be checked with [CSVRecordFormat.Validate].
+ParseAmount assumes the format is valid, which can be checked with [CSVRecordFormat.Validate].
+The value string must represent a decimal floating-point number without an exponent but optionally with a sign.
 The value cannot be zero.
-If parseAmount fails to parse a non-zero value, it returns the first error.
+If parseAmount fails to parse a non-zero value, it returns the error.
 */
 func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, err error) {
 	a, c, d := fields[f.AmountI], fields[f.CreditI], fields[f.DebitI]
@@ -87,7 +87,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 		vText, v, err = parsePositiveDecimal(d)
 		negative = true
 	default:
-		return "", 0, fmt.Errorf("%w not %q and %q", errCreditDebit, c, d)
+		err = fmt.Errorf("%w not %q and %q", errCreditDebit, c, d)
 	}
 
 	if err != nil {
