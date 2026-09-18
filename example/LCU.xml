@@ -1,4 +1,8 @@
-<!-- The CSV record format of the fictional Local Credit Union's financial statements. -->
+<!--
+The CSV record format of the fictional Local Credit Union's financial statements.
+
+For further details see the format for National Bank in file NB.xml.
+-->
 <CSVRecordFormat>
   <NFields>4</NFields>
 
@@ -7,5 +11,5 @@
   <DebitI>3</DebitI>
   <CreditI>4</CreditI>
 
-  <DateLayout>02/01/2006</DateLayout><!-- DD/MM/YYYY -->
+  <DateLayout>02/01/2006</DateLayout>
 </CSVRecordFormat>

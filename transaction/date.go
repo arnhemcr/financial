@@ -22,27 +22,18 @@ If not, see <https://www.gnu.org/licenses/>.
 package transaction
 
 import (
-	"errors"
 	"fmt"
 	"time"
 )
 
-var ErrDateLayout = errors.New("expect Go-style date layout")
+var ErrDateLayout = fmt.Errorf("expect layout of Go reference date 2 January 2006 e.g. %q", time.DateOnly)
 
 /*
-ParseDate2 parses a date from the string, according to the layout, and returns the date in this module's layout.
-It assumes the layout is valid, which can be checked with [ValidateDateLayout].
-This module's date layout is YYYY-MM-DD or [ISO 8601 extended date],
-which in Go is represented by string constant "2006-01-02" or [time.DateOnly].
-If it fails to parse a date, ParseDate returns the first error.
-
-[ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
+ParseDate2 parses a date from the string according to the layout and returns the date in this module's layout.
+It assumes the layout is valid (see [ValidateDateLayout]).
+If it fails to parse a date, ParseDate2 returns the error.
 */
 func ParseDate2(d, layout string) (string, error) {
-	if d == "" {
-		return "", fmt.Errorf("ParseDate2: %w not %q", errDate, d)
-	}
-
 	v, err := time.Parse(layout, d)
 	if err != nil {
 		return "", fmt.Errorf("ParseDate2: %w", err)
@@ -65,7 +56,10 @@ func ParseDate(d, layout string) (string, error) {
 
 /*
 ParseModuleDate2 parses a date from the string, according to this module's layout, and returns the date in that layout.
+This module's date layout is YYYY-MM-DD or [ISO 8601 extended date].
 If it fails to parse a date, ParseModuleDate2 returns the error.
+
+[ISO 8601 extended date]: https://en.wikipedia.org/wiki/ISO_8601#Calendar_dates
 */
 func ParseModuleDate2(d string) (string, error) {
 	return ParseDate2(d, time.DateOnly)
@@ -77,16 +71,14 @@ func ParseModuleDate(d string) (string, error) {
 }
 
 /*
-ValidateDateLayout returns nil if the date layout is valid.
-If not, ValidateDateLayout returns the first error.
+ValidateDateLayout returns nil if the string is a valid layout of the Go reference date 2 January 2006.
+If not, ValidateDateLayout returns the error.
 */
 func ValidateDateLayout(dl string) error {
-	v, err := time.Parse(dl, dl)
-	if err != nil {
-		return fmt.Errorf("ValidateDateLayout: %w", err)
-	}
+	r, _ := time.Parse(time.DateOnly, time.DateOnly)
 
-	if v.Format(time.DateOnly) != time.DateOnly {
+	v, err := time.Parse(dl, dl)
+	if err != nil || !v.Equal(r) {
 		return fmt.Errorf("ValidateDateLayout: %w not %q", ErrDateLayout, dl)
 	}
 
@@ -99,8 +91,6 @@ func IsDateLayout(layout string) bool {
 
 	return d.Format(time.DateOnly) == time.DateOnly
 }
-
-var errDate = errors.New("expect date")
 
 /*
 TrimDate assumes the text starts with a date and returns it trimmed to the length of the date layout.

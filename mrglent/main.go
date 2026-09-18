@@ -35,7 +35,7 @@ Usage:
 The flag is:
 
 	-d string
-	  	Go-style date layout of input entries (default "2006-01-02")
+		layout of Go reference date 2 January 2006 in input entries
 
 See also [this module's README].
 
@@ -200,7 +200,8 @@ ParseFlags returns the date layout of Ledger journal entries parsed from command
 If the flags are invalid, this program exits with a non-zero status.
 */
 func parseFlags() (dateLayout string) {
-	flag.StringVar(&dateLayout, "d", time.DateOnly, "Go-style date layout of input entries")
+	flag.StringVar(&dateLayout, "d", time.DateOnly,
+		"layout of Go reference date 2 January 2006 in input entries")
 
 	flag.Usage = usage
 	flag.Parse()
