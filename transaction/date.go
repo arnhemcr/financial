@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-var ErrDateLayout = fmt.Errorf("expect layout of Go reference date 2 January 2006 e.g. %q", time.DateOnly)
+var ErrDateLayout = fmt.Errorf("expect layout of Go reference date 2 January 2006 e.g. %v", time.DateOnly)
 
 /*
 ParseDate2 parses a date from the string according to the layout and returns the date in this module's layout.
@@ -55,7 +55,7 @@ func ParseDate(d, layout string) (string, error) {
 }
 
 /*
-ParseModuleDate2 parses a date from the string, according to this module's layout, and returns the date in that layout.
+ParseModuleDate2 parses a date from the string according to this module's layout and returns the date in that layout.
 This module's date layout is YYYY-MM-DD or [ISO 8601 extended date].
 If it fails to parse a date, ParseModuleDate2 returns the error.
 
@@ -75,10 +75,13 @@ ValidateDateLayout returns nil if the string is a valid layout of the Go referen
 If not, ValidateDateLayout returns the error.
 */
 func ValidateDateLayout(dl string) error {
-	r, _ := time.Parse(time.DateOnly, time.DateOnly)
-
 	v, err := time.Parse(dl, dl)
-	if err != nil || !v.Equal(r) {
+	if err != nil {
+		return fmt.Errorf("ValidateDateLayout: %w", err)
+	}
+
+	r, _ := time.Parse(time.DateOnly, time.DateOnly)
+	if !v.Equal(r) {
 		return fmt.Errorf("ValidateDateLayout: %w not %q", ErrDateLayout, dl)
 	}
 

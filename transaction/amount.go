@@ -66,12 +66,12 @@ func isDecimal(d string) bool {
 }
 
 /*
-ParseAmount returns the value of a transaction as both string and floating-point values.
-The value is parsed from the amount, credit or debit fields of a CSV record according to the format.
-ParseAmount assumes the format is valid, which can be checked with [CSVRecordFormat.Validate].
-The value string must represent a decimal floating-point number without an exponent but optionally with a sign.
-The value cannot be zero.
-If parseAmount fails to parse a non-zero value, it returns the error.
+ParseAmount returns the amount of a transaction as both string and floating-point values.
+It is parsed from the amount, credit or debit field of a CSV record according to the format.
+ParseAmount assumes the format is valid (see [CSVRecordFormat.Validate]).
+The value string must represent a decimal floating-point number with an optional sign but without an exponent.
+The amount cannot be zero.
+If parseAmount fails to parse a non-zero amount, it returns the error.
 */
 func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, err error) {
 	a, c, d := fields[f.AmountI], fields[f.CreditI], fields[f.DebitI]

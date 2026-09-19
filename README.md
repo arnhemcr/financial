@@ -14,8 +14,8 @@ This module supports the following layouts for transaction details:
 * Amount: decimal number with optional sign e.g. "1234.56", "-98.765" "+1234".
   Decimal separators other than '.', thousands separators and amounts including currencies are not supported.
 * Date: YYYY-MM-DD or [ISO 8601 extended date].
-  Go represents a date layout with an arrangment of the reference date 2 January 2006,
-  so this module's date layout is "2006-01-02" or [time.DateOnly].
+  In Go a layout is represented by an arrangement of reference date 2 January 2006,
+  so this module's date layout is "2006-01-02".
   Programs `csv2trn` and `mrglent` support other date layouts in their inputs.
 
 This module's only dependency is the standard library in the [Go installation].

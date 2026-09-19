@@ -54,12 +54,12 @@ IsLedgerCurrency reports whether the string is a currency symbol or word in Ledg
 
 [Commodities and Currencies]: https://ledger-cli.org/doc/ledger3.html#Commodities-and-Currencies
 */
-func IsLedgerCurrency(currency string) bool {
-	if currency == "" {
+func IsLedgerCurrency(c string) bool {
+	if c == "" {
 		return false
 	}
 
-	for _, r := range currency {
+	for _, r := range c {
 		switch r {
 		case '.', ',', '/', '@':
 			return false
