@@ -74,20 +74,23 @@ The amount cannot be zero.
 If parseAmount fails to parse a non-zero amount, it returns the error.
 */
 func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, err error) {
-	a, c, d := fields[f.AmountI], fields[f.CreditI], fields[f.DebitI]
-
 	var negative bool
 
-	switch {
-	case a != "":
-		vText, v, err = parseNonZeroDecimal(a)
-	case c != "" && d == "":
-		vText, v, err = parsePositiveDecimal(c)
-	case d != "" && c == "":
-		vText, v, err = parsePositiveDecimal(d)
-		negative = true
-	default:
-		err = fmt.Errorf("%w not %q and %q", errCreditDebit, c, d)
+	if f.AmountI == 0 {
+		// If field index for amount is zero then indexes for credit and debit will be non-zero.
+		c, d := fields[f.CreditI], fields[f.DebitI]
+
+		switch {
+		case c != "" && d == "":
+			vText, v, err = parsePositiveDecimal(c)
+		case d != "" && c == "":
+			vText, v, err = parsePositiveDecimal(d)
+			negative = true
+		default:
+			err = fmt.Errorf("%w not %q and %q", errCreditDebit, c, d)
+		}
+	} else {
+		vText, v, err = parseNonZeroDecimal(fields[f.AmountI])
 	}
 
 	if err != nil {
