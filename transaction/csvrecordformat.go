@@ -167,15 +167,14 @@ func (f CSVRecordFormat) validateIndexes() error {
 		}
 	}
 
-	if f.DateI == 0 {
+	switch {
+	case f.DateI == 0:
 		return errDateI
-	}
-
-	if f.MemoI == 0 {
+	case f.MemoI == 0:
 		return errMemoI
+	default:
+		return nil
 	}
-
-	return nil
 }
 
 /*
@@ -183,9 +182,12 @@ ValidateOptions returns nil if the combination of optional field indexes in this
 If not, validateOptions returns the error.
 */
 func (f CSVRecordFormat) validateOptions() error {
-	if (f.AmountI != 0 && f.CreditI == 0 && f.DebitI == 0) || (f.CreditI != 0 && f.DebitI != 0 && f.AmountI == 0) {
+	switch {
+	case f.AmountI != 0 && f.CreditI == 0 && f.DebitI == 0:
 		return nil
+	case f.CreditI != 0 && f.DebitI != 0 && f.AmountI == 0:
+		return nil
+	default:
+		return fmt.Errorf("%w not %v, or %v and %v", errAmountOption, f.AmountI, f.CreditI, f.DebitI)
 	}
-
-	return fmt.Errorf("%w not %v, or %v and %v", errAmountOption, f.AmountI, f.CreditI, f.DebitI)
 }

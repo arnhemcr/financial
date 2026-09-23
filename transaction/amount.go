@@ -77,7 +77,7 @@ func parseAmount(fields []string, f CSVRecordFormat) (vText string, v float64, e
 	var negative bool
 
 	if f.AmountI == 0 {
-		// If field index for amount is zero then indexes for credit and debit will be non-zero.
+		// The field index for amount is zero so the indexes for credit and debit will be non-zero.
 		c, d := fields[f.CreditI], fields[f.DebitI]
 
 		switch {

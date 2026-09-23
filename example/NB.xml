@@ -14,10 +14,10 @@
   <OtherAccountI>12</OtherAccountI>
   <AmountI>15</AmountI>
   <!--
-    The remaining fields are credit, debit and currency.
-    As the record has the amount field, credit and debit are not needed.
-    The currency field is not contained in these records.
-    Indexes for these fields default to zero.
+    The remaining field indexes are CreditI, DebitI and CurrencyI which default to zero.
+    Amount and credit/debit fields are mutually exclusive.
+    As AmountI is non-zero, CreditI and DebitI must be zero.
+    The records do not contain a currency field.
     -->
 
   <!-- How the Go reference date 2 January 2006 would be laid out in these records. -->
