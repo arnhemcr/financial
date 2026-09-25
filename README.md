@@ -2,8 +2,8 @@
 
 This [Go] module offers three [filter] programs to:
 * help translate financial transactions from [comma-separated values (CSV)] records in an account statement
-  to journal entries for the [Ledger] command-line accounting system
-* merge multiple Ledger journals into one general journal for reporting and analysis
+  to journal entries for the [Ledger] command-line accounting system (program `csv2trn`)
+* merge multiple Ledger journals into one general journal for reporting and analysis (programs `mcsv2lent` and `mrglent`)
 
 A financial transaction is the transfer of an amount of currency from one account to another on a date.
 It is described by a memo and code, also called the description and transaction type.
@@ -44,7 +44,8 @@ cat LCU.csv | csv2trn -f LCU.xml -o lent -t Assets:Emergency
 In contrast to the bank's CSV records, those from the credit union do not have this or other account, and they are in reverse order.
 The program sets this account to `Assets:Emergency` and other account defaults to `Imbalance`.
 
-This module's two remaining programs are used when merging multiple Ledger journals into one general journal.
+This module's two remaining programs, `mcsv2lent` and `mrglent`,
+are only needed when merging multiple Ledger journals, each for its own account, into one general journal.
 Those who have just one account and one Ledger journal can stop reading here.
 
 ## Accounts, journals and mirror entries

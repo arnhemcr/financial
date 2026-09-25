@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-var ErrDateLayout = fmt.Errorf("expect layout of Go reference date 2 January 2006 e.g. %v", time.DateOnly)
+var ErrDateLayout = fmt.Errorf("expect layout of Go reference date 2 January 2006 e.g. %q", time.DateOnly)
 
 /*
 ParseDate2 parses a date from the string according to the layout and returns the date in this module's layout.
