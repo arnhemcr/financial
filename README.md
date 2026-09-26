@@ -19,8 +19,9 @@ This module supports the following layouts for transaction details:
   Programs `csv2trn` and `mrglent` support other date layouts in their inputs.
 
 This module's only dependency is the standard library in the [Go installation].
-The examples depend on a [Ledger installation], [pipelines] and [redirection] of output to a file.
-They also use the stream editor `sed` but other programs that can match text strings and substitute one string for another could be used instead.
+The examples depend on a [Ledger installation]
+and a Unix-like command-line interpreter with [pipelines] and [redirection] of output to a file.
+The stream editor `sed` is also used although other programs that match and substitute text strings could be used instead.
 
 ## Program `csv2trn`
 

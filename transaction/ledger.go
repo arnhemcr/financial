@@ -80,7 +80,13 @@ IsLedgerIndented reports whether the line is indented with a Ledger space rune
 [Transactions and Comments]: https://ledger-cli.org/doc/ledger3.html#Transactions-and-Comments
 */
 func IsLedgerIndented(line string) bool {
-	if line == "" {
+	n := len(line)
+	
+	if n <= 1 {
+		return false
+	}
+
+	if line[n-1] != '\n' {
 		return false
 	}
 
