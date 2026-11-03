@@ -27,7 +27,7 @@ It:
   - reads the statement from standard input
   - parses a transaction from each CSV record following the input format (default this module's CSV records (mcsv))
   - warns if a record cannot be parsed into a transaction to standard error
-  - writes transactions to standard output in the other format ordered by date ascending
+  - writes transactions to standard output in the output format ordered by date ascending
 
 Usage:
 
@@ -113,7 +113,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	stringTransactions(ts, os.Stdout, cfg.outFormatName)
+	writeTransactions(ts, os.Stdout, cfg.outFormatName)
 }
 
 /*
@@ -139,7 +139,8 @@ func parseFlags() (c config) {
 /*
 ParseCSVStatement reads a CSV account statement,
 parses a transaction from each CSV record following the input format
-then returns the transactions.
+then returns the transactions ordered by date ascending.
+It assumes transactions are ordered by date either ascending or descending.
 If it fails to read the statement, parseCSVStatement returns an error.
 If it fails to parse a transaction, parseCSVStatement logs a warning then continues.
 */
@@ -167,24 +168,17 @@ func parseCSVStatement(r *csv.Reader, c config, f aft.CSVRecordFormat) (ts []aft
 		ts = append(ts, t)
 	}
 
+	n := len(ts)
+	if 2 <= n && ts[0].Date > ts[n-1].Date {
+		slices.Reverse(ts)
+	}
+
 	return ts, nil
 }
 
-/*
-StringTransactions writes the transactions in the named format.
-It assumes the transactions are in date order ascending or descending.
-If the first transaction is later than the last one,
-stringTransactions reverses the order.
-*/
-func stringTransactions(ts []aft.Transaction, w *os.File, name string) {
-	n := len(ts)
-
-	tSeq := slices.All(ts)
-	if 2 <= n && ts[0].Date > ts[n-1].Date {
-		tSeq = slices.Backward(ts)
-	}
-
-	for _, t := range tSeq {
+// WriteTransactions writes the transactions in the named format.
+func writeTransactions(ts []aft.Transaction, w *os.File, name string) {
+	for _, t := range ts {
 		fmt.Fprint(w, t.StringFormat(name))
 	}
 }
@@ -199,7 +193,7 @@ It:
  - reads the statement from standard input
  - parses a transaction from each CSV record following the input format (default this module's CSV records (mcsv))
  - warns if a record cannot be parsed into a transaction to standard error
- - writes transactions to standard output in the other format ordered by date ascending
+ - writes transactions to standard output in the output format ordered by date ascending
 
 Usage:
 
