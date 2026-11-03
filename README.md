@@ -1,7 +1,7 @@
 # Arnhemcr/financial
 
 This [Go] module offers three [filter] programs to:
-* help translate financial transactions from [comma-separated values (CSV)] records in an account statement
+* help translate financial transactions from [comma-separated values (CSV)] records, following RFC 4180, in an account statement
   to journal entries for the [Ledger] command-line accounting system (program `csv2trn`)
 * merge multiple Ledger journals into one general journal for reporting and analysis (programs `mcsv2lent` and `mrglent`)
 
