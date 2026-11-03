@@ -46,6 +46,7 @@ See also [this module's README].
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"errors"
 	"flag"
@@ -75,13 +76,18 @@ func main() {
 	}
 
 	mcsv := aft.NewModuleCSVRecordFormat()
+
 	r := csv.NewReader(os.Stdin)
 	r.FieldsPerRecord, r.ReuseRecord = -1, true
+
+	w := bufio.NewWriter(os.Stdout)
 
 	for {
 		fs, err := r.Read()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
+				_ = w.Flush()
+
 				return
 			}
 
@@ -104,7 +110,7 @@ func main() {
 			ent = aft.StartMirrorEntry + ent + aft.EndMirrorEntry
 		}
 
-		fmt.Fprint(os.Stdout, ent)
+		fmt.Fprint(w, ent)
 	}
 }
 

@@ -75,10 +75,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ets := sortEntries(es)
+	ets, w := sortEntries(es), bufio.NewWriter(os.Stdout)
+
 	for _, e := range ets {
-		fmt.Fprint(os.Stdout, e)
+		fmt.Fprint(w, e)
 	}
+
+	_ = w.Flush()
 }
 
 // An entry represents a dated Ledger journal entry.

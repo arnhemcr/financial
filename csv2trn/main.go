@@ -53,6 +53,7 @@ See also [this module's README].
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"errors"
 	"flag"
@@ -113,7 +114,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	writeTransactions(ts, os.Stdout, cfg.outFormatName)
+	if cfg.outFormatName == aft.ModuleCSV {
+		w := csv.NewWriter(os.Stdout)
+		w.UseCRLF = true
+
+		for _, t := range ts {
+			err := w.Write(t.SliceModuleCSV())
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		w.Flush()
+	} else {
+		w := bufio.NewWriter(os.Stdout)
+
+		for _, t := range ts {
+			fmt.Fprint(w, t.StringLedger())
+		}
+
+		_ = w.Flush()
+	}
 }
 
 /*
@@ -174,13 +195,6 @@ func parseCSVStatement(r *csv.Reader, c config, f aft.CSVRecordFormat) (ts []aft
 	}
 
 	return ts, nil
-}
-
-// WriteTransactions writes the transactions in the named format.
-func writeTransactions(ts []aft.Transaction, w *os.File, name string) {
-	for _, t := range ts {
-		fmt.Fprint(w, t.StringFormat(name))
-	}
 }
 
 // Usage writes the help text for this program.

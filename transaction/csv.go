@@ -90,9 +90,13 @@ func (t *Transaction) ParseCSV(fields []string, f CSVRecordFormat) (err error) {
 	return nil
 }
 
+// SliceModuleCSV returns this transaction's values in the order of fields in a record of this module's CSV format (mcsv).
+func (t Transaction) SliceModuleCSV() []string {
+	return []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
+}
+
 // StringModuleCSV returns this transaction formatted as this module's CSV record (mcsv).
 func (t Transaction) StringModuleCSV() string {
-	vs := []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
 
-	return strings.Join(vs, ",") + "\n"
+	return strings.Join(t.SliceModuleCSV(), ",") + "\n"
 }

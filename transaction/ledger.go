@@ -81,7 +81,7 @@ IsLedgerIndented reports whether the line is indented with a Ledger space rune
 */
 func IsLedgerIndented(line string) bool {
 	n := len(line)
-	
+
 	if n <= 1 {
 		return false
 	}
