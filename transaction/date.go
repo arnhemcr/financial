@@ -42,7 +42,7 @@ func ParseDate2(d, layout string) (string, error) {
 	return v.Format(time.DateOnly), nil
 }
 
-// Deprecated: call ParseDate2 instead of this function.
+// Deprecated: call ParseDate2 instead.
 func ParseDate(d, layout string) (string, error) {
 	t := trimDate(d, layout)
 
@@ -65,7 +65,7 @@ func ParseModuleDate2(d string) (string, error) {
 	return ParseDate2(d, time.DateOnly)
 }
 
-// Deprecated: call ParseModuleDate2 instead of this function.
+// Deprecated: call ParseModuleDate2 instead.
 func ParseModuleDate(d string) (string, error) {
 	return ParseDate(d, time.DateOnly)
 }

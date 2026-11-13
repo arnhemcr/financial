@@ -95,7 +95,7 @@ func (t Transaction) SliceModuleCSV() []string {
 	return []string{t.Date, t.ThisAccount, t.OtherAccount, t.Code, t.Memo, t.AmountText, t.Currency}
 }
 
-// StringModuleCSV returns this transaction formatted as this module's CSV record (mcsv).
+// Deprecated: call SliceModuleCSV instead.
 func (t Transaction) StringModuleCSV() string {
 
 	return strings.Join(t.SliceModuleCSV(), ",") + "\n"

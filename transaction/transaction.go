@@ -57,10 +57,7 @@ type Transaction struct {
 
 const DefaultOtherAccount = "Imbalance" // The default value for other account.
 
-/*
-StringFormat returns this transaction in the named format.
-If the name is not known, StringFormat returns the empty string.
-*/
+// Deprecated: this function calls StringModuleCSV which is deprecated.
 func (t Transaction) StringFormat(name string) string {
 	switch name {
 	case Ledger:
